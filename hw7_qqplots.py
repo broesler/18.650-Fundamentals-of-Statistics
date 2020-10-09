@@ -40,19 +40,21 @@ for i, (dist, label) in enumerate(zip(dists, labels)):
     # Generate data
     X = dist.rvs(N)
     X.sort()
-    Fn = X  # => Fn(i/N) == X(i)
+    Fn_inv = X  # => Fn_inv(i/N) == X(i)
 
     # Calculate normal distribution values
-    F = stats.norm(0, 1).ppf([i/N for i in range(1,N+1)])
+    F_inv = stats.norm(0, 1).ppf([i/N for i in range(1,N+1)])
 
-    ax.plot(F, F, 'k-')
-    ax.scatter(F, Fn, s=10, edgecolors='C0', c='None', zorder=99)
+    ax.plot(F_inv, F_inv, 'k-')
+    ax.scatter(F_inv, Fn_inv, s=10, edgecolors='C0', c='None', zorder=99)
 
     ax.set(title=f"QQ Plot {i}: {label}",
            xlabel='Theoretical Quantiles $\mathcal{N}(0, 1)$',
            ylabel='Empirical Quantiles',
            xlim=(-3, 3))
     ax.grid('on')
+
+# TODO plot each distribution vs a standard normal for visual comparison
 
 gs.tight_layout(fig)
 plt.show()
