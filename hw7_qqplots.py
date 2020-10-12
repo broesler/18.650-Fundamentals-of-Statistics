@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#==============================================================================
+# =============================================================================
 #     File: hw7_qqplots.py
 #  Created: 2020-10-09 14:09
 #   Author: Bernie Roesler
@@ -7,7 +7,7 @@
 """
   Description: Plot example QQ-plots of various distributions
 """
-#==============================================================================
+# =============================================================================
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -43,7 +43,7 @@ for i, (dist, label) in enumerate(zip(dists, labels)):
     Fn_inv = X  # => Fn_inv(i/N) == X(i)
 
     # Calculate normal distribution values
-    F_inv = stats.norm(0, 1).ppf([i/N for i in range(1,N+1)])
+    F_inv = stats.norm(0, 1).ppf([i/N for i in range(1, N+1)])
 
     ax.plot(F_inv, F_inv, 'k-')
     ax.scatter(F_inv, Fn_inv, s=10, edgecolors='C0', c='None', zorder=99)
@@ -59,5 +59,5 @@ for i, (dist, label) in enumerate(zip(dists, labels)):
 gs.tight_layout(fig)
 plt.show()
 
-#==============================================================================
-#==============================================================================
+# =============================================================================
+# =============================================================================
