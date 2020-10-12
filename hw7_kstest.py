@@ -244,9 +244,10 @@ X = Xdist.rvs(n)
 Y = Ydist.rvs(m)
 
 fig, ax = plot_cdfs(X, Y)
+ax.set(title=r'Empirical CDF: $X \sim \mathcal{N}(0,1)$, $Y \sim \mathcal{N}(0, 2)$')
 
 Tnm, pvalue, q_hat = ks_2samp(X, Y, alpha=0.05)
-print((Tnm, pvalue, q_hat)) 
+print(f"Tnm:     {Tnm:.4f}\nq_hat:   {q_hat:.4f}\np-value: {pvalue:.2e}") 
 
 if Tnm > q_hat:
     print(f"Reject null w.p. {100*pvalue:0.2g}%.")
