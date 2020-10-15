@@ -72,20 +72,21 @@ Sv_norm = np.sqrt(n) * Sv
 rv = stats.norm(0, 1)  
 x = np.linspace(rv.ppf(0.001), rv.ppf(1 - 0.001), 1000)
 
-fig = plt.figure(1, clear=True)
-ax = fig.add_subplot()
+fig = plt.figure(1, clear=True, figsize=(12, 6))
+gs = GridSpec(nrows=1, ncols=2)
+ax = fig.add_subplot(gs[0])
 sns.histplot(Sv_norm, stat='density', kde=True, ax=ax, label='KDE $S_n$')
 ax.plot(x, rv.pdf(x), 'k-', label=r'$\mathcal{N}(0,1)$')
-ax.legend(loc='upper left')
-
-fig = plt.figure(2, clear=True)
-ax = fig.add_subplot()
-sns.ecdfplot(Sv_norm, ax=ax, zorder=9, label=r'ECDF $S_n$')
-ax.plot(x, rv.cdf(x),
-        'k-', label=r'$\Phi(x)$')
-
 ax.set(xlabel=r'$x$')
 ax.legend(loc='upper left')
+
+ax = fig.add_subplot(gs[1])
+sns.ecdfplot(Sv_norm, ax=ax, zorder=9, label=r'ECDF $S_n$')
+ax.plot(x, rv.cdf(x), 'k-', label=r'$\Phi(x)$')
+ax.set(xlabel=r'$x$')
+ax.legend(loc='upper left')
+
+gs.tight_layout(fig)
 
 plt.show()
 # =============================================================================
