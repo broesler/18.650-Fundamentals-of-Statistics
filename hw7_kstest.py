@@ -66,7 +66,7 @@ def ks_2samp(X, Y, alpha=0.05):
     # take value s.t. M*(1-alpha) values are > Tv[q]
     Tvs = np.sort(Tv)
 
-    q_hat = Tvs[np.ceil(M*(1-alpha)).astype(int)]
+    q_hat = Tvs[np.ceil(M*(1 - alpha)).astype(int)]
     pvalue = np.sum(Tvs > Tnm) / M
 
     return Tnm, pvalue, q_hat
