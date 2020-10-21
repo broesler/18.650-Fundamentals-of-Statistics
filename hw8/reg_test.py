@@ -15,7 +15,6 @@ import numpy as np
 # import seaborn as sns
 
 import statsmodels.api as sm
-# import statsmodels.formula.api as smf
 
 from matplotlib.gridspec import GridSpec
 from scipy import stats
@@ -51,18 +50,20 @@ Y_hat   = X @ beta_hat    # estimate of original data
 Y_s_hat = X_s @ beta_hat  # prediction along the line
 eps_hat = Y - Y_hat       # residuals (estimate of the actual epsilon)
 
-xd = x - x.mean()
-yd = Y - Y.mean()
+# ----------------------------------------------------------------------------- 
+#         Compute Statistics on the Fit
+# -----------------------------------------------------------------------------
+# Centered data
+xc = x - x.mean()
+yc = Y - Y.mean()
 
 RSS = float(eps_hat.T @ eps_hat)  # == np.sum(eps_hat**2) # residual sum of squared errors
-TSS = float(yd.T @ yd)            # == np.sum((Y - Y.mean())**2)  # total sum of squares
+TSS = float(yc.T @ yc)            # == np.sum((Y - Y.mean())**2)  # total sum of squares
 R2 = 1 - RSS/TSS                  # explained variance
 
 # covariance in the data: Cov(X, Y) 
-# manually compute
-r = (xd.T @ yd / np.sqrt(xd.T @ xd * yd.T @ yd)).squeeze()
-# compute using scipy
-r_p, pval = stats.pearsonr(x.squeeze(), Y.squeeze())
+r = float(xc.T @ yc / np.sqrt(xc.T @ xc * yc.T @ yc))  # manually compute
+r_p, pval = stats.pearsonr(x.squeeze(), Y.squeeze())   # compute using scipy
 
 np.testing.assert_allclose(R2, r**2)
 np.testing.assert_allclose(R2, r_p**2)
@@ -79,25 +80,23 @@ s = qa * np.sqrt(sigma_hat2 * gamma)
 ci_b = np.c_[beta_hat - s, beta_hat + s]  # (p, 2)
 
 # Compute F-statistic
-k = p  # use all variables
+G = np.eye(beta_hat.size)      # (k, p) restriction coefficients matrix
+G[0,0] = 0                     # do not include constant term in restrictions
+lam = np.zeros_like(beta_hat)  # (k, 1) restriction values
+k = np.linalg.matrix_rank(G)
 
-# Let G = identity, lambda = 0-vector for most basic test
-G = np.eye(beta_hat.size)      # (k, p)
-lam = np.zeros_like(beta_hat)  # (k, 1)
-gb = G @ beta_hat - lam
+# Two options:
+#   1. take pseudo-inverse in calculation of Sn
+#   2. subset X, beta_hat to match dimensions of G, lambda
 
 # Most general form
-# TODO figure out where this is derived vs. F-statistic
-Sn = float((gb.T @ np.linalg.inv(G @ XTXi @ G.T) @ gb) / (k*sigma_hat2))
-
-# If G = I, lambda = 0, Sn reduces to: 
-Snp = float((Y.T @ Y_hat) / (k * sigma_hat2))
+gb = G @ beta_hat - lam
+Sn = float((gb.T @ np.linalg.pinv(G @ XTXi @ G.T) @ gb) / (k*sigma_hat2))
+f_pvalue = 1 - stats.f(k, n - p).cdf(Sn)  # one-tailed since Sn ~ chi-sq
 
 # ISLR, eqn (3.23)
 F = ((TSS - RSS) / (p - 1)) / (RSS / (n - p))  # ~ F(k-1, n-p)
-
-F_pvalue = 1 - stats.f(k - 1, n - p).cdf(F)
-f_pvalue = 1 - stats.f(k, n - p).cdf(Sn)  # one-tailed since Sn ~ chi-sq
+F_pvalue = 1 - stats.f(k, n - p).cdf(F)
 
 # Compute t-test statistics and pvalues
 Tn = (beta_hat / np.sqrt(sigma_hat2 * gamma)).squeeze()
@@ -105,21 +104,25 @@ pvalues = 2*(1 - beta_dist.cdf(np.abs(Tn)))
 
 # Prediction interval (*see* Wasserman, Theorem 13.11)
 za = stats.norm(0, 1).ppf(1 - alpha/2)
-xi_hat2 = sigma_hat2 * (1 + 1/n * np.sum((x - X_s[:, 1])**2, axis=0) / np.sum(xd**2))  # (n_s, 1)
+xi_hat2 = sigma_hat2 * (1 + 1/n * np.sum((x - X_s[:, 1])**2, axis=0) / np.sum(xc**2))  # (n_s, 1)
 Y_lo = Y_s_hat.reshape(n_s) - za * np.sqrt(xi_hat2)
 Y_hi = Y_s_hat.reshape(n_s) + za * np.sqrt(xi_hat2)
 
-# Compare vs statsmodels function
+# ----------------------------------------------------------------------------- 
+#         Compare vs statsmodels function
+# -----------------------------------------------------------------------------
 res = sm.OLS(Y, X).fit()
 # print(res.summary())
+
 np.testing.assert_allclose(beta_hat.squeeze(), res.params)
-np.testing.assert_allclose(ci_b, res.conf_int())
-# pvalues may be 0.0, so include only absolute tolerance
-np.testing.assert_allclose(pvalues, res.pvalues, atol=1e-7)
-np.testing.assert_allclose(Tn, res.tvalues)
-np.testing.assert_allclose(R2, res.rsquared)
-np.testing.assert_allclose(F, res.fvalue)
-np.testing.assert_allclose(F_pvalue, res.f_pvalue, atol=1e-7)
+np.testing.assert_allclose(ci_b,               res.conf_int())
+np.testing.assert_allclose(pvalues,            res.pvalues,    atol=1e-7)  # pvalues may be 0.0, so include only absolute tolerance
+np.testing.assert_allclose(Tn,                 res.tvalues)
+np.testing.assert_allclose(R2,                 res.rsquared)
+np.testing.assert_allclose(Sn,                 res.fvalue)
+np.testing.assert_allclose(F,                  res.fvalue)
+np.testing.assert_allclose(F_pvalue,           res.f_pvalue,   atol=1e-7)
+np.testing.assert_allclose(f_pvalue,           res.f_pvalue,   atol=1e-7)
 
 # ----------------------------------------------------------------------------- 
 #         Plots
