@@ -80,6 +80,7 @@ s = qa * np.sqrt(sigma_hat2 * gamma)
 ci_b = np.c_[beta_hat - s, beta_hat + s]  # (p, 2)
 
 # Compute F-statistic
+# Define the null hypothesis H0: G\beta = \lambda
 G = np.eye(beta_hat.size)      # (k, p) restriction coefficients matrix
 G[0,0] = 0                     # do not include constant term in restrictions
 lam = np.zeros_like(beta_hat)  # (k, 1) restriction values
@@ -95,7 +96,7 @@ Sn = float((gb.T @ np.linalg.pinv(G @ XTXi @ G.T) @ gb) / (k*sigma_hat2))
 f_pvalue = 1 - stats.f(k, n - p).cdf(Sn)  # one-tailed since Sn ~ chi-sq
 
 # ISLR, eqn (3.23)
-F = ((TSS - RSS) / (p - 1)) / (RSS / (n - p))  # ~ F(k-1, n-p)
+F = ((TSS - RSS) / (p - 1)) / (RSS / (n - p))  # ~ F(k, n-p)
 F_pvalue = 1 - stats.f(k, n - p).cdf(F)
 
 # Compute t-test statistics and pvalues
