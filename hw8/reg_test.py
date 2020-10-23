@@ -33,7 +33,8 @@ p = beta.size  # number of parameters
 # Create synthetic "true" data points
 x = stats.uniform(0, 10).rvs(size=(n, p-1))  # (n,)
 
-err_dist = stats.norm(0, 1)
+sigma_sq = 1  # variance of the error
+err_dist = stats.norm(0, sigma_sq)
 eps = err_dist.rvs(size=(n, 1))
 
 X = np.c_[np.ones_like(x), x]  # (n, p) assume deterministic
@@ -131,10 +132,13 @@ Y_hat_boots = X_s @ beta_boots  # (n_s, n_boot)
 err_bands = np.quantile(Y_hat_boots, (alpha/2, 1 - alpha/2), axis=1).T  # (n_s, p)
 
 # TODO 
-#   * log-likelihood of the data
 #   * AIC
 #   * BIC
 #   * adjusted Rsq?
+
+# log-likelihood function
+llf     = float(-n/2 * np.log(2*np.pi*sigma_sq)     - 1/(2*sigma_sq)     * (eps.T     @ eps))
+llf_hat = float(-n/2 * np.log(2*np.pi*sigma_hat_sq) - 1/(2*sigma_hat_sq) * (eps_hat.T @ eps_hat))
 
 # ----------------------------------------------------------------------------- 
 #         Compare vs statsmodels function
@@ -154,6 +158,7 @@ np.testing.assert_allclose(Sn,                 res.fvalue)
 np.testing.assert_allclose(F,                  res.fvalue)
 np.testing.assert_allclose(F_pvalue,           res.f_pvalue,   atol=1e-7)
 np.testing.assert_allclose(f_pvalue,           res.f_pvalue,   atol=1e-7)
+np.testing.assert_allclose(llf_hat,            res.llf,        atol=1e-1)
 
 # Create pandas dataframe for other plots
 # df = pd.DataFrame(np.c_[x, Y], columns=['x', 'y'])
@@ -186,7 +191,6 @@ ax.legend()
 ax.set(xlabel='$x$',
        ylabel='$y$',
        xlim=(-0.5, 10.5))
-       #aspect=1)
 
 # Plot residuals
 ax = fig.add_subplot(gs[1])
