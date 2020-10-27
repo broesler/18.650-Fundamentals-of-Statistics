@@ -19,10 +19,11 @@ import statsmodels.api as sm
 from matplotlib.gridspec import GridSpec
 from scipy import stats
 
-np.random.seed(565656)
-sns.set_style('whitegrid')
+# Set seed for reproducability
+seed = 565656
+rng = np.random.default_rng(seed=seed)
 
-rng = np.random.default_rng(seed=565656)
+sns.set_style('whitegrid')
 
 # Define true parameters
 beta = np.array([[1.0, 0.5]]).T  # (p, 1)
@@ -31,11 +32,11 @@ n = 100        # number of observations
 p = beta.size  # number of parameters
 
 # Create synthetic "true" data points
-x = stats.uniform(0, 10).rvs(size=(n, p-1))  # (n,)
+x = stats.uniform(0, 10).rvs(size=(n, p-1), random_state=seed)  # (n,)
 
 sigma_sq = 1  # variance of the error
 err_dist = stats.norm(0, sigma_sq)
-eps = err_dist.rvs(size=(n, 1))
+eps = err_dist.rvs(size=(n, 1), random_state=seed)
 
 X = np.c_[np.ones_like(x), x]  # (n, p) assume deterministic
 Y = X @ beta + eps             # (n, 1) noisy observations
@@ -54,6 +55,10 @@ beta_hat = XTXi @ X.T @ Y      # == np.linalg.pinv(X) @ Y
 Y_hat   = X @ beta_hat    # estimate of original data
 Y_s_hat = X_s @ beta_hat  # prediction along the line
 eps_hat = Y - Y_hat       # residuals (estimate of the actual epsilon)
+
+# NOTE `plt.figure(); plt.scatter(x, eps - eps_hat)` shows that difference is
+# *linear* in x, decreasing with increasing x. Appears to be independent of
+# slope sign or magnitude.
 
 # ----------------------------------------------------------------------------- 
 #         Compute Statistics on the Fit
@@ -97,7 +102,7 @@ k = np.linalg.matrix_rank(G)
 #   1. take pseudo-inverse in calculation of Sn
 #   2. subset X, beta_hat to match dimensions of G, lambda
 
-# Most general form
+# Most general form: pinv takes only invertible part of X
 gb = G @ beta_hat - lam
 Sn = float((gb.T @ np.linalg.pinv(G @ XTXi @ G.T) @ gb) / (k*sigma_hat_sq))
 f_pvalue = 1 - stats.f(k, n - p).cdf(Sn)  # one-tailed since Sn ~ chi-sq
@@ -121,7 +126,7 @@ Y_hi = Y_s_hat.squeeze() + za * np.sqrt(xi_hat2)
 def bootstrap(X, Y, n_boot=10000):
     """Bootstrap estimates of `beta_hat`."""
     n, p = X.shape
-    boot_dist = np.empty((p, n_boot))
+    boot_dist = np.zeros((p, n_boot))
     for i in range(n_boot):
         resampler = rng.integers(0, n, n, dtype=np.intp)  # intp is index dtype
         boot_dist[:, [i]] = np.linalg.pinv(X[resampler, :]) @ Y[resampler, :]
@@ -172,34 +177,31 @@ fig.set_size_inches(10, 6, forward=True)
 gs = GridSpec(1, 2)
 ax = fig.add_subplot(gs[0])
 ax.scatter(x, Y, alpha=0.5, label='data')
-ax.plot(x_s, Y_s, label=f'$y = {beta[0,0]:.4f} + {beta[1,0]:.4f}x$')
+
+ax.plot(x_s, Y_s,                 label=fr'$y = {beta[0,0]:.4f} + {beta[1,0]:.4f}x$')
 ax.plot(x_s, Y_s_hat, color='C3', label=fr'$\hat{{y}} = {beta_hat[0,0]:.4f} + {beta_hat[1,0]:.4f}x$')
 
-ax.fill_between(x_s, Y_lo, Y_hi, color='C3', alpha=0.1)  # prediction CI
+ax.fill_between(x_s, Y_lo, Y_hi, color='C3', alpha=0.1)                        # prediction CI
 ax.fill_between(x_s, err_bands[:, 0], err_bands[:, 1], color='C3', alpha=0.3)  # curve fit CI
 
-# plot seaborn code:
-# yhat = X_s @ np.linalg.pinv(X) @ Y
-# ax.scatter(x_s, yhat, marker='*')
-
-# Plot possible ranges of beta_hat parameters
-# for i in range(2):
-#     for j in range(2):
-#         ax.plot(x_s, X_s @ ci_b[[0, 1], [i, j]], 'k-')
-
-ax.legend()
-ax.set(xlabel='$x$',
+ax.legend(loc='lower right', fontsize=10)
+ax.set(title='Regression',
+       xlabel='$x$',
        ylabel='$y$',
-       xlim=(-0.5, 10.5))
+       xlim=(-0.5, 10.5),
+       aspect=1)
 
 # Plot residuals
 ax = fig.add_subplot(gs[1])
-ax.scatter(x, eps_hat, alpha=0.8)
+ax.scatter(x, eps,     alpha=0.5,             label=r'$\varepsilon$')
+ax.scatter(x, eps_hat, alpha=0.5, color='C3', label=r'$\hat{\varepsilon}$')
 ax.axhline(0, color='k', ls='--')
 ax.set(title='Residuals',
        xlabel='$x$',
        ylabel=r'$Y - X\beta$',
+       xlim=(-0.5, 10.5),
        aspect=1)
+ax.legend(fontsize=10)
 
 gs.tight_layout(fig)
 
