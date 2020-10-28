@@ -68,7 +68,7 @@ eps_hat = Y - Y_hat       # residuals (estimate of the actual epsilon)
 xc = x - x.mean()
 yc = Y - Y.mean()
 
-RSS = float(eps_hat.T @ eps_hat)  # == np.sum(eps_hat**2) # residual sum of squared errors
+RSS = float(eps_hat.T @ eps_hat)  # == np.sum(eps_hat**2)         # residual sum of squared errors
 TSS = float(yc.T @ yc)            # == np.sum((Y - Y.mean())**2)  # total sum of squares
 ESS = TSS - RSS
 Rsq = 1 - RSS/TSS                 # == ESS / TSS  # explained variance
@@ -128,12 +128,18 @@ def bootstrap(X, Y, n_boot=10000):
     """Bootstrap estimates of `beta_hat`."""
     n, p = X.shape
     boot_dist = np.zeros((p, n_boot))
+    sh2_dist = np.zeros(n_boot)  # also get calculations of sigma_hat_sq
     for i in range(n_boot):
         resampler = rng.integers(0, n, n, dtype=np.intp)  # intp is index dtype
-        boot_dist[:, [i]] = np.linalg.pinv(X[resampler, :]) @ Y[resampler, :]
-    return boot_dist
+        Ys = Y[resampler, :]
+        Xs = X[resampler, :]
+        beta_hat = np.linalg.pinv(Xs) @ Ys
+        boot_dist[:, [i]] = beta_hat
+        eps_hat = Ys - Xs @ beta_hat
+        sh2_dist[i] = float(eps_hat.T @ eps_hat) / (n - p)
+    return boot_dist, sh2_dist
 
-beta_boots = bootstrap(X, Y)    # (p,   n_boot)
+beta_boots, sh2_boots = bootstrap(X, Y)    # (p,   n_boot)
 Y_hat_boots = X_s @ beta_boots  # (n_s, n_boot)
 err_bands = np.quantile(Y_hat_boots, (alpha/2, 1 - alpha/2), axis=1).T  # (n_s, p)
 
@@ -205,6 +211,17 @@ ax.set(title='Residuals',
 ax.legend(fontsize=10)
 
 gs.tight_layout(fig)
+
+# TODO figure out mismatch
+# Plot bootstrap distribution of sigma_hat_sq
+# fig = plt.figure(2, clear=True)
+# ax = fig.add_subplot()
+# sh2_norm = sorted((n - p)*sh2_boots / sigma_sq)
+# sns.histplot(sh2_norm, ax=ax, stat='density', label=r'$\hat{\sigma}^2$')
+# ax.plot(sh2_norm, stats.chi2(n-p).pdf(sh2_norm), 'k-', label=r'$\chi^2_{n-p}$')
+# ax.set(xlabel='',
+#        ylabel='')
+# ax.legend()
 
 plt.show()
 # =============================================================================
