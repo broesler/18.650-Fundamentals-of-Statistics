@@ -34,6 +34,7 @@ p = beta.size  # number of parameters
 # Create synthetic "true" data points
 x = stats.uniform(0, 10).rvs(size=(n, p-1), random_state=seed)  # (n,)
 
+# TODO create heteroscedastic example, simplify to `sigma_sq * np.eye(n)`
 sigma_sq = 1  # variance of the error
 err_dist = stats.norm(0, sigma_sq)
 eps = err_dist.rvs(size=(n, 1), random_state=seed)
@@ -69,7 +70,8 @@ yc = Y - Y.mean()
 
 RSS = float(eps_hat.T @ eps_hat)  # == np.sum(eps_hat**2) # residual sum of squared errors
 TSS = float(yc.T @ yc)            # == np.sum((Y - Y.mean())**2)  # total sum of squares
-Rsq = 1 - RSS/TSS                  # explained variance
+ESS = TSS - RSS
+Rsq = 1 - RSS/TSS                 # == ESS / TSS  # explained variance
 
 # covariance in the data: Cov(X, Y) 
 r = float(xc.T @ yc / np.sqrt(xc.T @ xc * yc.T @ yc))  # manually compute
@@ -115,12 +117,11 @@ F_pvalue = 1 - stats.f(k, n - p).cdf(F)
 Tn = (beta_hat / np.sqrt(sigma_hat_sq * gamma)).squeeze()
 pvalues = 2*(1 - beta_dist.cdf(np.abs(Tn)))
 
-# Prediction interval (*see* Wasserman, Theorem 13.11)
+# Prediction interval (*see* Wasserman, Theorem 13.11, Exercise 13.10)
 za = stats.norm(0, 1).ppf(1 - alpha/2)
 xd_s = x - x_s
 xi_hat2 = sigma_hat_sq * (1 + 1/n * np.sum((x - x_s)**2, axis=0) / np.sum(xc**2))  # (n_s, 1)
-Y_lo = Y_s_hat.squeeze() - za * np.sqrt(xi_hat2)
-Y_hi = Y_s_hat.squeeze() + za * np.sqrt(xi_hat2)
+Yh_bands = np.c_[Y_s_hat.squeeze() - za * np.sqrt(xi_hat2), Y_s_hat.squeeze() + za * np.sqrt(xi_hat2)]
 
 # Bootstrap a confidence interval for the *function* fit
 def bootstrap(X, Y, n_boot=10000):
@@ -181,7 +182,7 @@ ax.scatter(x, Y, alpha=0.5, label='data')
 ax.plot(x_s, Y_s,                 label=fr'$y = {beta[0,0]:.4f} + {beta[1,0]:.4f}x$')
 ax.plot(x_s, Y_s_hat, color='C3', label=fr'$\hat{{y}} = {beta_hat[0,0]:.4f} + {beta_hat[1,0]:.4f}x$')
 
-ax.fill_between(x_s, Y_lo, Y_hi, color='C3', alpha=0.1)                        # prediction CI
+ax.fill_between(x_s,  Yh_bands[:, 0],  Yh_bands[:, 1], color='C3', alpha=0.1)  # prediction CI
 ax.fill_between(x_s, err_bands[:, 0], err_bands[:, 1], color='C3', alpha=0.3)  # curve fit CI
 
 ax.legend(loc='lower right', fontsize=10)
