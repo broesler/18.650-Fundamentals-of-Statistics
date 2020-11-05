@@ -25,7 +25,9 @@ rng = np.random.default_rng(seed=seed)
 
 sns.set_style('whitegrid')
 
-# Define true parameters
+# ----------------------------------------------------------------------------- 
+#         Define true parameters
+# -----------------------------------------------------------------------------
 beta = np.array([[1.0, 0.5]]).T  # (p, 1)
 
 n = 100        # number of observations
@@ -35,7 +37,7 @@ p = beta.size  # number of parameters
 x = stats.uniform(0, 10).rvs(size=(n, p-1), random_state=seed)  # (n,)
 
 # TODO create heteroscedastic example, simplify to `sigma_sq * np.eye(n)`
-sigma_sq = 1  # variance of the error
+sigma_sq = 1.0  # variance of the error
 err_dist = stats.norm(0, sigma_sq)
 eps = err_dist.rvs(size=(n, 1), random_state=seed)
 
@@ -130,7 +132,7 @@ def bootstrap(X, Y, n_boot=10000):
     boot_dist = np.zeros((p, n_boot))
     sh2_dist = np.zeros(n_boot)  # also get calculations of sigma_hat_sq
     for i in range(n_boot):
-        resampler = rng.integers(0, n, n, dtype=np.intp)  # intp is index dtype
+        resampler = rng.integers(0, n, size=n, dtype=np.intp)  # intp is index dtype
         Ys = Y[resampler, :]
         Xs = X[resampler, :]
         beta_hat = np.linalg.pinv(Xs) @ Ys
@@ -213,11 +215,15 @@ ax.legend(fontsize=10)
 gs.tight_layout(fig)
 
 # TODO figure out mismatch
-# Plot bootstrap distribution of sigma_hat_sq
+# >>> stats.chi2.fit(sh2_norm)
+# (86.09140837998865, 3.24197272474812, 0.8167616348787945)  # (df, loc, scale)
+# Should be (98, 1, 0)
+
+# # Plot bootstrap distribution of sigma_hat_sq
 # fig = plt.figure(2, clear=True)
 # ax = fig.add_subplot()
 # sh2_norm = sorted((n - p)*sh2_boots / sigma_sq)
-# sns.histplot(sh2_norm, ax=ax, stat='density', label=r'$\hat{\sigma}^2$')
+# sns.histplot(sh2_norm, stat='density', ax=ax, label=r'$\hat{\sigma}^2$')
 # ax.plot(sh2_norm, stats.chi2(n-p).pdf(sh2_norm), 'k-', label=r'$\chi^2_{n-p}$')
 # ax.set(xlabel='',
 #        ylabel='')
