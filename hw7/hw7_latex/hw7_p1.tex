@@ -1,0 +1,164 @@
+\documentclass[letterpaper, oneside]{amsart}
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[comma, compress, numbers, square]{natbib}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{amsmath}
+\usepackage{amssymb}
+% \usepackage{mathtools}
+\usepackage{enumerate}
+\usepackage{array, multirow}
+\usepackage{url}
+\usepackage[font=small, hypcap=true]{caption}                % link to top of figures and subfigures
+\usepackage[font=small, hypcap=true, list=true]{subcaption}   % use for subfigures instead of {subfigure}
+
+%-------------------------------------------------------------------------------
+%     {hyperref} package options
+%-------------------------------------------------------------------------------
+\usepackage{hyperref}
+\hypersetup{
+    linktoc=all,    % link table of contents to sections
+    colorlinks,
+    allcolors=black }
+
+%-------------------------------------------------------------------------------
+%     {listings + color} package options
+%-------------------------------------------------------------------------------
+% Define colors for code
+% \usepackage{color}
+% \definecolor{dkgreen}{rgb}{0,0.6,0}
+% \definecolor{gray}{rgb}{0.5,0.5,0.5}
+% \definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\usepackage{listings}
+% \lstset{
+%   % language = Matlab,                      % the language of the code
+%   basicstyle = \scriptsize\ttfamily,    % the size of the fonts that are used for the code
+%   numbers = left,                         % where to put the line-numbers
+%   numberstyle = \tiny\color{gray},        % the style that is used for the line-numbers
+%   stepnumber = 1,                         % the step between two line-numbers.
+%   numbersep = 10pt,                        % how far the line-numbers are from the code
+%   breaklines = true,                      % sets automatic line breaking
+%   showspaces = false,                     % show spaces adding particular underscores
+%   showstringspaces = false,               % underline spaces within strings
+%   showtabs = false,                       % show tabs within strings adding particular underscores
+%   keywordstyle = \color{blue},            % keyword style
+%   commentstyle = \color{dkgreen},         % comment style
+%   stringstyle = \color{mauve}             % string literal style
+% }
+
+% Place loose figures at actual top of page
+% \makeatletter
+%   \setlength{\@fptop}{0pt}
+% \makeatother
+
+%-------------------------------------------------------------------------------
+% NO HYPHENATION
+%-------------------------------------------------------------------------------
+\tolerance=1
+\emergencystretch=\maxdimen
+\hyphenpenalty=10000
+\hbadness=10000
+
+%==============================================================================
+% General macros
+%==============================================================================
+% \renewcommand{\L}{\left}
+% \newcommand{\R}{\right}
+\renewcommand{\(}{\left(}
+\renewcommand{\)}{\right)}
+\renewcommand{\[}{\left[}
+\renewcommand{\]}{\right]}
+\newcommand{\T}{\top} % transpose symbol
+
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\vect}[1]{\boldsymbol{\mathbf{#1}}} % use BOTH to cover all cases
+
+% Misc.
+\newcommand{\ie}{\emph{i.e.\ }}
+
+% Use for fractions with large terms
+\newcommand{\ddfrac}[2]{\frac{\displaystyle #1}{\displaystyle #2}}
+
+% Derivatives
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\ddx}[2]{\frac{\dd #1}{\dd #2}}
+\newcommand{\dx}[1]{\,\dd #1} % for inside integration
+
+% Probability helpers
+\newcommand{\N}[2]{\mathcal{N}\left( #1, #2 \right)}
+\newcommand{\U}[2]{\mathcal{U}\left(\left[ #1, #2 \right]\right)}
+\newcommand{\indep}{\perp \!\!\! \perp}  % "is independent from"
+\newcommand{\indic}[1]{\mathbbm{1}\!\left\{#1\right\}} % indicator function
+\newcommand{\iid}{i.i.d.\ }
+
+
+%%%% TITLE ----------------------------
+\title[Homework 7 -- Problem \thesection]{18.650 Fundamentals of Statistics\\{\large Homework 7}}
+\author{Bernie Roesler}
+\date{\today}
+%%%%
+
+%%%%%%% BEGIN DOCUMENT ----------------
+\begin{document}
+% \sloppy
+
+\graphicspath{{./figures/}}
+
+\maketitle
+
+\section{QQ-Plots}
+Consider the QQ-plots of five \iid random variables with the following
+distributions:
+\begin{itemize}
+\item Standard Normal, $\N{0}{1}$,
+  \item Uniform distribution, $\U{-\sqrt{3}}{\sqrt{3}}$,
+  \item Cauchy distribution $\sim g(x) = \frac{1}{\pi}\frac{2}{1+x^2}$,
+  \item Exponential distribution $\sim \operatorname{Exp}(\lambda) = \lambda
+    e^{-\lambda x}, \lambda = 1$,
+  \item Laplace distribution $\sim \operatorname{Laplace}(\lambda)
+    = \frac{\lambda}{2} e^{-\lambda x}, \lambda = \sqrt{2}$.
+\end{itemize}
+Figure \ref{fig:qqplots} shows the samples labeled with the appropriate
+distribution.
+
+% \begin{figure}[!h]
+%   \centering
+%   \includegraphics[width=0.75\textwidth]{myfilename.pdf}
+%   \caption{My caption goes here.}
+%   \label{fig:qqplots}
+% \end{figure}
+
+% % INCLUDE CODE:
+% \clearpage
+% \subsection*{Code}
+% \renewcommand{\baselinestretch}{1.0}
+% \lstinputlisting[language=matlab]{../engs250_2_1_wallshear.m}
+
+%===============================================================================
+% References:
+%===============================================================================
+% \clearpage
+% \lhead{References}
+% \bibliographystyle{apalike}
+% \bibliography{engg149_finalbib}
+
+%===============================================================================
+%   Source Code {{{
+%===============================================================================
+% \clearpage
+% \appendix   % BEGIN APPENDIX NUMBERING
+% \lhead{Roesler, Final Exam, Source Code} % clear "Problem #" header
+%
+% \renewcommand{\baselinestretch}{1.0}
+%
+% \section{Main Script for Problems 1--4} \label{app:code1}
+% \ % keep '\ 'space here to include "Source Code" appendix header
+% \lstinputlisting[language=matlab]{../engg149_final_mimo.m}
+%
+% }}}
+
+
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
