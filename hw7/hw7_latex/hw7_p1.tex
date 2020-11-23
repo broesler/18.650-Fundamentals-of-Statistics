@@ -12,6 +12,8 @@
 \usepackage{mleftright}
 \usepackage{enumerate}
 \usepackage{array, multirow}
+\usepackage[ruled]{algorithm}
+\usepackage{algpseudocode}
 \usepackage{url}
 \usepackage[font=small, hypcap=true]{caption}                % link to top of figures and subfigures
 \usepackage[font=small, hypcap=true, list=true]{subcaption}   % use for subfigures instead of {subfigure}
@@ -32,6 +34,10 @@
 % Letter subsections
 \renewcommand{\thesubsubsection}{\thesubsection(\alph{subsubsection})}
 
+% Algorithm
+% \renewcommand{\algorithmicrequire}{\textbf{Input:}}
+% \renewcommand{\algorithmicensure}{\textbf{Output:}}
+
 %-------------------------------------------------------------------------------
 %     {listings + color} package options
 %-------------------------------------------------------------------------------
@@ -43,16 +49,16 @@
 
 \usepackage{listings}
 \lstset{
-  language = Python,                      % the language of the code
-  basicstyle = \scriptsize\ttfamily,    % the size of the fonts that are used for the code
-  numbers = left,                         % where to put the line-numbers
-  numberstyle = \tiny\color{gray},        % the style that is used for the line-numbers
-  stepnumber = 1,                         % the step between two line-numbers.
-  numbersep = 8pt,                        % how far the line-numbers are from the code
-  breaklines = true,                      % sets automatic line breaking
-  keywordstyle = \color{lblue},            % keyword style
-  commentstyle = \color{gray},         % comment style
-  stringstyle = \color{mauve}             % string literal style
+  language = Python,
+  basicstyle = \scriptsize\ttfamily,
+  numbers = left,
+  numberstyle = \tiny\color{gray},
+  stepnumber = 1,
+  numbersep = 8pt,
+  breaklines = true,
+  keywordstyle = \bfseries\color{lblue},
+  commentstyle = \color{gray},
+  % stringstyle = \color{mauve}
 }
 
 % Place loose figures at actual top of page
@@ -71,15 +77,14 @@
 %==============================================================================
 % General macros
 %==============================================================================
-% \renewcommand{\L}{\left}
-% \newcommand{\R}{\right}
 \renewcommand{\(}{\mleft(}
 \renewcommand{\)}{\mright)}
 \renewcommand{\[}{\mleft[}
 \renewcommand{\]}{\mright]}
-\newcommand{\T}{\top} % transpose symbol
 
-\newcommand{\code}[1]{\texttt{#1}}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+
+\newcommand{\T}{\top} % transpose symbol
 \newcommand{\vect}[1]{\boldsymbol{\mathbf{#1}}} % use BOTH to cover all cases
 
 % Misc.
@@ -109,9 +114,9 @@
 
 \newcommand{\by}[1]{&\quad&\text{(#1)}}
 
-\newcommand{\alim}{\xrightarrow[n \to \infty]{\text{a.s.}}}
-\newcommand{\plim}{\xrightarrow[n \to \infty]{\mathbb{P}}}
-\newcommand{\dlim}{\xrightarrow[n \to \infty]{(d)}}
+\newcommand{\Alim}{\xrightarrow[n \to \infty]{\text{a.s.}}}
+\newcommand{\Plim}{\xrightarrow[n \to \infty]{\mathbb{P}}}
+\newcommand{\Dlim}{\xrightarrow[n \to \infty]{(d)}}
 
 %%%% TITLE ----------------------------
 \title[Homework 7 -- Problem \thesection]{18.650 Fundamentals of Statistics\\{\large Homework 7}}
@@ -198,7 +203,7 @@ Likewise, $f_V(t) = \U{0}{1}$.
 Let $F_n$ be the empirical cdf of $\{X_1, \dots, X_n\}$ and $G_m$ be the
 empirical cdf of $\{Y_1, \dots, Y_m\}$.
 
-\subsubsection{}
+\subsubsection{The Test Statistic}
 Let
 \begin{equation}
   T_{n,m} = \sup_{t \in \R} \left| F_n(t) - G_m(t) \right|
@@ -212,14 +217,14 @@ Let
   By definition, the cdf
   \begin{alignat}{3}
     F(t) &= \Prob{X \le t} \quad \forall t \in \R \by{$X_i$'s are \iid\!\!} \\
-           &= \E{\indic{X \le t}} \nonumber \\
-    \avg{i}{n}(\cdot) & \dlim \E{\cdot} \by{LLN} \nonumber \\
+         &= \E{\indic{X \le t}} \nonumber \\
+    \avg{i}{n}(\cdot) & \Dlim \E{\cdot} \by{LLN} \nonumber \\
     \implies F_n(t) &= \avg{i}{n} \indic{X_i \le t} \label{eq:F_n}
     \intertext{Likewise,}
     G_m(t) &= \avg{j}{m} \indic{Y_j \le t}. \label{eq:G_m}
   \end{alignat}
   \begin{equation}
-    \therefore T_{n,m} &= \sup_{t \in \R} \left| \avg{i}{n} \indic{X_i \le t} - \avg{j}{m} \indic{Y_j \le t} \right|.
+    \therefore T_{n,m} = \sup_{t \in \R} \left| \avg{i}{n} \indic{X_i \le t} - \avg{j}{m} \indic{Y_j \le t} \right|.
   \end{equation}
   The empirical cdfs~\eqref{eq:F_n}~and~\eqref{eq:G_m} can also be written
   \begin{alignat}{3}
@@ -236,15 +241,46 @@ Let
   \begin{equation}
     \begin{split}
       T_{n,m} = \max_{i=0,\dots,n} \Bigg[
-      &\max_{j=0,\dots,m} \left| \frac{i}{n} - \frac{j}{m} \right| \indic{Y_j \le X_i < Y_{j+1}}, \right. \\ 
-      \left. &\max_{k=j+1, \dots, m} \left| \frac{i}{n} - \frac{k}{m} \right| \indic{Y_k \le X_{i+1}} \Bigg]
+      &\max_{j=0,\dots,m} \left| \frac{i}{n} - \frac{j}{m} \right| \indic{Y_j \le X_i < Y_{j+1}}, \\ 
+      &\max_{k=j+1, \dots, m} \left| \frac{i}{n} - \frac{k}{m} \right| \indic{Y_k \le X_{i+1}} \Bigg]
     \end{split}
   \end{equation}
-  where the values $X_0 \coloneqq -\infty$ and $Y_0 \coloneqq -\infty$ are prepended to the otherwise finite realizations to simplify the algorithm.
+  where the value $X_0 \coloneqq -\infty$ is prepended to the otherwise finite realizations to simplify the algorithm.
 \end{proof}
 
 \clearpage
-The following subroutine computes an array of test statistics $T_v(i)$ for each value of $X_i$. The test statistic $T_{n,m}$ is the maximum of these values.
+The following algorithm calculates the KS test statistic for two given samples.
+\begin{algorithm}[!h]
+  \caption{Calculate the KS test statistic $T_{n,m}$ for two samples.}
+  \label{alg:ks_stat}
+  \begin{algorithmic}[1]
+    \Require $X, Y$ are 1-D arrays of real numbers.
+    \Ensure $0 \le T_{n,m} \le 1$.
+    \Function{Rank}{$A, k$}
+      \State {\bfseries assert} $A$ is sorted in ascending order.
+      \State\Return $\#\{i=1,\dots,\text{length}(A): k < A_i\}$
+    \EndFunction
+    \Procedure{KS2Sample}{$X, Y$}
+    \State $X_s \gets \{-\infty, \text{sort}(X)\}$
+    \State $Y_s \gets$ sort($Y$)
+    \State $n \gets$ length($X_s$)
+    \State $m \gets$ length($Y_s$)
+    \State $T_v \gets$ empty array of length $n$
+    \ForAll{$i \in \{0, \dots, n-1\}$}
+      \State $j \gets$ \Call{rank}{$Y_s, X_s^{(i)}$} + 1
+      \State $k \gets$ \Call{rank}{$\{Y_s^{(\ell)}\}_{\ell=j+1}^m, X_s^{(i+1)}$}
+      + (j+1)
+      \State $\displaystyle{T_v^{(i)} \gets 
+        \max\(\left|\frac{i}{n} - \frac{j}{m}\right|,
+              \left|\frac{i}{n} - \frac{k}{m}\right|\)}$
+    \EndFor
+    \State\Return $\displaystyle{\max_i T_v}$
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+\clearpage
+The following subroutine is an implementation of Algorithm~\ref{alg:ks_stat}. It computes an array of values $T_v(i)$ for each value of $X_i$. The test statistic $T_{n,m}$ is the maximum of these values.
 \lstinputlisting[language=python, firstline=75, lastline=124]{../hw7_kstest.py}
 
 \clearpage
@@ -256,40 +292,39 @@ An example two-sample KS-test is shown in Figure~\ref{fig:ks_test}.
   \label{fig:ks_test}
 \end{figure}
 
-\subsubsection{}
+\subsubsection{The Null Hypothesis}
 \begin{prop}
   If $H_0$ is true, then
   $$ T_{n,m} = \sup_{0 \le x \le 1} \left| \avg{i}{n} \indic{U_i \le x}
-- \avg{j}{m} \indic{V_j \le x} \right|.
+- \avg{j}{m} \indic{V_j \le x} \right|. $$
 \end{prop}
 
 \begin{proof}
   By~\eqref{eq:F_n}~and~\eqref{eq:G_m},
-  \begin{equation}
-    T_{n,m} &= \sup_{t \in \R} \left| \avg{i}{n} \indic{X_i \le t} - \avg{j}{m} \indic{Y_j \le t} \right|.
+  \begin{equation} \label{eq:Tnm_supt}
+    T_{n,m} = \sup_{t \in \R} \left| \avg{i}{n} \indic{X_i \le t} - \avg{j}{m} \indic{Y_j \le t} \right|.
   \end{equation}
   To show the proposition is true, we make a change of variable. Let
     $$ x = F(t). $$
   Then,
     $$ t \in \R \implies x \in [0, 1]. $$
-    Since $F$ and $G$ are continuous and monotonically increasing by definition,
+    Since $F$ and $G$ are continuous and monotonically increasing,
   \begin{alignat*}{3}
-    X_i &\le t \\
-    \iff F(X_i) &\le F(t) \\
-      \iff U_i &\le x \by{definition}.
+    X_i \le t &\iff F(X_i) \le F(t) \\
+              &\iff U_i \le x \by{definition}.
   \end{alignat*}
   Similarly,
   \begin{alignat*}{3}
-    Y_i &\le t \\
-    \iff G(Y_i) &\le G(t) \\
-      F(t) &= G(t) \by{under $H_0$} \\
-    \iff G(Y_i) &\le F(t) \\
-      \iff V_i &\le x \by{definition}. \qedhere
+    Y_i \le t &\iff G(Y_i) \le G(t) \\
+              &\iff G(Y_i) \le F(t) \by{under $H_0$} \\
+              &\iff V_i \le x \by{definition}.
   \end{alignat*}
+  Substitution of these expressions into~\eqref{eq:Tnm_supt} completes the
+  proof. 
 \end{proof}
 
-\subsubsection{}
-\begin{prop}
+\subsubsection{The Joint Distribution of the Samples}
+\begin{prop} \label{prop:Tnm}
   If $H_0$ is true, the joint distribution of $U_1, \dots, U_n, V_1, \dots, V_m$
   $(n+m)$ random variables is uniform on $[0, 1]$.
 \end{prop}
@@ -300,12 +335,75 @@ An example two-sample KS-test is shown in Figure~\ref{fig:ks_test}.
                      &= \Prob{F(X_1) \le t} \by{\iid\!\!} \\
                      &= \Prob{G(X_1) \le t} \by{under $H_0$} \\
                      &= \Prob{G(Y_1) \le t} \by{\iid\!\!} \\
-                     &= F(F^{-1}(t)) \\
+                     &= \Prob{V_1 \le t} \by{definition} \\
+    \intertext{These probabilities can be rearranged to find the cdfs of $U$ and $V$}
+                     &= \Prob{X_1 \le F^{-1}(t)} \\
+                     &= F(F^{-1}(t)) \by{definition of cdf} \\
                      &= t \\
-    \therefore F_U(t) &= F_V(t) = t \\
+    \therefore F_U(t) &= G_V(t) = t \\
     \implies f_{U,V}(t) &= \U{0}{1} \qedhere
   \end{alignat*}
 \end{proof}
+
+\subsubsection{The Test Statistic is Pivotal}
+Since Proposition~\ref{prop:Tnm} has been shown to be true under the null hypothesis $H_0$, and the distributions of $U_i$
+and $V_j$ have been shown to be $\U{0}{1}$ independent of the distributions of
+the underlying samples $X_i$, $Y_j$, we conclude that $T_{n,m}$ is
+\emph{pivotal}, \ie it does not itself depend on the unknown distributions of
+the samples.
+
+\clearpage
+\subsubsection{Quantiles of the Test Statistic}
+Let $\alpha \in (0, 1)$ and $q_\alpha$ be the $(1 - \alpha)$-quantile of the
+distribution of $T_{n,m}$ under $H_0$. The quantile $q_\alpha$ is given by
+\begin{align}
+  q_\alpha &= F^{-1}(1-\alpha) \\
+           &= \inf\{x \colon F(x) \ge 1 - \alpha\}, \quad 0 \le 1 - \alpha \le
+           1 \\
+           \implies q_\alpha \approx \hat{q}_\alpha &= \min_i \left\{ T_{n,m}^{(i)} \colon \tfrac{i}{M} \ge 1 - \alpha \right\}
+\end{align}
+where $M \in \mathbb{N}$ is large, and $T_{n,m}^{(i)}$ is the $i^\text{th}$
+value in a sorted sample of $M$ test statistics. Thus, $q_\alpha$ can be approximated by choosing $i = \ceil{M\alpha}$. An algorithm to approximate $q_\alpha$
+given $\alpha$ is as follows.
+
+\begin{algorithm}[!h]
+  \caption{Approximate $q_\alpha$, the $(1 - \alpha)$-quantile of the
+distribution of $T_{n,m}$ under $H_0$.}
+  \label{alg:ks_q}
+  \begin{algorithmic}
+    \Require $X, Y$ are 1-D arrays of real numbers. $M \in \mathbb{N}$. $\alpha
+    \in (0, 1)$.
+    \Ensure $q_\alpha \in [0, 1]$.
+    \Procedure{KSQuantile}{$X, Y, M, \alpha$}
+      \State $n \gets$ length of $X$
+      \State $m \gets$ length of $Y$
+      \State $T_v \gets$ empty array of length $n$
+      \ForAll{$i \in \{0,\dots,M\}$}
+        \State $X_s \gets$ sample of size $n$ from $\N{0}{1}$.
+        \State $Y_s \gets$ sample of size $m$ from $\N{0}{1}$.
+        \State $T_v^{(i)} \gets$ \Call{KS2Sample}{$X_s, Y_s$}
+      \EndFor
+      \State $T_{vs} \gets$ \Call{sort}{$T_v$}
+      \State $j \gets \ceil*{M\alpha}$
+      \State \Return $T_{vs}^{(j)}$
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+\subsubsection{The Hypothesis Test}
+Given the aproximation for $\hat{q}_\alpha$ for $q_\alpha$ from
+Algorithm~\ref{alg:ks_q}, we define a test with non-asymptotic level $\alpha$
+for $H_0$ vs.\ $H_1$:
+\begin{equation}
+  \delta_\alpha = \indic{T_{n,m} > \hat{q}_\alpha^{(n, M)}}
+\end{equation}
+where $T_{n,m}$ is found by Algorithm~\ref{alg:ks_stat}. The p-value for this
+test is
+\begin{align}
+  \text{p-value} &\coloneqq \Prob{Z \ge T_{n,m}} \\
+  &\approx \frac{\#\{j = 1, \dots, M \colon T_{n,m}^{(j)} \ge T_{n,m}\}}{M}
+\end{align}
+where $Z$ is a random variable distributed as $T_{n,m}$.
 
 % % INCLUDE CODE:
 % \clearpage
