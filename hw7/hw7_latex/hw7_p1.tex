@@ -28,6 +28,8 @@
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{prop}{Proposition}[section]
 
+\numberwithin{equation}{section}
+
 % lists as 1., 2., ...
 \renewcommand{\labelenumi}{\theenumi.}
 
@@ -102,12 +104,14 @@
 \newcommand{\Prob}[1]{\mathbb{P}\[#1\]}
 \newcommand{\E}[1]{\mathbb{E}\[#1\]}
 \newcommand{\V}[1]{\mathbb{V}\[#1\]}
+\newcommand{\Var}[1]{\operatorname{Var}\(#1\)}
+\newcommand{\Cov}[1]{\operatorname{Cov}\(#1\)}
 \newcommand{\R}{\mathbb{R}}  % real numbers
 \newcommand{\N}[2]{\mathcal{N}\( #1, #2 \)}
 \newcommand{\U}[2]{\mathcal{U}\(\[ #1, #2 \]\)}
 \newcommand{\indep}{\perp \!\!\! \perp}  % "is independent from"
 \newcommand{\indic}[1]{\mathbbm{1}\!\mleft\{#1\mright\}} % indicator function
-\newcommand{\iid}{i.i.d.\ }
+\newcommand{\iid}{i.i.d.}
 
 \newcommand{\sumi}[2]{\sum_{#1=1}^{#2}}
 \newcommand{\avg}[2]{\frac{1}{#2}\sumi{#1}{#2}}
@@ -117,6 +121,14 @@
 \newcommand{\Alim}{\xrightarrow[n \to \infty]{\text{a.s.}}}
 \newcommand{\Plim}{\xrightarrow[n \to \infty]{\mathbb{P}}}
 \newcommand{\Dlim}{\xrightarrow[n \to \infty]{(d)}}
+
+\newcommand{\phat}{\hat{p}}
+\newcommand{\qhat}{\hat{q}}
+\newcommand{\rhat}{\hat{r}}
+
+\DeclareMathOperator{\Ber}{Ber}
+% \DeclareMathOperator{\Var}{Var}
+% \DeclareMathOperator{\Cov}{Cov}
 
 %%%% TITLE ----------------------------
 \title[Homework 7 -- Problem \thesection]{18.650 Fundamentals of Statistics\\{\large Homework 7}}
@@ -133,7 +145,7 @@
 \maketitle
 
 \section{QQ-Plots}
-Consider the QQ-plots of five \iid random variables with the following
+Consider the QQ-plots of five \iid\ random variables with the following
 distributions:
 \begin{enumerate}
 \item Standard Normal, $\N{0}{1}$,
@@ -150,7 +162,7 @@ distribution.
 \begin{figure}[!h]
   \centering
   \includegraphics[width=\textwidth]{qqplots.pdf}
-  \caption{QQ-plots of five \iid random variables from different distributions.}
+  \caption{QQ-plots of five \iid\ random variables from different distributions.}
   \label{fig:qqplots}
 \end{figure}
 
@@ -158,7 +170,7 @@ distribution.
 \section{Kolmogorov-Smirnov Test for Two Samples}
 Consider two independent samples $X_1, \dots, X_n$, and $Y_1, \dots, Y_m$ of
 independent, real-valued, continuous random variables, and assume that the $X_i$'s
-are \iid with some cdf $F$ and that the $Y_i$'s are \iid with some cdf $G$. Note that the
+are \iid\ with some cdf $F$ and that the $Y_i$'s are \iid\ with some cdf $G$. Note that the
 two samples may have different sizes (if $n \ne m$). We want to test whether $F = G$.
 Consider the following hypotheses:
 \begin{align*}
@@ -216,7 +228,7 @@ Let
 \begin{proof}
   By definition, the cdf
   \begin{alignat}{3}
-    F(t) &= \Prob{X \le t} \quad \forall t \in \R \by{$X_i$'s are \iid\!\!} \\
+    F(t) &= \Prob{X \le t} \quad \forall t \in \R \by{$X_i$'s are \iid} \\
          &= \E{\indic{X \le t}} \nonumber \\
     \avg{i}{n}(\cdot) & \Dlim \E{\cdot} \by{LLN} \nonumber \\
     \implies F_n(t) &= \avg{i}{n} \indic{X_i \le t} \label{eq:F_n}
@@ -281,7 +293,7 @@ The following algorithm calculates the KS test statistic for two given samples.
 
 \clearpage
 The following subroutine is an implementation of Algorithm~\ref{alg:ks_stat}. It computes an array of values $T_v(i)$ for each value of $X_i$. The test statistic $T_{n,m}$ is the maximum of these values.
-\lstinputlisting[language=python, firstline=75, lastline=124]{../hw7_kstest.py}
+\lstinputlisting[language=python, firstline=76, lastline=130]{../hw7_kstest.py}
 
 \clearpage
 An example two-sample KS-test is shown in Figure~\ref{fig:ks_test}.
@@ -332,9 +344,9 @@ An example two-sample KS-test is shown in Figure~\ref{fig:ks_test}.
 \begin{proof}
   \begin{alignat*}{3}
     \Prob{U_i \le t} &= \Prob{F(X_i) \le t} \\
-                     &= \Prob{F(X_1) \le t} \by{\iid\!\!} \\
+                     &= \Prob{F(X_1) \le t} \by{\iid} \\
                      &= \Prob{G(X_1) \le t} \by{under $H_0$} \\
-                     &= \Prob{G(Y_1) \le t} \by{\iid\!\!} \\
+                     &= \Prob{G(Y_1) \le t} \by{\iid} \\
                      &= \Prob{V_1 \le t} \by{definition} \\
     \intertext{These probabilities can be rearranged to find the cdfs of $U$ and $V$}
                      &= \Prob{X_1 \le F^{-1}(t)} \\
@@ -404,6 +416,175 @@ test is
   &\approx \frac{\#\{j = 1, \dots, M \colon T_{n,m}^{(j)} \ge T_{n,m}\}}{M}
 \end{align}
 where $Z$ is a random variable distributed as $T_{n,m}$.
+
+\clearpage
+\section{Aside: Homework 6, Problem 3 -- Test of Independence for Bernoulli Random Variables}
+Let $X, Y$ be two Bernoulli random variables, not necessarily independent, and
+let $p = \Prob{X=1}$, $q = \Prob{Y=1}$, and $r = \Prob{X=1, Y=1}$.
+
+\subsection{Condition for Independence}
+\begin{prop}
+  $X \indep Y \iff r = pq$.
+\end{prop}
+
+\begin{proof}
+  Two random variables are independent iff 
+  \begin{equation}
+    \Prob{X \cap Y} = \Prob{X}\Prob{Y} \label{eq:indep}
+    % \iff \Prob{X} = \frac{\Prob{X,Y}}{\Prob{Y}} = \Prob{X | Y}
+  \end{equation}
+  By definition,
+  \begin{align}
+    \Prob{X \cap Y} &= \Prob{X=1, Y=1} = r \\
+    \Prob{X} &= \Prob{X=1} = p \\
+    \Prob{Y} &= \Prob{Y=1} = q \\
+    \therefore r = pq &\iff \Prob{X=1,Y=1} = \Prob{X}\Prob{Y} \\
+    &\iff X \indep Y  \qedhere
+  \end{align}
+\end{proof}
+
+\subsection{Test for Independence}
+Let $(X_1, Y_1), \dots, (X_n, Y_n)$ be a sample of $n$ \iid\ copies of $(X, Y)$
+(\ie $X_i \indep X_j$ for $i \ne j$, but $X_i$ may not be independent of
+$Y_i$). Based on this sample, we want to test whether $X \indep Y$, \ie whether $r = pq$.
+
+\subsubsection{Estimators of $p, q, r$}
+Define the estimators:
+\begin{align*}
+  \phat &= \avg{i}{n} X_i, \\
+  \qhat &= \avg{i}{n} Y_i, \\
+  \rhat &= \avg{i}{n} X_i Y_i.
+\end{align*}
+
+\begin{prop}
+  These estimators $\phat$, $\qhat$, and $\rhat$ are consistent estimators of the true values $p$, $q$, and $r$.
+\end{prop}
+
+\begin{proof}
+  To show that an estimator is \emph{consistent}, we must prove that it
+  converges to the true value of the parameter in the limit as $n \to \infty$.
+  \begin{alignat*}{3}
+    \avg{i}{n} X_i &\Plim \E{X} \by{LLN} \\
+    \E{X} &= \E{\Ber(p)} \by{given} \\
+          &= p \by{definition of Bernoulli r.v.} \\
+    \therefore \avg{i}{n} X_i &\Plim p \\
+    \implies \phat &\Plim p. \qedhere
+  \end{alignat*}
+\end{proof}
+Likewise $\qhat \Plim q$.
+
+\begin{proof}
+  To show that $\rhat$ converges to $r$, let $R \coloneqq X Y$ be
+  a Bernoulli random variable with parameter $r = \Prob{X, Y}$, so that the
+  estimator
+  \begin{equation}
+    \rhat = \avg{i}{n} X_i Y_i = \avg{i}{n} R_i.
+  \end{equation}
+  Then,
+  \begin{alignat*}{3}
+    \avg{i}{n} R_i &\Plim \E{R} \by{LLN} \\
+    \E{R} &= \E{\Ber(r)} \by{given} \\
+          &= r \by{definition of Bernoulli r.v.} \\
+    \therefore \avg{i}{n} R_i &\Plim r \\
+    \implies \rhat &\Plim r. \qedhere
+  \end{alignat*}
+\end{proof}
+
+\subsubsection{Asymptotic Normality of the Estimators}
+By the Central Limit Theorem,
+\begin{equation} \label{eq:CLT}
+  \sqrt{n} ((\phat, \qhat, \rhat) - (p, q, r)) \Dlim \N{\vect{0}_n}{\Sigma}
+\end{equation}
+where $\Sigma$ is the 3-by-3 symmetric covariance matrix, defined as:
+\begin{equation}
+  \Sigma \coloneqq 
+  \begin{bmatrix}
+    \Var{\phat} & \Cov{\phat, \qhat} & \Cov{\phat, \rhat} \\
+    \cdot & \Var{\qhat} & \Cov{\qhat, \rhat} \\
+    \cdot & \cdot & \Var{\rhat}
+  \end{bmatrix}.
+\end{equation}
+We now determine each of these values to show the asymptotic normality of the
+vector of estimators.
+
+\begin{prop}
+The variance of $\phat$ is given by $\Var{\phat} = \frac{1}{n} p(1 - p)$.
+\end{prop}
+
+\begin{proof}
+  Using the definition of $\phat$,
+  \begin{alignat*}{3}
+    \Var{\phat} &= \Var{\avg{i}{n} X_i} \\
+                &= \frac{1}{n^2}\Var{\sumi{i}{n} X_i} \by{variance rule} \\
+                &= \frac{1}{n^2}\sumi{i}{n}\Var{X_i} \by{\iid} \\
+                &= \frac{1}{n^2}n\Var{X_1} \by{\iid} \\
+   \therefore \Var{\phat} &= \frac{1}{n} p(1-p) \by{variance of $\Ber(p)$} \qedhere
+  \end{alignat*}
+\end{proof}
+
+Likewise, $\Var{\qhat} = \frac{1}{n} q(1 - q)$,
+and $\Var{\rhat} = \frac{1}{n} r(1 - r)$.
+
+\clearpage
+The covariance of $\phat$ and $\qhat$ is given by 
+\begin{equation}
+  \Cov{\phat, \qhat} = \E{\phat\qhat} - \E{\phat}\E{\qhat}
+\end{equation}
+
+\begin{prop}
+  The expectation of the estimator $\phat$ is given by $\E{\phat} = p$.
+\end{prop}
+
+\begin{proof}
+  \begin{align}
+    \E{\phat} &= \E{\avg{i}{n} X_i} \\
+              &= \frac{1}{n} \sum{i}{n} \E{X_i} \by{linearity of expectation} \\
+              &= \frac{1}{n} n \E{X_1} \by{\iid} \\
+    \implies \E{\phat} &= p \by{expectation of $\Ber(p)$} \qedhere
+  \end{align}
+\end{proof}
+Incidentally, this proposition also shows that the estimator is \emph{unbiased},
+since $\E{\phat - p} = 0$.
+
+The covariance is then
+\begin{equation}
+  \Cov{\phat, \qhat} = \E{\phat\qhat} - pq.
+\end{equation}
+The expectation of the product $\phat\qhat$ is unknown since it is unknown if
+$X \indep Y$.
+
+\begin{prop}
+  The covariance of $\phat$ and $\rhat$ is given by $\Cov{\phat, \rhat} = r(1
+  - p)$.
+\end{prop}
+
+\begin{proof}
+  \begin{alignat*}{3}
+    \Cov{\phat, \rhat} &= \Cov{\avg{i}{n} X_i, \avg{i}{n} R_i} \\
+    &= \frac{1}{n^2} \Cov{\sumi{i}{n} X_i, \sumi{i}{n} R_i} \by{covariance rules} \\
+    &= \frac{1}{n^2} \sumi{i}{n} \sumi{j}{n} \Cov{X_i, R_j} \by{bilinearity of covariance} \\
+    &= \frac{1}{n^2} n^2 \Cov{X_1, R_1} \by{\iid} \\
+    &= \Cov{X_1, R_1}  \\
+    &= \E{X R} - \E{X}\E{R} \by{definition} \\
+    &= \E{X R} - pr \by{given} \\
+    &= \E{X (X Y)} - pr \by{definition of $R$} \\
+    \intertext{Since $X \sim \Ber(p) \in \{0, 1\}$, $X^2 = X$, so we have}
+    &= \E{X Y} - pr \\
+    &= r - pr \\
+    \therefore \Cov{\phat, \rhat} &= r(1 - p) \qedhere
+  \end{alignat*}
+\end{proof}
+Similarly, $\Cov{\qhat, \rhat} = r(1 - q)$.
+
+The entire asymptotic covariance matrix is then
+\begin{equation}
+  \Sigma \coloneqq 
+  \begin{bmatrix}
+    p(1-p) & \E{\phat\qhat} - pq & r(1-p) \\
+    \cdot & q(1-q) & r(1-q) \\
+    \cdot & \cdot & r(1-r)
+  \end{bmatrix}.
+\end{equation}
 
 % % INCLUDE CODE:
 % \clearpage
