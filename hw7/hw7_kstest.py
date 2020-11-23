@@ -47,7 +47,7 @@ def ks_2samp(X, Y, alpha=0.05):
     --------
     scipy.stats.ks_2samp
     """
-    Tnm = np.max(_ks_2samp(X, Y))  # the test statistic
+    Tnm = np.max(_ks_2samp(X, Y)[0])  # the test statistic
 
     # Simulate M iid copies Tn(1), ..., Tn(M) of the test statistic.
     # Note: Under the null, Tn is *pivotal*, so it does not depend on the
@@ -60,7 +60,7 @@ def ks_2samp(X, Y, alpha=0.05):
         # Sample from two arbitrary distributions
         Xs = stats.norm(0, 1).rvs(n)
         Ys = stats.norm(0, 1).rvs(m)
-        Tv[i] = np.max(_ks_2samp(Xs, Ys))
+        Tv[i] = np.max(_ks_2samp(Xs, Ys)[0])
 
     # Estimate the (1-alpha) quantile of Tn
     # take value s.t. M*(1-alpha) values are > Tv[q]
@@ -72,6 +72,7 @@ def ks_2samp(X, Y, alpha=0.05):
     return Tnm, pvalue, q_hat
 
 
+# TODO implement as binary search
 def _ks_2samp(X, Y):
     """Compute the Kolmogorov-Smirnov statistic on 2 samples.
 
@@ -96,6 +97,7 @@ def _ks_2samp(X, Y):
     Ys = np.sort(Y)
     # Calculate the maximum difference in the empirical CDFs
     Tv = np.zeros(n+1)  # extra value at Fn = 0 (Xs -> -infty)
+    js = np.zeros(n+1, dtype=int)
     j = 0
     for i in range(n):
         # Find greatest Ys point j s.t. Ys[j] <= Xs[i] and Xs[i] < Ys[j+1]
@@ -108,27 +110,29 @@ def _ks_2samp(X, Y):
             continue
 
         test_lo = np.abs(i/n - j/m)
+        j_lo = j
 
         # Find next greatest Ys point k s.t. Ys[k] < X[i+1]
         while j < m and Ys[j] < Xs[i+1]:
             j += 1
         test_hi = np.abs(i/n - j/m)
+        j_hi = j
 
         Tv[i] = np.max((test_lo, test_hi))
+        js[i] = j_lo if np.argmax((test_lo, test_hi)) == 0 else j_hi
 
     # Clean up last point
     # any remaining Gm(Y) values get closer to 1
     if j < m and Ys[j] > Xs[-1]:
         Tv[-1] = 1 - j/m
+        js[-1] = j
 
-    return Tv
+    return Tv, js
 
 
 def plot_cdfs(X, Y, fignum=1):
     """Plot empirical CDFs of two samples `X` and `Y`."""
-    # TODO
-    #   * generalize to K-samples
-    #   * plot point of maximum difference
+    # TODO generalize to K-samples
     n = len(X)
     m = len(Y)
     Xs = np.sort(X)
@@ -144,18 +148,42 @@ def plot_cdfs(X, Y, fignum=1):
     Fn_plot = np.hstack([0, Fn, 1])
     Gm_plot = np.hstack([0, Gm, 1])
 
+    # Compute the test statistic
+    Tvs, js = _ks_2samp(X, Y)
+    i_max = np.argmax(Tvs) - 1
+    j_max = js[i_max]
+
+    # plot difference
+    y_ks0 = (i_max+1)/n
+    y_ks1 = j_max/m
+
+    if y_ks0 > y_ks1:
+        x_ks = (Xs[i_max] + Ys[j_max]) / 2
+    else:
+        x_ks = (Xs[i_max+1] + Ys[j_max]) / 2
+        y_ks1 = (j_max+1)/m
+
+
     fig = plt.figure(fignum, clear=True)
     ax = fig.add_subplot()
-    ax.step(Xs_plot, Fn_plot, where='post', label='$F_n(X_i)$')
-    ax.step(Ys_plot, Gm_plot, where='post', label='$G_m(Y_j)$')
+    ax.step(Xs_plot, Fn_plot, where='post', c='C0', label=fr"$F_n(X^{{(i)}}), n = {n}$")
+    ax.step(Ys_plot, Gm_plot, where='post', c='C3', label=fr"$G_m(Y^{{(j)}}), m = {m}$")
+
+    # Plot the actual test statistic
+    ax.annotate(text='', xy=(x_ks, y_ks0), xytext=(x_ks, y_ks1),
+                arrowprops=dict(arrowstyle='<->',
+                                shrinkA=0.0,  # extend arrow to exact point
+                                shrinkB=0.0,
+                                lw=2))
+
     if n < 10 or m < 10:
         ax.scatter(Xs, Fn)
         ax.scatter(Ys, Gm)
+
     ax.set(xlabel='$X$, $Y$',
            ylabel='$F_n$, $G_m$')
     ax.legend()
 
-    plt.show()
     return fig, ax
 
 
@@ -184,7 +212,7 @@ def run_test(n, m, plot=False, fignum=1):
     if plot:
         plot_cdfs(X, Y, fignum)
 
-    return _ks_2samp(X, Y)  # use helper to return entire vector of values
+    return _ks_2samp(X, Y)[0]  # use helper to return entire vector of values
 
 
 # -----------------------------------------------------------------------------
@@ -245,17 +273,19 @@ Ydist = stats.norm(0, 2)
 X = Xdist.rvs(n)
 Y = Ydist.rvs(m)
 
-fig, ax = plot_cdfs(X, Y)
-ax.set(title=r'Empirical CDF: $X \sim \mathcal{N}(0,1)$, $Y \sim \mathcal{N}(0, 2)$')
-# fig.savefig('./hw7_latex/figures/ks_test.pdf')
-
 Tnm, pvalue, q_hat = ks_2samp(X, Y, alpha=0.05)
 print(f"Tnm:     {Tnm:.4f}\nq_hat:   {q_hat:.4f}\np-value: {pvalue:.2e}")
 
 if Tnm > q_hat:
-    print(f"Reject null w.p. {100*pvalue:0.2g}%.")
+    print(f"Reject null @ {100*pvalue:0.2g}%.")
 else:
-    print(f"Fail to reject null w.p. {100*pvalue:0.2g}%.")
+    print(f"Fail to reject null @ {100*pvalue:0.2g}%.")
 
+# Plot the results
+fig, ax = plot_cdfs(X, Y)
+ax.set(title=r'Empirical CDF: $X \sim \mathcal{N}(0,1)$, $Y \sim \mathcal{N}(0, 2)$')
+fig.savefig('./hw7_latex/figures/ks_test.pdf')
+
+plt.show()
 # =============================================================================
 # =============================================================================
