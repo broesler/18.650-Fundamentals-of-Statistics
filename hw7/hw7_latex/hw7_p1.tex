@@ -1,4 +1,4 @@
-\documentclass[letterpaper, oneside]{amsart}
+\documentclass[letterpaper, oneside, reqno]{amsart}
 \usepackage[english]{babel}
 \usepackage[T1]{fontenc}
 \usepackage[comma, compress, numbers, square]{natbib}
@@ -6,47 +6,54 @@
 \usepackage{verbatim}
 \usepackage{amsmath}
 \usepackage{amssymb}
-% \usepackage{mathtools}
+\usepackage{amsthm}
+\usepackage{bbm}  % for indicator function
+\usepackage{mathtools}
+\usepackage{mleftright}
 \usepackage{enumerate}
 \usepackage{array, multirow}
 \usepackage{url}
 \usepackage[font=small, hypcap=true]{caption}                % link to top of figures and subfigures
 \usepackage[font=small, hypcap=true, list=true]{subcaption}   % use for subfigures instead of {subfigure}
 
-%-------------------------------------------------------------------------------
-%     {hyperref} package options
-%-------------------------------------------------------------------------------
 \usepackage{hyperref}
 \hypersetup{
     linktoc=all,    % link table of contents to sections
     colorlinks,
     allcolors=black }
 
+% Declare theorem environments
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{prop}{Proposition}[section]
+
+% lists as 1., 2., ...
+\renewcommand{\labelenumi}{\theenumi.}
+
+% Letter subsections
+\renewcommand{\thesubsubsection}{\thesubsection(\alph{subsubsection})}
+
 %-------------------------------------------------------------------------------
 %     {listings + color} package options
 %-------------------------------------------------------------------------------
 % Define colors for code
-% \usepackage{color}
-% \definecolor{dkgreen}{rgb}{0,0.6,0}
-% \definecolor{gray}{rgb}{0.5,0.5,0.5}
-% \definecolor{mauve}{rgb}{0.58,0,0.82}
+\usepackage{xcolor}
+\definecolor{gray}{rgb}{0.5, 0.5, 0.5}
+\definecolor{mauve}{rgb}{0.58, 0, 0.82}
+\definecolor{lblue}{HTML}{1F77B4}
 
 \usepackage{listings}
-% \lstset{
-%   % language = Matlab,                      % the language of the code
-%   basicstyle = \scriptsize\ttfamily,    % the size of the fonts that are used for the code
-%   numbers = left,                         % where to put the line-numbers
-%   numberstyle = \tiny\color{gray},        % the style that is used for the line-numbers
-%   stepnumber = 1,                         % the step between two line-numbers.
-%   numbersep = 10pt,                        % how far the line-numbers are from the code
-%   breaklines = true,                      % sets automatic line breaking
-%   showspaces = false,                     % show spaces adding particular underscores
-%   showstringspaces = false,               % underline spaces within strings
-%   showtabs = false,                       % show tabs within strings adding particular underscores
-%   keywordstyle = \color{blue},            % keyword style
-%   commentstyle = \color{dkgreen},         % comment style
-%   stringstyle = \color{mauve}             % string literal style
-% }
+\lstset{
+  language = Python,                      % the language of the code
+  basicstyle = \scriptsize\ttfamily,    % the size of the fonts that are used for the code
+  numbers = left,                         % where to put the line-numbers
+  numberstyle = \tiny\color{gray},        % the style that is used for the line-numbers
+  stepnumber = 1,                         % the step between two line-numbers.
+  numbersep = 8pt,                        % how far the line-numbers are from the code
+  breaklines = true,                      % sets automatic line breaking
+  keywordstyle = \color{lblue},            % keyword style
+  commentstyle = \color{gray},         % comment style
+  stringstyle = \color{mauve}             % string literal style
+}
 
 % Place loose figures at actual top of page
 % \makeatletter
@@ -66,10 +73,10 @@
 %==============================================================================
 % \renewcommand{\L}{\left}
 % \newcommand{\R}{\right}
-\renewcommand{\(}{\left(}
-\renewcommand{\)}{\right)}
-\renewcommand{\[}{\left[}
-\renewcommand{\]}{\right]}
+\renewcommand{\(}{\mleft(}
+\renewcommand{\)}{\mright)}
+\renewcommand{\[}{\mleft[}
+\renewcommand{\]}{\mright]}
 \newcommand{\T}{\top} % transpose symbol
 
 \newcommand{\code}[1]{\texttt{#1}}
@@ -87,12 +94,24 @@
 \newcommand{\dx}[1]{\,\dd #1} % for inside integration
 
 % Probability helpers
-\newcommand{\N}[2]{\mathcal{N}\left( #1, #2 \right)}
-\newcommand{\U}[2]{\mathcal{U}\left(\left[ #1, #2 \right]\right)}
+\newcommand{\Prob}[1]{\mathbb{P}\[#1\]}
+\newcommand{\E}[1]{\mathbb{E}\[#1\]}
+\newcommand{\V}[1]{\mathbb{V}\[#1\]}
+\newcommand{\R}{\mathbb{R}}  % real numbers
+\newcommand{\N}[2]{\mathcal{N}\( #1, #2 \)}
+\newcommand{\U}[2]{\mathcal{U}\(\[ #1, #2 \]\)}
 \newcommand{\indep}{\perp \!\!\! \perp}  % "is independent from"
-\newcommand{\indic}[1]{\mathbbm{1}\!\left\{#1\right\}} % indicator function
+\newcommand{\indic}[1]{\mathbbm{1}\!\mleft\{#1\mright\}} % indicator function
 \newcommand{\iid}{i.i.d.\ }
 
+\newcommand{\sumi}[2]{\sum_{#1=1}^{#2}}
+\newcommand{\avg}[2]{\frac{1}{#2}\sumi{#1}{#2}}
+
+\newcommand{\by}[1]{&\quad&\text{(#1)}}
+
+\newcommand{\alim}{\xrightarrow[n \to \infty]{\text{a.s.}}}
+\newcommand{\plim}{\xrightarrow[n \to \infty]{\mathbb{P}}}
+\newcommand{\dlim}{\xrightarrow[n \to \infty]{(d)}}
 
 %%%% TITLE ----------------------------
 \title[Homework 7 -- Problem \thesection]{18.650 Fundamentals of Statistics\\{\large Homework 7}}
@@ -111,7 +130,7 @@
 \section{QQ-Plots}
 Consider the QQ-plots of five \iid random variables with the following
 distributions:
-\begin{itemize}
+\begin{enumerate}
 \item Standard Normal, $\N{0}{1}$,
   \item Uniform distribution, $\U{-\sqrt{3}}{\sqrt{3}}$,
   \item Cauchy distribution $\sim g(x) = \frac{1}{\pi}\frac{2}{1+x^2}$,
@@ -119,16 +138,174 @@ distributions:
     e^{-\lambda x}, \lambda = 1$,
   \item Laplace distribution $\sim \operatorname{Laplace}(\lambda)
     = \frac{\lambda}{2} e^{-\lambda x}, \lambda = \sqrt{2}$.
-\end{itemize}
+\end{enumerate}
 Figure \ref{fig:qqplots} shows the samples labeled with the appropriate
 distribution.
 
-% \begin{figure}[!h]
-%   \centering
-%   \includegraphics[width=0.75\textwidth]{myfilename.pdf}
-%   \caption{My caption goes here.}
-%   \label{fig:qqplots}
-% \end{figure}
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=\textwidth]{qqplots.pdf}
+  \caption{QQ-plots of five \iid random variables from different distributions.}
+  \label{fig:qqplots}
+\end{figure}
+
+\clearpage
+\section{Kolmogorov-Smirnov Test for Two Samples}
+Consider two independent samples $X_1, \dots, X_n$, and $Y_1, \dots, Y_m$ of
+independent, real-valued, continuous random variables, and assume that the $X_i$'s
+are \iid with some cdf $F$ and that the $Y_i$'s are \iid with some cdf $G$. Note that the
+two samples may have different sizes (if $n \ne m$). We want to test whether $F = G$.
+Consider the following hypotheses:
+\begin{align*}
+  H_0: ``F = G" \\
+  H_1: ``F \ne G"
+\end{align*}
+For simplicity, we will assume that $F$ and $G$ are continuous and increasing.
+
+\subsection{Example Experiment}
+An example experiment in which testing if two samples are from the same
+distribution is of interest may be encountered in a lab setting where we have
+two devices for measurement, and wish to determine if the errors have the same
+distribution for our analysis. 
+
+\subsection{CDF Distributions}
+Let 
+\begin{align*}
+  U_i &= F(X_i), \quad \forall i = 1, \dots, n, \\
+  V_j &= G(Y_j), \quad \forall j = 1, \dots, n.
+\end{align*}
+
+\begin{prop}
+  The distribution of the cdf of a continuous random variable is uniform on $[0,
+  1]$.
+\end{prop}
+
+\begin{proof}
+The distributions of $U_i$ and $V_j$ can be determined by finding their cdfs.
+The cdf of $U_i$ is defined by $F_U(t) \coloneqq \Prob{U_i \le t}$. Assuming that $F(X)$ and $G(Y)$ are invertible, it follows that
+\begin{alignat*}{3}
+  \Prob{U_i \le t} &= \Prob{F(X_i) \le t} \by{definition of $U_i$} \\
+                   &= \Prob{X_i \le F^{-1}(t)} \\
+                   &= F(F^{-1}(t)) \by{definition of cdf} \\
+                   &= t \\
+  \therefore F_U(t) &= t \\
+  \implies f_U(t) &= \U{0}{1} \qedhere
+\end{alignat*}
+\end{proof}
+Likewise, $f_V(t) = \U{0}{1}$.
+
+\subsection{Empirical CDFs}
+Let $F_n$ be the empirical cdf of $\{X_1, \dots, X_n\}$ and $G_m$ be the
+empirical cdf of $\{Y_1, \dots, Y_m\}$.
+
+\subsubsection{}
+Let
+\begin{equation}
+  T_{n,m} = \sup_{t \in \R} \left| F_n(t) - G_m(t) \right|
+\end{equation}
+
+\begin{prop}
+  The test statistic $T_{n,m}$ can be written as the maximum value of a finite set of numbers.
+\end{prop}
+
+\begin{proof}
+  By definition, the cdf
+  \begin{alignat}{3}
+    F(t) &= \Prob{X \le t} \quad \forall t \in \R \by{$X_i$'s are \iid\!\!} \\
+           &= \E{\indic{X \le t}} \nonumber \\
+    \avg{i}{n}(\cdot) & \dlim \E{\cdot} \by{LLN} \nonumber \\
+    \implies F_n(t) &= \avg{i}{n} \indic{X_i \le t} \label{eq:F_n}
+    \intertext{Likewise,}
+    G_m(t) &= \avg{j}{m} \indic{Y_j \le t}. \label{eq:G_m}
+  \end{alignat}
+  \begin{equation}
+    \therefore T_{n,m} &= \sup_{t \in \R} \left| \avg{i}{n} \indic{X_i \le t} - \avg{j}{m} \indic{Y_j \le t} \right|.
+  \end{equation}
+  The empirical cdfs~\eqref{eq:F_n}~and~\eqref{eq:G_m} can also be written
+  \begin{alignat}{3}
+    F_n(t) &= \#\{i=1, \dots, n \colon X_i \le t\} \cdot \frac{1}{n} \\
+    G_m(t) &= \#\{i=1, \dots, m \colon Y_j \le t\} \cdot \frac{1}{m},
+  \end{alignat}
+  so the only values that the empirical cdfs can take are the discrete sets
+  \begin{align}
+    F_n(i) &= \frac{i}{n} \quad \forall i = 1, \dots, n \\
+    G_m(j) &= \frac{j}{m} \quad \forall j = 1, \dots, m.
+  \end{align}
+  Therefore, the test statistic can be rewritten as the maximum value of
+  a finite set of numbers:
+  \begin{equation}
+    \begin{split}
+      T_{n,m} = \max_{i=0,\dots,n} \Bigg[
+      &\max_{j=0,\dots,m} \left| \frac{i}{n} - \frac{j}{m} \right| \indic{Y_j \le X_i < Y_{j+1}}, \right. \\ 
+      \left. &\max_{k=j+1, \dots, m} \left| \frac{i}{n} - \frac{k}{m} \right| \indic{Y_k \le X_{i+1}} \Bigg]
+    \end{split}
+  \end{equation}
+  where the values $X_0 \coloneqq -\infty$ and $Y_0 \coloneqq -\infty$ are prepended to the otherwise finite realizations to simplify the algorithm.
+\end{proof}
+
+\clearpage
+The following subroutine computes an array of test statistics $T_v(i)$ for each value of $X_i$. The test statistic $T_{n,m}$ is the maximum of these values.
+\lstinputlisting[language=python, firstline=75, lastline=124]{../hw7_kstest.py}
+
+\clearpage
+An example two-sample KS-test is shown in Figure~\ref{fig:ks_test}.
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.9\textwidth]{ks_test.pdf}
+  \caption{The empirical cdfs of two independent random samples from $\N{0}{1}$ and $\N{0}{2}$.}
+  \label{fig:ks_test}
+\end{figure}
+
+\subsubsection{}
+\begin{prop}
+  If $H_0$ is true, then
+  $$ T_{n,m} = \sup_{0 \le x \le 1} \left| \avg{i}{n} \indic{U_i \le x}
+- \avg{j}{m} \indic{V_j \le x} \right|.
+\end{prop}
+
+\begin{proof}
+  By~\eqref{eq:F_n}~and~\eqref{eq:G_m},
+  \begin{equation}
+    T_{n,m} &= \sup_{t \in \R} \left| \avg{i}{n} \indic{X_i \le t} - \avg{j}{m} \indic{Y_j \le t} \right|.
+  \end{equation}
+  To show the proposition is true, we make a change of variable. Let
+    $$ x = F(t). $$
+  Then,
+    $$ t \in \R \implies x \in [0, 1]. $$
+    Since $F$ and $G$ are continuous and monotonically increasing by definition,
+  \begin{alignat*}{3}
+    X_i &\le t \\
+    \iff F(X_i) &\le F(t) \\
+      \iff U_i &\le x \by{definition}.
+  \end{alignat*}
+  Similarly,
+  \begin{alignat*}{3}
+    Y_i &\le t \\
+    \iff G(Y_i) &\le G(t) \\
+      F(t) &= G(t) \by{under $H_0$} \\
+    \iff G(Y_i) &\le F(t) \\
+      \iff V_i &\le x \by{definition}. \qedhere
+  \end{alignat*}
+\end{proof}
+
+\subsubsection{}
+\begin{prop}
+  If $H_0$ is true, the joint distribution of $U_1, \dots, U_n, V_1, \dots, V_m$
+  $(n+m)$ random variables is uniform on $[0, 1]$.
+\end{prop}
+
+\begin{proof}
+  \begin{alignat*}{3}
+    \Prob{U_i \le t} &= \Prob{F(X_i) \le t} \\
+                     &= \Prob{F(X_1) \le t} \by{\iid\!\!} \\
+                     &= \Prob{G(X_1) \le t} \by{under $H_0$} \\
+                     &= \Prob{G(Y_1) \le t} \by{\iid\!\!} \\
+                     &= F(F^{-1}(t)) \\
+                     &= t \\
+    \therefore F_U(t) &= F_V(t) = t \\
+    \implies f_{U,V}(t) &= \U{0}{1} \qedhere
+  \end{alignat*}
+\end{proof}
 
 % % INCLUDE CODE:
 % \clearpage

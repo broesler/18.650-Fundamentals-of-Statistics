@@ -26,8 +26,8 @@ dists = [stats.norm(0, 1),
 labels = [r'$\mathcal{N}(0, 1)$',
           r'$\mathcal{U}(-\sqrt{3}, \sqrt{3})$',
           'Cauchy',
-          r'$\lambda \exp^{-\lambda x}, \lambda = 1$',
-          r'$\frac{\lambda}{2} \exp^{-\lambda\|x\|}, \lambda = \sqrt{2}$']
+          r'$\lambda e^{-\lambda x}, \lambda = 1$',
+          r'$\frac{\lambda}{2} e^{-\lambda\|x\|}, \lambda = \sqrt{2}$']
 
 N = 1000
 
@@ -48,8 +48,8 @@ for i, (dist, label) in enumerate(zip(dists, labels)):
     ax.plot(F_inv, F_inv, 'k-')
     ax.scatter(F_inv, Fn_inv, s=10, edgecolors='C0', c='None', zorder=99)
 
-    ax.set(title=f"QQ Plot {i}: {label}",
-           xlabel='Theoretical Quantiles $\mathcal{N}(0, 1)$',
+    ax.set(title=f"{i+1}: {label}",
+           xlabel=r'Theoretical Quantiles $\mathcal{N}(0, 1)$',
            ylabel='Empirical Quantiles',
            xlim=(-3, 3))
     ax.grid('on')
@@ -58,6 +58,8 @@ for i, (dist, label) in enumerate(zip(dists, labels)):
 
 gs.tight_layout(fig)
 plt.show()
+
+fig.savefig('./hw7_latex/figures/qqplots.pdf')
 
 # =============================================================================
 # =============================================================================

@@ -49,7 +49,7 @@ def ks_2samp(X, Y, alpha=0.05):
     """
     Tnm = np.max(_ks_2samp(X, Y))  # the test statistic
 
-    # Simulate M iid copies Tn(1), ..., Tn(M) of the test statistic. 
+    # Simulate M iid copies Tn(1), ..., Tn(M) of the test statistic.
     # Note: Under the null, Tn is *pivotal*, so it does not depend on the
     # underlying distributions of X and Y.
     M = 1000  # number of samples to take
@@ -126,7 +126,9 @@ def _ks_2samp(X, Y):
 
 def plot_cdfs(X, Y, fignum=1):
     """Plot empirical CDFs of two samples `X` and `Y`."""
-    # TODO generalize to K-samples
+    # TODO
+    #   * generalize to K-samples
+    #   * plot point of maximum difference
     n = len(X)
     m = len(Y)
     Xs = np.sort(X)
@@ -144,8 +146,8 @@ def plot_cdfs(X, Y, fignum=1):
 
     fig = plt.figure(fignum, clear=True)
     ax = fig.add_subplot()
-    ax.step(Xs_plot, Fn_plot, where='post', label='$F_n(X^{(i)})$')
-    ax.step(Ys_plot, Gm_plot, where='post', label='$G_m(Y^{(j)})$')
+    ax.step(Xs_plot, Fn_plot, where='post', label='$F_n(X_i)$')
+    ax.step(Ys_plot, Gm_plot, where='post', label='$G_m(Y_j)$')
     if n < 10 or m < 10:
         ax.scatter(Xs, Fn)
         ax.scatter(Ys, Gm)
@@ -217,20 +219,20 @@ np.random.seed(565656)  # Y jumps before X
 Tv = run_test(n=5, m=2)
 should_be(Tv, [0.0, 0.3, 0.1, 0.4, 0.2, 0.0])
 
-# 2.
-np.random.seed(123)  # Y jumps before X, multiple Xs within a Y
+# 2. Y jumps before X, multiple Xs within a Y
+np.random.seed(123)
 Tv = run_test(n=5, m=2)
 should_be(Tv, [0.5, 0.3, 0.1, 0.1, 0.3, 0.5])
 
-# 3.
-np.random.seed(123)  # Y jumps before X, multiple Xs within a Y
+# 3. Y jumps before X, multiple Ys within an X
+np.random.seed(123)
 Tv = run_test(n=2, m=5)
 should_be(Tv, [0.4, 0.3, 0.2])
 
-# ----------------------------------------------------------------------------- 
+# -----------------------------------------------------------------------------
 #         Run an actual example
 # -----------------------------------------------------------------------------
-np.random.seed()
+np.random.seed(565656)
 n = 100
 m =  70
 
@@ -245,9 +247,10 @@ Y = Ydist.rvs(m)
 
 fig, ax = plot_cdfs(X, Y)
 ax.set(title=r'Empirical CDF: $X \sim \mathcal{N}(0,1)$, $Y \sim \mathcal{N}(0, 2)$')
+# fig.savefig('./hw7_latex/figures/ks_test.pdf')
 
 Tnm, pvalue, q_hat = ks_2samp(X, Y, alpha=0.05)
-print(f"Tnm:     {Tnm:.4f}\nq_hat:   {q_hat:.4f}\np-value: {pvalue:.2e}") 
+print(f"Tnm:     {Tnm:.4f}\nq_hat:   {q_hat:.4f}\np-value: {pvalue:.2e}")
 
 if Tnm > q_hat:
     print(f"Reject null w.p. {100*pvalue:0.2g}%.")
