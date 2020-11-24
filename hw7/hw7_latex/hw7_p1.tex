@@ -639,6 +639,7 @@ estimators $(\phat, \qhat, \rhat)$ is asymptotically normal. \qed
 \subsubsection{The Delta Method}
 \begin{prop} \label{prop:delta}
   \[ \sqrt{n}\mleft((\rhat - \phat\qhat) - (r - pq)\mright) \Dlim \N{0}{V} \]
+  where $V$ depends only on $p$, $q$, and $r$.
 \end{prop}
 
 \begin{proof}
@@ -647,7 +648,7 @@ estimators $(\phat, \qhat, \rhat)$ is asymptotically normal. \qed
     \hat{\theta} = \begin{bmatrix} \phat \\ \qhat \\ \rhat \end{bmatrix} \text{, and } 
     \theta = \begin{bmatrix} p \\ q \\ r \end{bmatrix}.
   \end{equation*}
-  We have
+  From our proof of Proposition~\ref{prop:normality_pqr}, we have
   \begin{alignat*}{3}
     \sqrt{n}(\hat{\theta} - \theta) &\Dlim \N{0}{\Sigma} \by{CLT} \\
     \implies \sqrt{n}(g(\hat{\theta}) - g(\theta)) &\Dlim \N{0}{\nabla g(\theta)^\T \Sigma
@@ -656,14 +657,14 @@ estimators $(\phat, \qhat, \rhat)$ is asymptotically normal. \qed
   for any differentiable function $g \colon \R^k \to \R$, and $\Sigma$ given by
   Equation~\eqref{eq:sigma}. 
   Define the function 
-  \begin{equation}
+  \begin{equation} \label{eq:g}
     g(u, v, w) = w - uv
   \end{equation}
   such that 
-  \begin{align}
-    g(\hat{\theta}) &= \rhat - \phat\qhat \\
+  \begin{align*}
+    g(\hat{\theta}) &= \rhat - \phat\qhat, \\
     g(\theta) &= r - pq.
-  \end{align}
+  \end{align*}
   The gradient of $g(\theta)$ is then
   \begin{equation}
     \nabla g(u,v,w) = \begin{bmatrix} -v \\ -u \\ 1 \end{bmatrix} 
@@ -720,37 +721,70 @@ Consider the hypotheses
   \[ V = pq(1-p)(1-q). \qedhere \]
 \end{proof}
 
-\begin{prop}
+\begin{prop} \label{prop:Vhat}
 Given
   \[ V = pq(1-p)(1-q), \]
-a consistent estimator
+a consistent estimator is given by
   \[ \hat{V} = \phat\qhat(1 - \phat)(1 - \qhat). \]
 \end{prop}
 
-\begin{thm}[Continuous Mapping Theorem]
-  Let $X \in \R^n$ be a vector of random variables, and $g \colon \R^n \to \R$
-  be a continuous function. Let $X_n = X_1, X_2, \dots$ be a sequence of
-  random vectors. If $X_n \Plim X$, then $g(X_n) \Plim g(X)$. 
-\end{thm}
-
 \begin{proof}
+  To prove that $\hat{V}$ converges to $V$, we employ the Continuous Mapping
+  Theorem.
+  \begin{thm}[Continuous Mapping Theorem]
+    Let $X \in \R^n$ be a vector of random variables, and $g \colon \R^n \to \R$
+    be a continuous function. Let $X_n = X_1, X_2, \dots$ be a sequence of
+    random vectors. If $X_n \Plim X$, then $g(X_n) \Plim g(X)$. 
+  \end{thm}
+
   Since $\phat \Plim p$ and $\qhat \Plim q$,
-  \[ \hat{V}(\phat, \qhat) \Plim V(p, q). \quad\text{(CMT)} \qedhere \]
+  $\hat{V}(\phat, \qhat) \Plim V(p, q)$.
 \end{proof}
 
 \subsubsection{A Hypothesis Test}
-Given $\alpha \in (0, 1)$, we propose the test statistic
-\begin{equation}
-  T_n = \sqrt{n}\frac{(\rhat - \phat\qhat)}{\sqrt{V}}
-\end{equation}
-where $V$ is given by Proposition~\ref{prop:V_H0}. Under $H_0$,
-Proposition~\ref{prop:delta} gives the distribution of the test statistic.
-\begin{alignat*}{3}
-  \sqrt{n}\mleft((\rhat - \phat\qhat) - (r - pq)\mright) &\Dlim \N{0}{V} \\
+\begin{prop}
+  Given $\alpha \in (0, 1)$, we propose the test statistic
+  \begin{equation}
+    T_n \coloneqq \sqrt{n}\frac{(\rhat - \phat\qhat)}{\sqrt{\hat{V}}} \sim t_{n-1}
+  \end{equation}
+  where $\hat{V}$ is given by Proposition~\ref{prop:Vhat}, and $t_{n-1}$ is
+  Student's $t$-distribution with $n-1$ degrees of freedom.
+\end{prop}
+
+\begin{proof}
+  Proposition~\ref{prop:delta} gives the distribution of $g(\theta)$ (given by
+  Equation~\eqref{eq:g}) under $H_0$. 
+  Assume that $p, q \in (0, 1)$ s.t.\ $V > 0$.
+  \begin{alignat*}{3}
+  \sqrt{n}\mleft((\rhat - \phat\qhat) - (r - pq)\mright) &\Dlim \N{0}{V}
+  \by{Proposition~\ref{prop:delta}} \\
   \sqrt{n}(\rhat - \phat\qhat) &\Dlim \N{0}{V} \by{$r = pq$ under $H_0$} \\
-  \sqrt{n}\frac{(\rhat - \phat\qhat)}{\sqrt{V}} &\Dlim \N{0}{1} \\
-  \implies T_n &\Dlim \N{0}{1} 
+  \sqrt{n}\frac{(\rhat - \phat\qhat)}{\sqrt{V}} &\Dlim \N{0}{1} \numberthis
+  \label{eq:Tn_norm}
 \end{alignat*}
+The asymptotic variance $V$, however, is unknown, so we substitute the estimator
+$\hat{V}$ to get the test statistic
+\[ T_n \coloneqq  \sqrt{n}\frac{(\rhat - \phat\qhat)}{\sqrt{\hat{V}}}. \]
+If we rewrite the test statistic in terms of the unknown variance,
+\begin{equation} \label{eq:t1}
+  \sqrt{n}\frac{(\rhat - \phat\qhat)}{\sqrt{\hat{V}}} =
+  \ddfrac{\sqrt{n}\frac{(\rhat - \phat\qhat)}{\sqrt{V}}}
+         {\sqrt{\frac{\hat{V}}{V}}} 
+\end{equation}
+Equation~\eqref{eq:Tn_norm} shows that the numerator is a standard normal random
+variable. Cochran's theorem gives the distribution of the denominator
+\begin{thm}[Cochran's Theorem]
+  If $X_1, \dots, X_n$ are \iid\ random variables drawn from the distribution
+  $\N{\mu}{\sigma^2}$, and $S_n \coloneqq \avg{i}{n} (X_i - \overline{X}_n)^2$,
+  then
+  \[ \overline{X}_n \indep S_n \]
+  and
+  \[ \frac{n S_n}{\sigma^2} \sim \chi_{n-1}^2. \]
+\end{thm}
+% where $S_n$ is the sample variance of $n$ \iid\ normal random variables 
+  % \sim \ddfrac{\N{0}{1}}{\sqrt{\frac{\chi_{n-1}^2}{\nu}}}
+  % \implies T_n &\Dlim t_{n-1}
+\end{proof}
 
 We define the rejection region of our test
 \begin{equation}
