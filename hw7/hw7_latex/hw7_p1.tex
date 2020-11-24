@@ -8,6 +8,7 @@
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{bbm}  % for indicator function
+\usepackage{centernot}
 \usepackage{mathtools}
 \usepackage{mleftright}
 \usepackage{enumerate}
@@ -110,6 +111,7 @@
 \newcommand{\N}[2]{\mathcal{N}\( #1, #2 \)}
 \newcommand{\U}[2]{\mathcal{U}\(\[ #1, #2 \]\)}
 \newcommand{\indep}{\perp \!\!\! \perp}  % "is independent from"
+\newcommand{\nindep}{\centernot\indep}
 \newcommand{\indic}[1]{\mathbbm{1}\!\mleft\{#1\mright\}} % indicator function
 \newcommand{\iid}{i.i.d.}
 
@@ -174,8 +176,8 @@ are \iid\ with some cdf $F$ and that the $Y_i$'s are \iid\ with some cdf $G$. No
 two samples may have different sizes (if $n \ne m$). We want to test whether $F = G$.
 Consider the following hypotheses:
 \begin{align*}
-  H_0: ``F = G" \\
-  H_1: ``F \ne G"
+  H_0 \colon ``F = G" \\
+  H_1 \colon ``F \ne G"
 \end{align*}
 For simplicity, we will assume that $F$ and $G$ are continuous and increasing.
 
@@ -270,7 +272,7 @@ The following algorithm calculates the KS test statistic for two given samples.
     \Ensure $0 \le T_{n,m} \le 1$.
     \Function{Rank}{$A, k$}
       \State {\bfseries assert} $A$ is sorted in ascending order.
-      \State\Return $\#\{i=1,\dots,\text{length}(A): k < A_i\}$
+      \State\Return $\#\{i=1,\dots,\text{length}(A) \colon k < A_i\}$
     \EndFunction
     \Procedure{KS2Sample}{$X, Y$}
     \State $X_s \gets \{-\infty, \text{sort}(X)\}$
@@ -463,31 +465,34 @@ Define the estimators:
 \begin{proof}
   To show that an estimator is \emph{consistent}, we must prove that it
   converges to the true value of the parameter in the limit as $n \to \infty$.
+  By the Law of Large Numbers,
   \begin{alignat*}{3}
-    \avg{i}{n} X_i &\Plim \E{X} \by{LLN} \\
+    \avg{i}{n} X_i &\Plim \E{X}, \by{LLN} \\
     \E{X} &= \E{\Ber(p)} \by{given} \\
           &= p \by{definition of Bernoulli r.v.} \\
     \therefore \avg{i}{n} X_i &\Plim p \\
-    \implies \phat &\Plim p. \qedhere
+    \implies \phat &\Plim p.
   \end{alignat*}
-\end{proof}
-Likewise $\qhat \Plim q$.
+  Likewise $\qhat \Plim q$.
 
-\begin{proof}
   To show that $\rhat$ converges to $r$, let $R \coloneqq X Y$ be
   a Bernoulli random variable with parameter $r = \Prob{X, Y}$, so that the
   estimator
-  \begin{equation}
+  \begin{equation} \label{eq:rhat}
     \rhat = \avg{i}{n} X_i Y_i = \avg{i}{n} R_i.
   \end{equation}
-  Then,
+  Note that the values of $R_i$ \emph{are} \iid\ since each pair $(X_i, Y_i)$
+  are \iid, even though $X_i$ and $Y_j$ may not be independent for $i \ne j$.
+  As before, we apply the Law of Large Numbers,
   \begin{alignat*}{3}
     \avg{i}{n} R_i &\Plim \E{R} \by{LLN} \\
     \E{R} &= \E{\Ber(r)} \by{given} \\
           &= r \by{definition of Bernoulli r.v.} \\
     \therefore \avg{i}{n} R_i &\Plim r \\
-    \implies \rhat &\Plim r. \qedhere
+    \implies \rhat &\Plim r.
   \end{alignat*}
+  Thus, each estimator $(\phat, \qhat, \rhat)$ converges to its
+  respective parameter $(p, q, r)$.
 \end{proof}
 
 \subsubsection{Asymptotic Normality of the Estimators}
@@ -495,7 +500,7 @@ By the Central Limit Theorem,
 \begin{equation} \label{eq:CLT}
   \sqrt{n} ((\phat, \qhat, \rhat) - (p, q, r)) \Dlim \N{\vect{0}_n}{\Sigma}
 \end{equation}
-where $\Sigma$ is the 3-by-3 symmetric covariance matrix, defined as:
+where $\Sigma$ is the 3-by-3 symmetric covariance matrix, defined as
 \begin{equation}
   \Sigma \coloneqq 
   \begin{bmatrix}
@@ -514,77 +519,173 @@ The variance of $\phat$ is given by $\Var{\phat} = \frac{1}{n} p(1 - p)$.
 \begin{proof}
   Using the definition of $\phat$,
   \begin{alignat*}{3}
-    \Var{\phat} &= \Var{\avg{i}{n} X_i} \\
+    \Var{\phat} &= \Var{\avg{i}{n} X_i} \by{definition} \\
                 &= \frac{1}{n^2}\Var{\sumi{i}{n} X_i} \by{variance rule} \\
                 &= \frac{1}{n^2}\sumi{i}{n}\Var{X_i} \by{\iid} \\
-                &= \frac{1}{n^2}n\Var{X_1} \by{\iid} \\
-   \therefore \Var{\phat} &= \frac{1}{n} p(1-p) \by{variance of $\Ber(p)$} \qedhere
+                &= \frac{1}{n^2}n\Var{X} \by{\iid} \\
+   \therefore \Var{\phat} &= \frac{1}{n} p(1-p) \by{variance of $\Ber(p)$}
   \end{alignat*}
+  Likewise, $\Var{\qhat} = \frac{1}{n} q(1 - q)$,
+  and $\Var{\rhat} = \frac{1}{n} r(1 - r)$. 
 \end{proof}
 
-Likewise, $\Var{\qhat} = \frac{1}{n} q(1 - q)$,
-and $\Var{\rhat} = \frac{1}{n} r(1 - r)$.
-
 \clearpage
-The covariance of $\phat$ and $\qhat$ is given by 
-\begin{equation}
-  \Cov{\phat, \qhat} = \E{\phat\qhat} - \E{\phat}\E{\qhat}
-\end{equation}
-
 \begin{prop}
-  The expectation of the estimator $\phat$ is given by $\E{\phat} = p$.
+  The covariance of $\phat$ and $\qhat$ is given by $\Cov{\phat, \qhat} = r - pq$.
 \end{prop}
 
 \begin{proof}
-  \begin{align}
-    \E{\phat} &= \E{\avg{i}{n} X_i} \\
-              &= \frac{1}{n} \sum{i}{n} \E{X_i} \by{linearity of expectation} \\
-              &= \frac{1}{n} n \E{X_1} \by{\iid} \\
-    \implies \E{\phat} &= p \by{expectation of $\Ber(p)$} \qedhere
-  \end{align}
+  \begin{alignat*}{3}
+    \Cov{\phat, \qhat} &= \Cov{\avg{i}{n} X_i, \avg{i}{n} Y_i} \\
+    &= \frac{1}{n^2} \Cov{\sumi{i}{n} X_i, \sumi{i}{n} Y_i} \by{covariance property} \\
+    &= \frac{1}{n^2} \sumi{i}{n} \sumi{j}{n} \Cov{X_i, Y_j} \by{bilinearity of covariance} \\
+    &= \frac{1}{n^2} n^2 \Cov{X, Y} \by{identically distributed} \\
+    &= \Cov{X, Y}  \\
+    &= \E{XY} - \E{X}\E{Y} \by{definition of covariance} \\
+    &= \E{R} - \E{X}\E{Y} \by{definition of $R$} \\
+    \therefore \Cov{\phat, \qhat} &= r - pq \qedhere
+  \end{alignat*}
 \end{proof}
-Incidentally, this proposition also shows that the estimator is \emph{unbiased},
-since $\E{\phat - p} = 0$.
 
-The covariance is then
-\begin{equation}
-  \Cov{\phat, \qhat} = \E{\phat\qhat} - pq.
-\end{equation}
-The expectation of the product $\phat\qhat$ is unknown since it is unknown if
-$X \indep Y$.
+% \begin{prop}
+%   The expectation of the estimator $\phat$ is $\E{\phat} = p$.
+% \end{prop}
+% \begin{proof}
+%   \begin{alignat*}{3}
+%     \E{\phat} &= \E{\avg{i}{n} X_i} \\
+%               &= \frac{1}{n} \sumi{i}{n} \E{X_i} \by{linearity of expectation} \\
+%               &= \frac{1}{n} n \E{X} \by{\iid} \\
+%     \implies \E{\phat} &= p \by{expectation of $\Ber(p)$} \qedhere
+%   \end{alignat*}
+% \end{proof}
+% Similarly, $\E{\qhat} = q$ and $\E{\rhat} = r$. Incidentally, this proposition
+% also shows that the estimators are \emph{unbiased}, since $\E{\phat - p} = 0$,
+% \emph{etc}.
 
 \begin{prop}
-  The covariance of $\phat$ and $\rhat$ is given by $\Cov{\phat, \rhat} = r(1
-  - p)$.
+  The covariance of $\phat$ and $\rhat$ is given by $\Cov{\phat, \rhat} = r(1 - p)$.
 \end{prop}
 
 \begin{proof}
   \begin{alignat*}{3}
     \Cov{\phat, \rhat} &= \Cov{\avg{i}{n} X_i, \avg{i}{n} R_i} \\
-    &= \frac{1}{n^2} \Cov{\sumi{i}{n} X_i, \sumi{i}{n} R_i} \by{covariance rules} \\
+    &= \frac{1}{n^2} \Cov{\sumi{i}{n} X_i, \sumi{i}{n} R_i} \by{covariance property} \\
     &= \frac{1}{n^2} \sumi{i}{n} \sumi{j}{n} \Cov{X_i, R_j} \by{bilinearity of covariance} \\
-    &= \frac{1}{n^2} n^2 \Cov{X_1, R_1} \by{\iid} \\
-    &= \Cov{X_1, R_1}  \\
-    &= \E{X R} - \E{X}\E{R} \by{definition} \\
+    &= \frac{1}{n^2} n^2 \Cov{X, R} \by{identically distributed} \\
+    &= \Cov{X, R}  \\
+    &= \E{X R} - \E{X}\E{R} \by{definition of covariance} \\
     &= \E{X R} - pr \by{given} \\
     &= \E{X (X Y)} - pr \by{definition of $R$} \\
     \intertext{Since $X \sim \Ber(p) \in \{0, 1\}$, $X^2 = X$, so we have}
     &= \E{X Y} - pr \\
     &= r - pr \\
-    \therefore \Cov{\phat, \rhat} &= r(1 - p) \qedhere
+    \therefore \Cov{\phat, \rhat} &= r(1 - p)
   \end{alignat*}
-\end{proof}
 Similarly, $\Cov{\qhat, \rhat} = r(1 - q)$.
+\end{proof}
 
 The entire asymptotic covariance matrix is then
-\begin{equation}
-  \Sigma \coloneqq 
+\begin{equation} \label{eq:sigma}
+  \Sigma =
   \begin{bmatrix}
-    p(1-p) & \E{\phat\qhat} - pq & r(1-p) \\
+    p(1-p) & r - pq & r(1-p) \\
     \cdot & q(1-q) & r(1-q) \\
     \cdot & \cdot & r(1-r)
   \end{bmatrix}.
 \end{equation}
+
+\subsubsection{The Delta Method}
+\begin{prop}
+  $$ \sqrt{n}\((\rhat - \phat\qhat) - (r - pq)\) \Dlim \N{0}{V} $$
+\end{prop}
+
+\begin{proof}
+  Let $\hat{\theta}$ and $\theta$ be vectors in $\R^3$
+  \begin{equation*}
+    \hat{\theta} = \begin{bmatrix} \phat \\ \qhat \\ \rhat \end{bmatrix} \text{, and } 
+    \theta = \begin{bmatrix} p \\ q \\ r \end{bmatrix}.
+  \end{equation*}
+  We have
+  \begin{alignat*}{3}
+    \sqrt{n}(\hat{\theta} - \theta) &\Dlim \N{0}{\Sigma} \by{CLT} \\
+    \implies \sqrt{n}(g(\hat{\theta}) - g(\theta)) &\Dlim \N{0}{\nabla g(\theta)^\T \Sigma
+      \nabla g(\theta)} \by{Delta method}
+  \end{alignat*}
+  for any differentiable function $g \colon \R^k \to \R$, and $\Sigma$ given by
+  Equation~\eqref{eq:sigma}. 
+  Define the function 
+  \begin{equation}
+    g(u, v, w) = w - uv
+  \end{equation}
+  such that 
+  \begin{align}
+    g(\hat{\theta}) &= \rhat - \phat\qhat \\
+    g(\theta) &= r - pq.
+  \end{align}
+  The gradient of $g(\theta)$ is then
+  \begin{equation}
+    \nabla g(u,v,w) = \begin{bmatrix} -v \\ -u \\ 1 \end{bmatrix} 
+    \implies \nabla g(\theta) = \begin{bmatrix} -q \\ -p \\ 1 \end{bmatrix}
+  \end{equation}
+  The asymptotic variance $V = \nabla g(\theta)^\T \Sigma \nabla g(\theta)$,
+  which we will now show is a function only of the parameters $(p, q, r)$.
+  \begin{alignat}{3}
+    V &= \begin{bmatrix} -q & -p & 1 \end{bmatrix} 
+    \begin{bmatrix}
+      p(1-p) & r - pq & r(1-p) \\
+      \cdot & q(1-q) & r(1-q) \\
+      \cdot & \cdot & r(1-r)
+    \end{bmatrix}
+    \begin{bmatrix} -q \\ -p \\ 1 \end{bmatrix} \\
+    &= \begin{bmatrix} -q & -p & 1 \end{bmatrix} 
+    \begin{bmatrix} 
+      -qp(1-p) - p(r - pq) + r(1-p) \\
+      -q(r - pq) - pq(1-q) + r(1-q) \\
+      -qr(1-p) - pr(1-q) + r(1-r)
+    \end{bmatrix} \nonumber  \\
+    &= \begin{bmatrix} -q & -p & 1 \end{bmatrix} 
+    \begin{bmatrix} 
+      (r - pq)(1 - 2p) \\
+      (r - pq)(1 - 2q) \\
+      r((1-p)(1-q) - (r-pq))
+    \end{bmatrix} \nonumber \\
+    \begin{split}
+      &= -q(r - pq)(1 - 2p) - p(r - pq)(1 - 2q)) \\
+      &\,\quad + r((1-p)(1-q) - (r-pq))
+    \end{split} \\
+    \therefore V &= (r - pq)[-q(1 - 2p) - p(1 - 2q) - r] + r(1-p)(1-q) \label{eq:V}
+  \end{alignat}
+  which is a function only of $(p, q, r)$.
+\end{proof}
+
+\subsubsection{The Null Hypothesis}
+Consider the hypotheses
+\begin{align*}
+  H_0 \colon X \indep Y \\
+  H_1 \colon X \nindep Y
+\end{align*}
+
+\begin{prop}
+  If $H_0$ is true, then $V = pq(1-p)(1-q)$.
+\end{prop}
+
+\begin{proof}
+  Under $H_0$, $r = pq$. Using the previous expression for $V$,
+  Equation~\eqref{eq:V}, replace $r$ by $pq$ to find
+  $$ V = (pq - pq)[-q(1 - 2p) - p(1 - 2q) - pq] + pq(1-p)(1-q). $$
+  The first term is identically 0, so
+  \begin{equation}
+    V = pq(1-p)(1-q). \qedhere
+  \end{equation}
+\end{proof}
+
+\subsubsection{A Hypothesis Test}
+Given $\alpha \in (0, 1)$, we propose the test statistic
+\begin{equation}
+  T_n = \sqrt{n}\frac{\rhat - \phat\quat}{\sqrt{V}}
+\end{equation}
+where $V$ is given by 
+
 
 % % INCLUDE CODE:
 % \clearpage
