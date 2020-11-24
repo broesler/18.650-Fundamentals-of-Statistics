@@ -28,6 +28,14 @@
 % Declare theorem environments
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{prop}{Proposition}[section]
+\renewcommand{\qedsymbol}{\ensuremath{\blacksquare}}
+% new environment for proofs of claims within proofs
+\newenvironment{subproof}[1][\proofname]{%
+  \renewcommand{\qedsymbol}{\ensuremath{\square}}%
+  \begin{proof}[#1]%
+}{%
+  \end{proof}%
+}
 
 \numberwithin{equation}{section}
 
@@ -36,6 +44,9 @@
 
 % Letter subsections
 \renewcommand{\thesubsubsection}{\thesubsection(\alph{subsubsection})}
+
+% number only specific equation in, say, align* environment
+\newcommand{\numberthis}{\addtocounter{equation}{1}\tag{\theequation}}
 
 % Algorithm
 % \renewcommand{\algorithmicrequire}{\textbf{Input:}}
@@ -80,11 +91,6 @@
 %==============================================================================
 % General macros
 %==============================================================================
-\renewcommand{\(}{\mleft(}
-\renewcommand{\)}{\mright)}
-\renewcommand{\[}{\mleft[}
-\renewcommand{\]}{\mright]}
-
 \DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
 
 \newcommand{\T}{\top} % transpose symbol
@@ -102,14 +108,14 @@
 \newcommand{\dx}[1]{\,\dd #1} % for inside integration
 
 % Probability helpers
-\newcommand{\Prob}[1]{\mathbb{P}\[#1\]}
-\newcommand{\E}[1]{\mathbb{E}\[#1\]}
-\newcommand{\V}[1]{\mathbb{V}\[#1\]}
-\newcommand{\Var}[1]{\operatorname{Var}\(#1\)}
-\newcommand{\Cov}[1]{\operatorname{Cov}\(#1\)}
+\newcommand{\Prob}[1]{\mathbb{P}\mleft[#1\mright]}
+\newcommand{\E}[1]{\mathbb{E}\mleft[#1\mright]}
+\newcommand{\V}[1]{\mathbb{V}\mleft[#1\mright]}
+\newcommand{\Var}[1]{\operatorname{Var}\mleft(#1\mright)}
+\newcommand{\Cov}[1]{\operatorname{Cov}\mleft(#1\mright)}
 \newcommand{\R}{\mathbb{R}}  % real numbers
-\newcommand{\N}[2]{\mathcal{N}\( #1, #2 \)}
-\newcommand{\U}[2]{\mathcal{U}\(\[ #1, #2 \]\)}
+\newcommand{\N}[2]{\mathcal{N}\mleft( #1, #2 \mright)}
+\newcommand{\U}[2]{\mathcal{U}\mleft(\mleft[ #1, #2 \mright]\mright)}
 \newcommand{\indep}{\perp \!\!\! \perp}  % "is independent from"
 \newcommand{\nindep}{\centernot\indep}
 \newcommand{\indic}[1]{\mathbbm{1}\!\mleft\{#1\mright\}} % indicator function
@@ -229,14 +235,15 @@ Let
 
 \begin{proof}
   By definition, the cdf
-  \begin{alignat}{3}
-    F(t) &= \Prob{X \le t} \quad \forall t \in \R \by{$X_i$'s are \iid} \\
-         &= \E{\indic{X \le t}} \nonumber \\
-    \avg{i}{n}(\cdot) & \Dlim \E{\cdot} \by{LLN} \nonumber \\
-    \implies F_n(t) &= \avg{i}{n} \indic{X_i \le t} \label{eq:F_n}
+  \begin{alignat*}{3}
+    F(t) &= \Prob{X \le t} \quad \forall t \in \R \\
+         &= \E{\indic{X \le t}}. \\
+    \intertext{By the Law of Large Numbers, the expectation can be approximated
+        by the sample average, so we can define the \emph{empirical cdf} as}
+    F_n(t) &= \avg{i}{n} \indic{X_i \le t} \numberthis \label{eq:F_n}
     \intertext{Likewise,}
-    G_m(t) &= \avg{j}{m} \indic{Y_j \le t}. \label{eq:G_m}
-  \end{alignat}
+    G_m(t) &= \avg{j}{m} \indic{Y_j \le t}. \numberthis \label{eq:G_m}
+  \end{alignat*}
   \begin{equation}
     \therefore T_{n,m} = \sup_{t \in \R} \left| \avg{i}{n} \indic{X_i \le t} - \avg{j}{m} \indic{Y_j \le t} \right|.
   \end{equation}
@@ -255,11 +262,16 @@ Let
   \begin{equation}
     \begin{split}
       T_{n,m} = \max_{i=0,\dots,n} \Bigg[
-      &\max_{j=0,\dots,m} \left| \frac{i}{n} - \frac{j}{m} \right| \indic{Y_j \le X_i < Y_{j+1}}, \\ 
-      &\max_{k=j+1, \dots, m} \left| \frac{i}{n} - \frac{k}{m} \right| \indic{Y_k \le X_{i+1}} \Bigg]
+      &\max_{j=0,\dots,m} \left| \frac{i}{n} - \frac{j}{m} \right| 
+        \indic{Y^{(j)} \le X^{(i)} < Y^{(j+1)}}, \\ 
+      &\max_{k=j+1, \dots, m} \left| \frac{i}{n} - \frac{k}{m} \right| 
+        \indic{Y^{(k)} \le X^{(i+1)}} \Bigg]
     \end{split}
   \end{equation}
-  where the value $X_0 \coloneqq -\infty$ is prepended to the otherwise finite realizations to simplify the algorithm.
+  where $X^{(i)}$ is the $i^\text{th}$ value in the ordered set of data 
+  $X^{(1)} \le \cdots \le X^{(n)}$. The values $X^{(0)}, Y^{(0)} \coloneqq -\infty$
+  are prepended to the otherwise finite realizations to simplify the
+  computation.
 \end{proof}
 
 \clearpage
@@ -285,8 +297,8 @@ The following algorithm calculates the KS test statistic for two given samples.
       \State $k \gets$ \Call{rank}{$\{Y_s^{(\ell)}\}_{\ell=j+1}^m, X_s^{(i+1)}$}
       + (j+1)
       \State $\displaystyle{T_v^{(i)} \gets 
-        \max\(\left|\frac{i}{n} - \frac{j}{m}\right|,
-              \left|\frac{i}{n} - \frac{k}{m}\right|\)}$
+        \max\mleft(\left|\frac{i}{n} - \frac{j}{m}\right|,
+              \left|\frac{i}{n} - \frac{k}{m}\right|\mright)}$
     \EndFor
     \State\Return $\displaystyle{\max_i T_v}$
     \EndProcedure
@@ -309,8 +321,8 @@ An example two-sample KS-test is shown in Figure~\ref{fig:ks_test}.
 \subsubsection{The Null Hypothesis}
 \begin{prop}
   If $H_0$ is true, then
-  $$ T_{n,m} = \sup_{0 \le x \le 1} \left| \avg{i}{n} \indic{U_i \le x}
-- \avg{j}{m} \indic{V_j \le x} \right|. $$
+  \[ T_{n,m} = \sup_{0 \le x \le 1} \left| \avg{i}{n} \indic{U_i \le x}
+- \avg{j}{m} \indic{V_j \le x} \right|. \]
 \end{prop}
 
 \begin{proof}
@@ -319,9 +331,9 @@ An example two-sample KS-test is shown in Figure~\ref{fig:ks_test}.
     T_{n,m} = \sup_{t \in \R} \left| \avg{i}{n} \indic{X_i \le t} - \avg{j}{m} \indic{Y_j \le t} \right|.
   \end{equation}
   To show the proposition is true, we make a change of variable. Let
-    $$ x = F(t). $$
+    \[ x = F(t). \]
   Then,
-    $$ t \in \R \implies x \in [0, 1]. $$
+    \[ t \in \R \implies x \in [0, 1]. \]
     Since $F$ and $G$ are continuous and monotonically increasing,
   \begin{alignat*}{3}
     X_i \le t &\iff F(X_i) \le F(t) \\
@@ -370,15 +382,17 @@ the samples.
 \subsubsection{Quantiles of the Test Statistic}
 Let $\alpha \in (0, 1)$ and $q_\alpha$ be the $(1 - \alpha)$-quantile of the
 distribution of $T_{n,m}$ under $H_0$. The quantile $q_\alpha$ is given by
-\begin{align}
+\begin{align*}
   q_\alpha &= F^{-1}(1-\alpha) \\
-           &= \inf\{x \colon F(x) \ge 1 - \alpha\}, \quad 0 \le 1 - \alpha \le
-           1 \\
-           \implies q_\alpha \approx \hat{q}_\alpha &= \min_i \left\{ T_{n,m}^{(i)} \colon \tfrac{i}{M} \ge 1 - \alpha \right\}
-\end{align}
+           &= \inf\{x \colon F(x) \ge 1 - \alpha\} \\
+           &\approx \min\{x \colon F_n(x) \ge 1 - \alpha\}, \quad n < \infty \\
+           \implies q_\alpha \approx \hat{q}_\alpha &= \min_i \left\{
+               T_{n,m}^{(i)} \colon \tfrac{i}{M} \ge 1 - \alpha \right\}
+\end{align*}
 where $M \in \mathbb{N}$ is large, and $T_{n,m}^{(i)}$ is the $i^\text{th}$
-value in a sorted sample of $M$ test statistics. Thus, $q_\alpha$ can be approximated by choosing $i = \ceil{M\alpha}$. An algorithm to approximate $q_\alpha$
-given $\alpha$ is as follows.
+value in a sorted sample of $M$ test statistics. Thus, $q_\alpha$ can be
+approximated by choosing $i = \ceil{M\alpha}$. An algorithm to approximate
+$q_\alpha$ given $\alpha$ is as follows.
 
 \begin{algorithm}[!h]
   \caption{Approximate $q_\alpha$, the $(1 - \alpha)$-quantile of the
@@ -435,20 +449,20 @@ let $p = \Prob{X=1}$, $q = \Prob{Y=1}$, and $r = \Prob{X=1, Y=1}$.
     \Prob{X \cap Y} = \Prob{X}\Prob{Y} \label{eq:indep}
     % \iff \Prob{X} = \frac{\Prob{X,Y}}{\Prob{Y}} = \Prob{X | Y}
   \end{equation}
-  By definition,
-  \begin{align}
-    \Prob{X \cap Y} &= \Prob{X=1, Y=1} = r \\
+  By the given definition of the Bernoulli random variables,
+  \begin{align*}
+    \Prob{X \cap Y} &= \Prob{X, Y} = \Prob{X=1, Y=1} = r \\
     \Prob{X} &= \Prob{X=1} = p \\
     \Prob{Y} &= \Prob{Y=1} = q \\
-    \therefore r = pq &\iff \Prob{X=1,Y=1} = \Prob{X}\Prob{Y} \\
+    \therefore r = pq &\iff \Prob{X,Y} = \Prob{X}\Prob{Y} \\
     &\iff X \indep Y  \qedhere
-  \end{align}
+  \end{align*}
 \end{proof}
 
 \subsection{Test for Independence}
 Let $(X_1, Y_1), \dots, (X_n, Y_n)$ be a sample of $n$ \iid\ copies of $(X, Y)$
-(\ie $X_i \indep X_j$ for $i \ne j$, but $X_i$ may not be independent of
-$Y_i$). Based on this sample, we want to test whether $X \indep Y$, \ie whether $r = pq$.
+(\ie $X_i \indep X_j$ for $i \ne j$, but $X_i$ may not be independent of $Y_i$).
+Based on this sample, we want to test whether $X \indep Y$, \ie whether $r = pq$.
 
 \subsubsection{Estimators of $p, q, r$}
 Define the estimators:
@@ -459,36 +473,44 @@ Define the estimators:
 \end{align*}
 
 \begin{prop}
-  These estimators $\phat$, $\qhat$, and $\rhat$ are consistent estimators of the true values $p$, $q$, and $r$.
+  These estimators $\phat$, $\qhat$, and $\rhat$ are consistent estimators of
+  the true values $p$, $q$, and $r$.
 \end{prop}
 
 \begin{proof}
   To show that an estimator is \emph{consistent}, we must prove that it
   converges to the true value of the parameter in the limit as $n \to \infty$.
-  By the Law of Large Numbers,
+  Since the sequence of $X_i$'s are \iid, we can use the Weak Law of Large
+  Numbers (LLN) to prove that $\phat$ converges to $p$.
+
+  \begin{thm}[Weak Law of Large Numbers] \label{eq:LLN}
+    If the sequence of random variables $X_1, \dots, X_n$ are \iid, then
+    \[ \avg{i}{n} X_i \Plim \E{X}. \]
+  \end{thm}
+
+  The expectation of $X$ is given by
   \begin{alignat*}{3}
-    \avg{i}{n} X_i &\Plim \E{X}, \by{LLN} \\
     \E{X} &= \E{\Ber(p)} \by{given} \\
           &= p \by{definition of Bernoulli r.v.} \\
-    \therefore \avg{i}{n} X_i &\Plim p \\
+    \therefore \avg{i}{n} X_i &\Plim p \by{LLN} \\
     \implies \phat &\Plim p.
   \end{alignat*}
   Likewise $\qhat \Plim q$.
 
   To show that $\rhat$ converges to $r$, let $R \coloneqq X Y$ be
-  a Bernoulli random variable with parameter $r = \Prob{X, Y}$, so that the
+  a Bernoulli random variable with parameter $r = \Prob{X=1, Y=1}$, so that the
   estimator
   \begin{equation} \label{eq:rhat}
     \rhat = \avg{i}{n} X_i Y_i = \avg{i}{n} R_i.
   \end{equation}
   Note that the values of $R_i$ \emph{are} \iid\ since each pair $(X_i, Y_i)$
   are \iid, even though $X_i$ and $Y_j$ may not be independent for $i \ne j$.
-  As before, we apply the Law of Large Numbers,
+  As before, we apply the Law of Large Numbers to the average of $R_i$'s. The
+  expectation of $R$ is 
   \begin{alignat*}{3}
-    \avg{i}{n} R_i &\Plim \E{R} \by{LLN} \\
-    \E{R} &= \E{\Ber(r)} \by{given} \\
+    \E{R} &= \E{\Ber(r)} \by{definition} \\
           &= r \by{definition of Bernoulli r.v.} \\
-    \therefore \avg{i}{n} R_i &\Plim r \\
+    \therefore \avg{i}{n} R_i &\Plim r \by{LLN} \\
     \implies \rhat &\Plim r.
   \end{alignat*}
   Thus, each estimator $(\phat, \qhat, \rhat)$ converges to its
@@ -496,9 +518,25 @@ Define the estimators:
 \end{proof}
 
 \subsubsection{Asymptotic Normality of the Estimators}
-By the Central Limit Theorem,
+\begin{prop} \label{prop:normality_pqr}
+    The vector of estimators $(\phat, \qhat, \rhat)$ is asymptotically normal, \ie
+    \[ \sqrt{n} ((\phat, \qhat, \rhat) - (p, q, r)) 
+        \Dlim \N{0}{\Cov{(\phat, \qhat, \rhat)}}. \]
+\end{prop}
+\emph{Proof.} To prove that the vector of estimators is asymptotically normal, we employ the
+Central Limit Theorem (CLT).
+
+\begin{thm}[Central Limit Theorem]
+    Let $X_1, \dots, X_n$ be a sequence of \iid\ random vectors $X_i \in \R^k$, 
+    and $\overline{X}_n = \avg{i}{n} X_i$.
+    Then,
+    \[ \sqrt{n}(\overline{X}_n - \E{X}) \Dlim \N{0}{\Sigma}. \]
+    where $\Sigma$ is the $k$-by-$k$ matrix $\Cov{X}$.
+\end{thm}
+
+By the CLT,
 \begin{equation} \label{eq:CLT}
-  \sqrt{n} ((\phat, \qhat, \rhat) - (p, q, r)) \Dlim \N{\vect{0}_n}{\Sigma}
+  \sqrt{n} ((\phat, \qhat, \rhat) - \E{(\phat, \qhat, \rhat)}) \Dlim \N{0}{\Sigma}
 \end{equation}
 where $\Sigma$ is the 3-by-3 symmetric covariance matrix, defined as
 \begin{equation}
@@ -509,14 +547,31 @@ where $\Sigma$ is the 3-by-3 symmetric covariance matrix, defined as
     \cdot & \cdot & \Var{\rhat}
   \end{bmatrix}.
 \end{equation}
-We now determine each of these values to show the asymptotic normality of the
-vector of estimators.
 
+We first need to determine the expectations of the estimators.
+
+\begin{prop}
+  The expectation of the estimator $\phat$ is $\E{\phat} = p$.
+\end{prop}
+\begin{subproof}
+  \begin{alignat*}{3}
+    \E{\phat} &= \E{\avg{i}{n} X_i} \by{definition} \\
+              &= \frac{1}{n} \sumi{i}{n} \E{X_i} \by{linearity of expectation} \\
+              &= \frac{1}{n} n \E{X} \by{\iid} \\
+              &= \E{\Ber(p)} \by{definition} \\
+    \implies \E{\phat} &= p \by{definition} \qedhere
+  \end{alignat*}
+\end{subproof}
+\noindent Similarly, $\E{\qhat} = q$ and $\E{\rhat} = r$. This proposition
+also shows that the estimators are \emph{unbiased}, since $\E{\phat - p} = 0$,
+\emph{etc}.
+
+We now determine the entries in the covariance matrix to complete the proof of
+asymptotic normality.
 \begin{prop}
 The variance of $\phat$ is given by $\Var{\phat} = \frac{1}{n} p(1 - p)$.
 \end{prop}
-
-\begin{proof}
+\begin{subproof}
   Using the definition of $\phat$,
   \begin{alignat*}{3}
     \Var{\phat} &= \Var{\avg{i}{n} X_i} \by{definition} \\
@@ -527,14 +582,12 @@ The variance of $\phat$ is given by $\Var{\phat} = \frac{1}{n} p(1 - p)$.
   \end{alignat*}
   Likewise, $\Var{\qhat} = \frac{1}{n} q(1 - q)$,
   and $\Var{\rhat} = \frac{1}{n} r(1 - r)$. 
-\end{proof}
+\end{subproof}
 
-\clearpage
 \begin{prop}
   The covariance of $\phat$ and $\qhat$ is given by $\Cov{\phat, \qhat} = r - pq$.
 \end{prop}
-
-\begin{proof}
+\begin{subproof}
   \begin{alignat*}{3}
     \Cov{\phat, \qhat} &= \Cov{\avg{i}{n} X_i, \avg{i}{n} Y_i} \\
     &= \frac{1}{n^2} \Cov{\sumi{i}{n} X_i, \sumi{i}{n} Y_i} \by{covariance property} \\
@@ -545,28 +598,12 @@ The variance of $\phat$ is given by $\Var{\phat} = \frac{1}{n} p(1 - p)$.
     &= \E{R} - \E{X}\E{Y} \by{definition of $R$} \\
     \therefore \Cov{\phat, \qhat} &= r - pq \qedhere
   \end{alignat*}
-\end{proof}
-
-% \begin{prop}
-%   The expectation of the estimator $\phat$ is $\E{\phat} = p$.
-% \end{prop}
-% \begin{proof}
-%   \begin{alignat*}{3}
-%     \E{\phat} &= \E{\avg{i}{n} X_i} \\
-%               &= \frac{1}{n} \sumi{i}{n} \E{X_i} \by{linearity of expectation} \\
-%               &= \frac{1}{n} n \E{X} \by{\iid} \\
-%     \implies \E{\phat} &= p \by{expectation of $\Ber(p)$} \qedhere
-%   \end{alignat*}
-% \end{proof}
-% Similarly, $\E{\qhat} = q$ and $\E{\rhat} = r$. Incidentally, this proposition
-% also shows that the estimators are \emph{unbiased}, since $\E{\phat - p} = 0$,
-% \emph{etc}.
+\end{subproof}
 
 \begin{prop}
   The covariance of $\phat$ and $\rhat$ is given by $\Cov{\phat, \rhat} = r(1 - p)$.
 \end{prop}
-
-\begin{proof}
+\begin{subproof}
   \begin{alignat*}{3}
     \Cov{\phat, \rhat} &= \Cov{\avg{i}{n} X_i, \avg{i}{n} R_i} \\
     &= \frac{1}{n^2} \Cov{\sumi{i}{n} X_i, \sumi{i}{n} R_i} \by{covariance property} \\
@@ -579,10 +616,10 @@ The variance of $\phat$ is given by $\Var{\phat} = \frac{1}{n} p(1 - p)$.
     \intertext{Since $X \sim \Ber(p) \in \{0, 1\}$, $X^2 = X$, so we have}
     &= \E{X Y} - pr \\
     &= r - pr \\
-    \therefore \Cov{\phat, \rhat} &= r(1 - p)
+    \therefore \Cov{\phat, \rhat} &= r(1 - p) \qedhere
   \end{alignat*}
-Similarly, $\Cov{\qhat, \rhat} = r(1 - q)$.
-\end{proof}
+\end{subproof}
+\noindent Similarly, $\Cov{\qhat, \rhat} = r(1 - q)$.
 
 The entire asymptotic covariance matrix is then
 \begin{equation} \label{eq:sigma}
@@ -594,9 +631,14 @@ The entire asymptotic covariance matrix is then
   \end{bmatrix}.
 \end{equation}
 
+Since we have determined the expectation $\E{(\phat, \qhat, \rhat)} = (p, q,
+r)$, and the covariance matrix $\Sigma$ in terms of $p$, $q$, and $r$, we
+conclude that Proposition~\ref{prop:normality_pqr} is true, and the vector of
+estimators $(\phat, \qhat, \rhat)$ is asymptotically normal. \qed
+
 \subsubsection{The Delta Method}
-\begin{prop}
-  $$ \sqrt{n}\((\rhat - \phat\qhat) - (r - pq)\) \Dlim \N{0}{V} $$
+\begin{prop} \label{prop:delta}
+  \[ \sqrt{n}\mleft((\rhat - \phat\qhat) - (r - pq)\mright) \Dlim \N{0}{V} \]
 \end{prop}
 
 \begin{proof}
@@ -629,32 +671,33 @@ The entire asymptotic covariance matrix is then
   \end{equation}
   The asymptotic variance $V = \nabla g(\theta)^\T \Sigma \nabla g(\theta)$,
   which we will now show is a function only of the parameters $(p, q, r)$.
-  \begin{alignat}{3}
+  \begin{alignat*}{3}
     V &= \begin{bmatrix} -q & -p & 1 \end{bmatrix} 
     \begin{bmatrix}
       p(1-p) & r - pq & r(1-p) \\
       \cdot & q(1-q) & r(1-q) \\
       \cdot & \cdot & r(1-r)
     \end{bmatrix}
-    \begin{bmatrix} -q \\ -p \\ 1 \end{bmatrix} \\
+    \begin{bmatrix} -q \\ -p \\ 1 \end{bmatrix} \numberthis \label{eq:V_mat} \\
     &= \begin{bmatrix} -q & -p & 1 \end{bmatrix} 
     \begin{bmatrix} 
       -qp(1-p) - p(r - pq) + r(1-p) \\
       -q(r - pq) - pq(1-q) + r(1-q) \\
       -qr(1-p) - pr(1-q) + r(1-r)
-    \end{bmatrix} \nonumber  \\
+    \end{bmatrix} \\
     &= \begin{bmatrix} -q & -p & 1 \end{bmatrix} 
     \begin{bmatrix} 
       (r - pq)(1 - 2p) \\
       (r - pq)(1 - 2q) \\
       r((1-p)(1-q) - (r-pq))
-    \end{bmatrix} \nonumber \\
+    \end{bmatrix} \\
     \begin{split}
       &= -q(r - pq)(1 - 2p) - p(r - pq)(1 - 2q)) \\
       &\,\quad + r((1-p)(1-q) - (r-pq))
     \end{split} \\
-    \therefore V &= (r - pq)[-q(1 - 2p) - p(1 - 2q) - r] + r(1-p)(1-q) \label{eq:V}
-  \end{alignat}
+    \therefore V &= (r - pq)[-q(1 - 2p) - p(1 - 2q) - r] + r(1-p)(1-q) 
+    \numberthis \label{eq:V}
+  \end{alignat*}
   which is a function only of $(p, q, r)$.
 \end{proof}
 
@@ -665,26 +708,60 @@ Consider the hypotheses
   H_1 \colon X \nindep Y
 \end{align*}
 
-\begin{prop}
+\begin{prop} \label{prop:V_H0}
   If $H_0$ is true, then $V = pq(1-p)(1-q)$.
 \end{prop}
 
 \begin{proof}
   Under $H_0$, $r = pq$. Using the previous expression for $V$,
   Equation~\eqref{eq:V}, replace $r$ by $pq$ to find
-  $$ V = (pq - pq)[-q(1 - 2p) - p(1 - 2q) - pq] + pq(1-p)(1-q). $$
+  \[ V = (pq - pq)[-q(1 - 2p) - p(1 - 2q) - pq] + pq(1-p)(1-q). \]
   The first term is identically 0, so
-  \begin{equation}
-    V = pq(1-p)(1-q). \qedhere
-  \end{equation}
+  \[ V = pq(1-p)(1-q). \qedhere \]
+\end{proof}
+
+\begin{prop}
+Given
+  \[ V = pq(1-p)(1-q), \]
+a consistent estimator
+  \[ \hat{V} = \phat\qhat(1 - \phat)(1 - \qhat). \]
+\end{prop}
+
+\begin{thm}[Continuous Mapping Theorem]
+  Let $X \in \R^n$ be a vector of random variables, and $g \colon \R^n \to \R$
+  be a continuous function. Let $X_n = X_1, X_2, \dots$ be a sequence of
+  random vectors. If $X_n \Plim X$, then $g(X_n) \Plim g(X)$. 
+\end{thm}
+
+\begin{proof}
+  Since $\phat \Plim p$ and $\qhat \Plim q$,
+  \[ \hat{V}(\phat, \qhat) \Plim V(p, q). \quad\text{(CMT)} \qedhere \]
 \end{proof}
 
 \subsubsection{A Hypothesis Test}
 Given $\alpha \in (0, 1)$, we propose the test statistic
 \begin{equation}
-  T_n = \sqrt{n}\frac{\rhat - \phat\quat}{\sqrt{V}}
+  T_n = \sqrt{n}\frac{(\rhat - \phat\qhat)}{\sqrt{V}}
 \end{equation}
-where $V$ is given by 
+where $V$ is given by Proposition~\ref{prop:V_H0}. Under $H_0$,
+Proposition~\ref{prop:delta} gives the distribution of the test statistic.
+\begin{alignat*}{3}
+  \sqrt{n}\mleft((\rhat - \phat\qhat) - (r - pq)\mright) &\Dlim \N{0}{V} \\
+  \sqrt{n}(\rhat - \phat\qhat) &\Dlim \N{0}{V} \by{$r = pq$ under $H_0$} \\
+  \sqrt{n}\frac{(\rhat - \phat\qhat)}{\sqrt{V}} &\Dlim \N{0}{1} \\
+  \implies T_n &\Dlim \N{0}{1} 
+\end{alignat*}
+
+We define the rejection region of our test
+\begin{equation}
+  R_\psi = \left\{ \hat{\theta} \colon |T_n| > q_{\alpha/2} \right\}
+\end{equation}
+where
+\begin{equation}
+  q_{\alpha/2} = \Phi^{-1}\mleft(1 - \frac{\alpha}{2}\mright)
+\end{equation}
+is the $\mleft(1-\frac{\alpha}{2}\mright)$-quantile of the standard normal $\N{0}{1}$
+distribution.
 
 
 % % INCLUDE CODE:
