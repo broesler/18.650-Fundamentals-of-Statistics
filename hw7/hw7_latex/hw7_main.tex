@@ -1,4 +1,4 @@
-\documentclass[letterpaper, oneside, reqno]{amsart}
+\documentclass[letterpaper, reqno]{amsart}
 \usepackage[english]{babel}
 \usepackage[T1]{fontenc}
 \usepackage[comma, compress, numbers, square]{natbib}
@@ -225,7 +225,7 @@ The cdf of $U_i$ is defined by $F_U(t) \coloneqq \Prob{U_i \le t}$. Assuming tha
                    &= F(F^{-1}(t)) \by{definition of cdf} \\
                    &= t \\
   \therefore F_U(t) &= t \\
-  \implies f_U(t) &= \U{0}{1} \qedhere
+  \implies f_U(t) &= \U{0}{1} \tag*{\qedhere}
 \end{alignat*}
 \end{proof}
 Likewise, $f_V(t) = \U{0}{1}$.
@@ -378,7 +378,7 @@ An example two-sample KS-test is shown in Figure~\ref{fig:ks_test}.
                      &= F(F^{-1}(t)) \by{definition of cdf} \\
                      &= t \\
     \therefore F_U(t) &= G_V(t) = t \\
-    \implies f_{U,V}(t) &= \U{0}{1} \qedhere
+    \implies f_{U,V}(t) &= \U{0}{1} \tag*{\qedhere}
   \end{alignat*}
 \end{proof}
 
@@ -570,7 +570,7 @@ We first need to determine the expectations of the estimators.
               &= \frac{1}{n} \sumi{i}{n} \E{X_i} \by{linearity of expectation} \\
               &= \frac{1}{n} n \E{X} \by{\iid} \\
               &= \E{\Ber(p)} \by{definition} \\
-    \implies \E{\phat} &= p \by{definition} \qedhere
+    \implies \E{\phat} &= p \by{definition} \tag*{\qedhere}
   \end{alignat*}
 \end{subproof}
 \noindent Similarly, $\E{\qhat} = q$ and $\E{\rhat} = r$. This proposition
@@ -607,7 +607,7 @@ The variance of $\phat$ is given by $\Var{\phat} = \frac{1}{n} p(1 - p)$.
     &= \Cov{X, Y}  \\
     &= \E{XY} - \E{X}\E{Y} \by{definition of covariance} \\
     &= \E{R} - \E{X}\E{Y} \by{definition of $R$} \\
-    \therefore \Cov{\phat, \qhat} &= r - pq \qedhere
+    \therefore \Cov{\phat, \qhat} &= r - pq \tag*{\qedhere}
   \end{alignat*}
 \end{subproof}
 
@@ -627,7 +627,7 @@ The variance of $\phat$ is given by $\Var{\phat} = \frac{1}{n} p(1 - p)$.
     \intertext{Since $X \sim \Ber(p) \in \{0, 1\}$, $X^2 = X$, so we have}
     &= \E{X Y} - pr \\
     &= r - pr \\
-    \therefore \Cov{\phat, \rhat} &= r(1 - p) \qedhere
+    \therefore \Cov{\phat, \rhat} &= r(1 - p) \tag*{\qedhere}
   \end{alignat*}
 \end{subproof}
 \noindent Similarly, $\Cov{\qhat, \rhat} = r(1 - q)$.
@@ -846,11 +846,11 @@ answers are summarized in Table~\ref{tab:tab1}.
 \end{table}
 
 The values of our estimators are as follows:
-\begin{alignat*}{3}
+\begin{align*}
   \phat &= \frac{\text{\# Happy}}{N} = \frac{384}{1000} = 0.384 \\
   \qhat &= \frac{\text{\# In a Relationship}}{N} = \frac{506}{1000} = 0.506 \\
   \rhat &= \frac{\text{\# Happy} \cap \text{\# In a Relationship}}{N} = \frac{205}{1000} = 0.205.
-\end{alignat*}
+\end{align*}
 The estimate of the asymptotic variance of the test statistic is
 \[ \hat{V} = \phat\qhat(1-\phat)(1-\qhat) = (0.384)(0.506)(1 - 0.384)(1 - 0.506)
   = 0.05913, \]
@@ -862,13 +862,13 @@ The standard normal quantile at $\alpha = 0.05$ is $q_{\alpha/2}
 - \frac{\alpha}{2}\mright) = 1.96$, so the test result is
 \[ |T_n| = 1.391 < q_{\alpha/2} = 1.96 \]
 so we \emph{fail to reject $H_0$ at the 5\% level}. The $p$-value of the test is
-\begin{alignat*}{3}
+\begin{align*}
   \text{$p$-value} &\coloneqq \Prob{Z > |T_n|} \by{$Z \sim \N{0}{1}$}  \\
                    &= \Prob{Z \le |T_n|} \by{symmetry} \\
                    &= \Prob{Z \le -T_n} + \Prob{Z > T_n} \\
                    &= 2\Phi(-|T_n|) \\
   \implies \text{$p$-value} &= 0.1642.
-\end{alignat*}
+\end{align*}
 In other words, the lowest level at which we could reject the null hypothesis is
 at $\alpha = \text{$p$-value} = 0.1642 = 16.42\%$.
 
@@ -930,7 +930,7 @@ Then, the $t$-distribution is \emph{pivotal}
     \implies \E{X^2} &= \Var{X} + \E{X}^2 \\
                      &= \sigma^2 + \mu^2. \by{given} \\
     \therefore S_n^2 &\Plim \sigma^2 + \mu^2 - \mu^2 \\
-    \implies S_n^2 &\Plim \sigma^2 \qedhere
+    \implies S_n^2 &\Plim \sigma^2 \tag*{\qedhere}
   \end{alignat*}
 \end{subproof}
 
@@ -993,24 +993,24 @@ $R_2,\dots,R_n \ne 1$.
 \end{prop}
 
 \begin{proof}
-  Given the definition of $R_i$, we can determine its distribution. 
-  \[ R_i = \operatorname{rank}(X_i) \coloneqq \#\{j \colon X_j \le X_i, \; i \ne j\} \tag{\ref{eq:R_i}} \]
+  Given the definition of $R_i$
+  \[ R_i = \operatorname{rank}(X_i) \coloneqq \#\{j \colon X_j \le X_i, \; i \ne j\}, \tag{\ref{eq:R_i}} \]
+  we can determine its distribution. 
   Let 
   \[ F_n(t) = \avg{i}{n} \indic{X_i \le t} \] 
   for some $t \in \R$ be the empirical cdf of the sample $X_i$'s. 
-  We can then rewrite the definition of the rank
+  We can then rewrite the definition of the rank as
   \[ R_i = \sumi{j}{n} \indic{X_j \le X_i} = n F_n(X_i). \]
   The cdf of $R_i$, $F_R(t)$ is then
-  \begin{alignat*}{3}
+  \begin{align*}{3}
     \Prob{R_i \le t} &= \Prob{n F_n(X_i) \le t} \\
                      &= \Prob{X_i \le F_n^{-1}\mleft(\frac{t}{n}\mright)} \\
-                     &= F_n\mleft(F_n^{-1}\mleft(\frac{t}{n}\mright)\mright) \\
-                     &= \frac{t}{n}.
-  \end{alignat*}
+                     &= F_n\mleft(F_n^{-1}\mleft(\frac{t}{n}\mright)\mright)
+  \end{align*}
   Since $F_n$ is a piecewise-constant function, $F_n \in \frac{1}{n} \{0, \dots, n\}$,
   it only takes discrete values 
-  % TODO rewrite with cases?
-  \[ \frac{\floor{t}}{n}, \quad t \in \{0, \dots, n\}. \]
+  \[ \frac{\floor{t}}{n} \quad t \in [0, n], \]
+  regardless of the sample on which it is based.
   Therefore,
   \begin{alignat*}{3}
     \Prob{R_i \le t} &= \frac{\floor{t}}{n} \\
