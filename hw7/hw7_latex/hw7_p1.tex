@@ -819,6 +819,58 @@ where
 is the $\mleft(1-\frac{\alpha}{2}\mright)$-quantile of the standard normal $\N{0}{1}$
 distribution.
 
+We would like to know whether the facts of being happy and being in
+a relationship are independent of each other. In a given population, 1000 people
+(aged at least 21 years old) are sampled and asked two questions: ``Do you
+consider yourself as happy?'' and ``Are you involved in a relationship?''. The
+answers are summarized in Table~\ref{tab:tab1}.
+
+\begin{table}[!h]
+  \setlength{\tabcolsep}{8pt}
+  \def\arraystretch{1.1}
+  \caption{}
+  \label{tab:tab1}
+    \centering
+    \begin{tabular}{|r|c c|c|}
+      \firsthline
+                                  & {\bf Happy} & {\bf Not Happy} & {\bf Total} \\ 
+      \hline
+      {\bf In a Relationship}     & 205         & 301             & 506 \\
+      {\bf Not in a Relationship} & 179         & 315             & 494 \\
+      \hline
+      {\bf Total}                 & 384         & 616             & 1000 \\
+      \lasthline
+    \end{tabular}
+\end{table}
+
+The values of our estimators are as follows:
+\begin{alignat*}{3}
+  \phat &= \frac{\text{\# Happy}}{N} = \frac{384}{1000} = 0.384 \\
+  \qhat &= \frac{\text{\# In a Relationship}}{N} = \frac{506}{1000} = 0.506 \\
+  \rhat &= \frac{\text{\# Happy} \cap \text{\# In a Relationship}}{N} = \frac{205}{1000} = 0.205.
+\end{alignat*}
+The estimate of the asymptotic variance of the test statistic is
+\[ \hat{V} = \phat\qhat(1-\phat)(1-\qhat) = (0.384)(0.506)(1 - 0.384)(1 - 0.506)
+  = 0.05913, \]
+giving the test statistic
+\[ T_n = \frac{\sqrt{n}(\rhat - \phat\qhat)}{\sqrt{\hat{V}}}
+  = \frac{\sqrt{1000}(0.205 - 0.384\cdot0.506)}{\sqrt{0.05913}} = 1.391. \]
+The standard normal quantile at $\alpha = 0.05$ is $q_{\alpha/2}
+= \Phi^{-1}\mleft(1
+- \frac{\alpha}{2}\mright) = 1.96$, so the test result is
+\[ |T_n| = 1.391 < q_{\alpha/2} = 1.96 \]
+so we \emph{fail to reject $H_0$ at the 5\% level}. The $p$-value of the test is
+\begin{alignat*}{3}
+  \text{$p$-value} &\coloneqq \Prob{Z > |T_n|} \by{$Z \sim \N{0}{1}$}  \\
+                   &= \Prob{Z \le |T_n|} \by{symmetry} \\
+                   &= \Prob{Z \le -T_n} + \Prob{Z > T_n} \\
+                   &= 2\Phi(-|T_n|) \\
+  \implies \text{$p$-value} &= 0.1642.
+\end{alignat*}
+In other words, the lowest level at which we could reject the null hypothesis is
+at $\alpha = \text{$p$-value} = 0.1642 = 16.42\%$.
+
+\clearpage
 \subsection*{Appendix A: Additional Proofs} \label{app:t_to_N}
 \begin{prop}
   A $t$-distribution with $\nu$ degrees of freedrom approaches a standard normal
