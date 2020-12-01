@@ -99,12 +99,14 @@
 % General macros
 %==============================================================================
 \DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
 
 \newcommand{\T}{\top} % transpose symbol
 \newcommand{\vect}[1]{\boldsymbol{\mathbf{#1}}} % use BOTH to cover all cases
 
 % Misc.
 \newcommand{\ie}{\emph{i.e.\ }}
+\newcommand{\eg}{\emph{e.g.\ }}
 
 % Use for fractions with large terms
 \newcommand{\ddfrac}[2]{\frac{\displaystyle #1}{\displaystyle #2}}
@@ -309,7 +311,7 @@ The following algorithm calculates the KS test statistic for two given samples.
         \max\mleft(\left|\frac{i}{n} - \frac{j}{m}\right|,
               \left|\frac{i}{n} - \frac{k}{m}\right|\mright)}$
     \EndFor
-    \State\Return $\displaystyle{\max_i T_v}$
+    \State\Return $\max\limits_i T_v$
     \EndProcedure
   \end{algorithmic}
 \end{algorithm}
@@ -873,35 +875,32 @@ at $\alpha = \text{$p$-value} = 0.1642 = 16.42\%$.
 \clearpage
 \subsection*{Appendix A: Additional Proofs} \label{app:t_to_N}
 \begin{prop}
-  A $t$-distribution with $\nu$ degrees of freedrom approaches a standard normal
+  A $t$-distribution with $n$ degrees of freedrom approaches a standard normal
   distribution as $n$ approaches infinity:
-  \[ t_{\nu} \Dlim \N{0}{1}. \]
+  \[ t_n \Dlim \N{0}{1}. \]
 \end{prop}
 
 \emph{Proof.}
-  Student's $t$-distribution with $\nu$ degrees of freedom is defined as the
-  distribution of the random variable $T$ such that
-  \[ t_{\nu} \sim T = \ddfrac{Z}{\sqrt{\frac{V}{\nu}}} \]
-  where $Z \sim \N{0}{1}$, $V \sim \chi^2_{\nu}$, and $Z \indep V$.
+Student's $t$-distribution with $\nu$ degrees of freedom is defined as the
+distribution of the random variable $T$ such that
+\[ t_{\nu} \sim T = \ddfrac{Z}{\sqrt{\frac{V}{\nu}}} \]
+where $Z \sim \N{0}{1}$, $V \sim \chi^2_{\nu}$, and $Z \indep V$.
 
-  Let $X_1, \dots, X_n \sim \N{\mu}{\sigma^2}$ be a sequence of \iid\ random
-  variables. Define the sample mean and sample variance
-  \begin{align*}
-    \Xnbar &\coloneqq \avg{i}{n} X_i \\
-    S_n^2 &\coloneqq \avg{i}{n} (X_i - \Xnbar)^2.
-  \end{align*}
-  Let the random variables
-  \begin{align*}
-    Z &= \frac{\sqrt{n}(\Xnbar - \mu)}{\sigma} \\
-    V &= \frac{n S_n^2}{\sigma^2}.
-  \end{align*}
-  such that $Z \sim \N{0}{1}$ by the Central Limit Theorem, and $V \sim
-  \chi^2_{n-1}$ by Cochran's Theorem (which also shows that $Z \indep V$).
-  Then, the $t$-distribution is exactly described in terms of the sample
-  \begin{align*}
-    t_{n-1} &= \ddfrac{Z}{\sqrt{\frac{V}{n-1}}}  \\
-            &= \frac{\sqrt{n}(\Xnbar - \mu)}{S_n}.
-  \end{align*}
+Let $X_1, \dots, X_n \sim \N{\mu}{\sigma^2}$ be a sequence of \iid\ random
+variables. Define the sample mean and sample variance
+\begin{align*}
+  \Xnbar &\coloneqq \avg{i}{n} X_i \\
+  S_n^2 &\coloneqq \avg{i}{n} (X_i - \Xnbar)^2.
+\end{align*}
+Let the random variables
+\begin{align*}
+  Z &= \frac{\sqrt{n}(\Xnbar - \mu)}{\sigma} \\
+  V &= \frac{n S_n^2}{\sigma^2}.
+\end{align*}
+such that $Z \sim \N{0}{1}$ by the Central Limit Theorem, and $V \sim
+\chi^2_{n-1}$ by Cochran's Theorem (which also shows that $Z \indep V$).
+Then, the $t$-distribution is \emph{pivotal}
+\[  t_{n-1} = \ddfrac{Z}{\sqrt{\frac{V}{n-1}}}. \]
 
 \begin{lemma}
   The sample variance converges in probability to the variance,
@@ -946,13 +945,80 @@ Thus, $V \Plim \frac{n \sigma^2}{\sigma^2} = n$, a constant.
   \end{alignat*}
 \end{theorem}
 
-Since $Z \Dlim \N{0}{1}$, Slutsky's theorem implies that
+% TODO rewrite all in terms of unbiased sample variance
+Since convergence in probability implies convergence in distribution, and $Z
+\Dlim \N{0}{1}$, Slutsky's theorem implies that
 \begin{align*}
-  t_{n-1} = \ddfrac{Z}{\sqrt{\frac{V}{\nu}}} 
+  t_{n-1} = \ddfrac{Z}{\sqrt{\frac{V}{n-1}}} 
         &\Dlim \ddfrac{\N{0}{1}}{\sqrt{\frac{n}{n-1}}} \\
-        \implies t_{n-1} &\Dlim \N{0}{1}  \qed
+        \implies t_{n-1} &\Dlim \N{0}{1}.  \qed
 \end{align*}
 
+\clearpage
+\section{Test of Independence for Samples with Continuous CDF}
+Consider the \iid\ pairs of random variables $(X_1, Y_1), \dots, (X_n, Y_n)$
+with some continuous distribution. While each pair is independent, $X_i \indep
+X_j$ for $i \ne j$, we would like to test if $X_i \indep Y_i$ for all $i$.
+
+Define the hypotheses
+\begin{align*}
+  H_0 &\colon X_1 \indep Y_1 \\
+  H_1 &\colon X_1 \nindep Y_1.
+\end{align*}
+For $i = 1, \dots, n$, let $R_i$ be the \emph{rank} of $X_i$ in the sample $X_1,
+\dots, X_n$. The rank function is defined as
+\begin{equation} \label{eq:R_i}
+  R_i = \operatorname{rank}(X_i) \coloneqq \#\{j \colon X_j \le X_i, \; i \ne j\} 
+\end{equation}
+\ie if $X_i = \min\limits_j X_j$, then $R_i = 1$, and if $X_i = \max\limits_j
+X_j$, then $R_j = n$. 
+Similarly, let $Q_i$ be the rank of $Y_i$ in $Y_1, \dots, Y_n$.
+
+\subsection{Example Experiment}
+An example experiment in which testing for independence of two continuous random
+variables is important is in a scientific experiment in which two devices are
+measured using sensors powered by the same circuitry. We would like to ensure
+that the measurements are not correlated.
+
+\subsection{Dependence of the Ranks}
+The ranks $R_1, \dots, R_n$ are \emph{not} independent because the rank of $X_i$
+in the sample is unique. Therefore, if you know that $R_1 = 1$, \emph{e.g.}, then
+$R_2,\dots,R_n \ne 1$.
+
+\subsection{Proof of Distribution of Ranks}
+\begin{prop}
+  The distribution of the vector $(R_1, \dots, R_n)$ does \emph{not} depend on
+  the distribution of $X_i$'s (and, similarly, the distribution of $(Q_1,
+  \dots, Q_n)$ does not depend on the distribution of $Y_i$'s).
+\end{prop}
+
+\begin{proof}
+  Given the definition of $R_i$, we can determine its distribution. 
+  \[ R_i = \operatorname{rank}(X_i) \coloneqq \#\{j \colon X_j \le X_i, \; i \ne j\} \tag{\ref{eq:R_i}} \]
+  Let 
+  \[ F_n(t) = \avg{i}{n} \indic{X_i \le t} \] 
+  for some $t \in \R$ be the empirical cdf of the sample $X_i$'s. 
+  We can then rewrite the definition of the rank
+  \[ R_i = \sumi{j}{n} \indic{X_j \le X_i} = n F_n(X_i). \]
+  The cdf of $R_i$, $F_R(t)$ is then
+  \begin{alignat*}{3}
+    \Prob{R_i \le t} &= \Prob{n F_n(X_i) \le t} \\
+                     &= \Prob{X_i \le F_n^{-1}\mleft(\frac{t}{n}\mright)} \\
+                     &= F_n\mleft(F_n^{-1}\mleft(\frac{t}{n}\mright)\mright) \\
+                     &= \frac{t}{n}.
+  \end{alignat*}
+  Since $F_n$ is a piecewise-constant function, $F_n \in \frac{1}{n} \{0, \dots, n\}$,
+  it only takes discrete values 
+  % TODO rewrite with cases?
+  \[ \frac{\floor{t}}{n}, \quad t \in \{0, \dots, n\}. \]
+  Therefore,
+  \begin{alignat*}{3}
+    \Prob{R_i \le t} &= \frac{\floor{t}}{n} \\
+    \implies F_R(t) &= \frac{\floor{t}}{n} \\
+    \implies f_R(t) &= \mathcal{U}(\{0,\dots,n\}) \\
+    \implies F_R(t) &\indep F_X(t) \qedhere
+  \end{alignat*}
+\end{proof}
 
 % % INCLUDE CODE:
 % \clearpage
