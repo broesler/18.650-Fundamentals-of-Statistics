@@ -20,15 +20,21 @@
 \usepackage[font=small, hypcap=true, list=true]{subcaption}   % use for subfigures instead of {subfigure}
 
 \usepackage{hyperref}
+\usepackage{nameref}  % refer to unnumbered sections
 \hypersetup{
     linktoc=all,    % link table of contents to sections
     colorlinks,
-    allcolors=black }
+    allcolors=black,
+    urlcolor=dblue,
+  }
 
 % Declare theorem environments
-\newtheorem{thm}{Theorem}[section]
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{prop}{Proposition}[section]
+
 \renewcommand{\qedsymbol}{\ensuremath{\blacksquare}}
+
 % new environment for proofs of claims within proofs
 \newenvironment{subproof}[1][\proofname]{%
   \renewcommand{\qedsymbol}{\ensuremath{\square}}%
@@ -59,6 +65,7 @@
 \usepackage{xcolor}
 \definecolor{gray}{rgb}{0.5, 0.5, 0.5}
 \definecolor{mauve}{rgb}{0.58, 0, 0.82}
+\definecolor{dblue}{HTML}{0645AD}
 \definecolor{lblue}{HTML}{1F77B4}
 
 \usepackage{listings}
@@ -133,6 +140,8 @@
 \newcommand{\phat}{\hat{p}}
 \newcommand{\qhat}{\hat{q}}
 \newcommand{\rhat}{\hat{r}}
+
+\newcommand{\Xnbar}{\overline{X}_n}
 
 \DeclareMathOperator{\Ber}{Ber}
 % \DeclareMathOperator{\Var}{Var}
@@ -483,10 +492,10 @@ Define the estimators:
   Since the sequence of $X_i$'s are \iid, we can use the Weak Law of Large
   Numbers (LLN) to prove that $\phat$ converges to $p$.
 
-  \begin{thm}[Weak Law of Large Numbers] \label{eq:LLN}
+  \begin{theorem}[Weak Law of Large Numbers] \label{eq:LLN}
     If the sequence of random variables $X_1, \dots, X_n$ are \iid, then
     \[ \avg{i}{n} X_i \Plim \E{X}. \]
-  \end{thm}
+  \end{theorem}
 
   The expectation of $X$ is given by
   \begin{alignat*}{3}
@@ -526,13 +535,13 @@ Define the estimators:
 \emph{Proof.} To prove that the vector of estimators is asymptotically normal, we employ the
 Central Limit Theorem (CLT).
 
-\begin{thm}[Central Limit Theorem]
+\begin{theorem}[Central Limit Theorem]
     Let $X_1, \dots, X_n$ be a sequence of \iid\ random vectors $X_i \in \R^k$, 
-    and $\overline{X}_n = \avg{i}{n} X_i$.
+    and $\Xnbar = \avg{i}{n} X_i$.
     Then,
-    \[ \sqrt{n}(\overline{X}_n - \E{X}) \Dlim \N{0}{\Sigma}. \]
+    \[ \sqrt{n}(\Xnbar - \E{X}) \Dlim \N{0}{\Sigma}. \]
     where $\Sigma$ is the $k$-by-$k$ matrix $\Cov{X}$.
-\end{thm}
+\end{theorem}
 
 By the CLT,
 \begin{equation} \label{eq:CLT}
@@ -731,11 +740,11 @@ a consistent estimator is given by
 \begin{proof}
   To prove that $\hat{V}$ converges to $V$, we employ the Continuous Mapping
   Theorem.
-  \begin{thm}[Continuous Mapping Theorem]
+  \begin{theorem}[Continuous Mapping Theorem]
     Let $X \in \R^n$ be a vector of random variables, and $g \colon \R^n \to \R$
     be a continuous function. Let $X_n = X_1, X_2, \dots$ be a sequence of
     random vectors. If $X_n \Plim X$, then $g(X_n) \Plim g(X)$. 
-  \end{thm}
+  \end{theorem}
 
   Since $\phat \Plim p$ and $\qhat \Plim q$,
   $\hat{V}(\phat, \qhat) \Plim V(p, q)$.
@@ -745,7 +754,7 @@ a consistent estimator is given by
 \begin{prop}
   Given $\alpha \in (0, 1)$, we propose the test statistic
   \begin{equation}
-    T_n \coloneqq \sqrt{n}\frac{(\rhat - \phat\qhat)}{\sqrt{\hat{V}}} \sim t_{n-1}
+    T_n \coloneqq \frac{\sqrt{n}(\rhat - \phat\qhat)}{\sqrt{\hat{V}}} \Dlim \N{0}{1}
   \end{equation}
   where $\hat{V}$ is given by Proposition~\ref{prop:Vhat}, and $t_{n-1}$ is
   Student's $t$-distribution with $n-1$ degrees of freedom.
@@ -762,31 +771,44 @@ a consistent estimator is given by
   \sqrt{n}\frac{(\rhat - \phat\qhat)}{\sqrt{V}} &\Dlim \N{0}{1} \numberthis
   \label{eq:Tn_norm}
 \end{alignat*}
-The asymptotic variance $V$, however, is unknown, so we substitute the estimator
-$\hat{V}$ to get the test statistic
-\[ T_n \coloneqq  \sqrt{n}\frac{(\rhat - \phat\qhat)}{\sqrt{\hat{V}}}. \]
-If we rewrite the test statistic in terms of the unknown variance,
+The asymptotic variance $V$, however, is unknown, so we divide the estimator by
+$\sqrt{\frac{\hat{V}}{V}}$ to get an expression that will evaluate to our
+desired test statistic
 \begin{equation} \label{eq:t1}
-  \sqrt{n}\frac{(\rhat - \phat\qhat)}{\sqrt{\hat{V}}} =
-  \ddfrac{\sqrt{n}\frac{(\rhat - \phat\qhat)}{\sqrt{V}}}
-         {\sqrt{\frac{\hat{V}}{V}}} 
+  T_n = \ddfrac{\sqrt{n}\frac{(\rhat - \phat\qhat)}{\sqrt{V}}}
+               {\sqrt{\frac{\hat{V}}{V}}} 
 \end{equation}
+Given this expression, we can determine the distribution of $T_n$.
 Equation~\eqref{eq:Tn_norm} shows that the numerator is a standard normal random
-variable. Cochran's theorem gives the distribution of the denominator
-\begin{thm}[Cochran's Theorem]
+variable. 
+\href{https://en.wikipedia.org/wiki/Cochran's_theorem}{\underline{Cochran's theorem}}
+gives the distribution of the denominator.
+\begin{lemma}[Result of Cochran's Theorem]
   If $X_1, \dots, X_n$ are \iid\ random variables drawn from the distribution
-  $\N{\mu}{\sigma^2}$, and $S_n \coloneqq \avg{i}{n} (X_i - \overline{X}_n)^2$,
+  $\N{\mu}{\sigma^2}$, and $S_n^2 \coloneqq \sumi{i}{n} (X_i - \Xnbar)^2$,
   then
-  \[ \overline{X}_n \indep S_n \]
+  \[ \Xnbar \indep S_n, \]
   and
-  \[ \frac{n S_n}{\sigma^2} \sim \chi_{n-1}^2. \]
-\end{thm}
-% where $S_n$ is the sample variance of $n$ \iid\ normal random variables 
-  % \sim \ddfrac{\N{0}{1}}{\sqrt{\frac{\chi_{n-1}^2}{\nu}}}
-  % \implies T_n &\Dlim t_{n-1}
+  \[ \frac{n S_n^2}{\sigma^2} \sim \chi^2_{n-1}. \]
+\end{lemma}
+Since $\hat{V}$ and $V$ describe the sample variance and variance of a
+(asymptotically) normal distribution, $T_n$ is asymptotically characterized by
+\begin{equation}
+  T_n \Dlim \ddfrac{\N{0}{1}}{\sqrt{\frac{\chi^2_{n-1}}{n}}}
+\end{equation}
+which is the definition of a random variable drawn from \emph{Student's
+T-distribution} with $n-1$ degrees of freedom. In this case, however, the
+normality of the underlying random variables is asymptotic, so the $t_{n-1}$
+distribution approaches a standard normal distribution
+\begin{align*}
+  T_n &\Dlim t_{n-1} \\
+  t_{n-1} &\Dlim \N{0}{1} \numberthis \label{eq:t_to_N} \\
+  \implies T_n &\Dlim \N{0}{1} \qedhere
+\end{align*}
+A proof of Equation~\eqref{eq:t_to_N} is given in \nameref{app:t_to_N}.
 \end{proof}
 
-We define the rejection region of our test
+Given the test statistic $T_n$, define the rejection region
 \begin{equation}
   R_\psi = \left\{ \hat{\theta} \colon |T_n| > q_{\alpha/2} \right\}
 \end{equation}
@@ -796,6 +818,88 @@ where
 \end{equation}
 is the $\mleft(1-\frac{\alpha}{2}\mright)$-quantile of the standard normal $\N{0}{1}$
 distribution.
+
+\subsection*{Appendix A: Additional Proofs} \label{app:t_to_N}
+\begin{prop}
+  A $t$-distribution with $\nu$ degrees of freedrom approaches a standard normal
+  distribution as $n$ approaches infinity:
+  \[ t_{\nu} \Dlim \N{0}{1}. \]
+\end{prop}
+
+\emph{Proof.}
+  Student's $t$-distribution with $\nu$ degrees of freedom is defined as the
+  distribution of the random variable $T$ such that
+  \[ t_{\nu} \sim T = \ddfrac{Z}{\sqrt{\frac{V}{\nu}}} \]
+  where $Z \sim \N{0}{1}$, $V \sim \chi^2_{\nu}$, and $Z \indep V$.
+
+  Let $X_1, \dots, X_n \sim \N{\mu}{\sigma^2}$ be a sequence of \iid\ random
+  variables. Define the sample mean and sample variance
+  \begin{align*}
+    \Xnbar &\coloneqq \avg{i}{n} X_i \\
+    S_n^2 &\coloneqq \avg{i}{n} (X_i - \Xnbar)^2.
+  \end{align*}
+  Let the random variables
+  \begin{align*}
+    Z &= \frac{\sqrt{n}(\Xnbar - \mu)}{\sigma} \\
+    V &= \frac{n S_n^2}{\sigma^2}.
+  \end{align*}
+  such that $Z \sim \N{0}{1}$ by the Central Limit Theorem, and $V \sim
+  \chi^2_{n-1}$ by Cochran's Theorem (which also shows that $Z \indep V$).
+  Then, the $t$-distribution is exactly described in terms of the sample
+  \begin{align*}
+    t_{n-1} &= \ddfrac{Z}{\sqrt{\frac{V}{n-1}}}  \\
+            &= \frac{\sqrt{n}(\Xnbar - \mu)}{S_n}.
+  \end{align*}
+
+\begin{lemma}
+  The sample variance converges in probability to the variance,
+  \[ S_n^2 \Plim \sigma^2. \]
+\end{lemma}
+
+\begin{subproof}
+  \begin{alignat*}{3}
+    S_n^2 &\coloneqq \avg{i}{n}(X_i - \Xnbar)^2 \\
+          &= \avg{i}{n}(X_i^2 - 2 \Xnbar X_i + \Xnbar^2) \\
+          &= \avg{i}{n} X_i^2 - \avg{i}{n} 2 \Xnbar X_i + \avg{i}{n} \Xnbar^2  \\
+          &= \avg{i}{n} X_i^2 - 2 \Xnbar \avg{i}{n} X_i + \Xnbar^2  \\
+          &= \avg{i}{n} X_i^2 - 2 \Xnbar^2  + \Xnbar^2  \\
+          &= \avg{i}{n} X_i^2 - \Xnbar^2.
+  \end{alignat*}
+  The second term in the expression for $S_n^2$ is determined by
+  \begin{alignat*}{3}
+    \Xnbar &\Plim \E{X} \by{LLN} \\
+    \E{X} &= \mu \by{given}. \\
+    g(\Xnbar) &\Plim g(\mu) \by{CMT} \\
+    \implies \Xnbar^2 &\Plim \mu^2.
+  \end{alignat*}
+  The first term in the expression for $S_n^2$ is then determined by
+  \begin{alignat*}{3}
+    \avg{i}{n} X_i^2 &\Plim \E{X^2} \by{LLN} \\
+    \Var{X} &= \E{X^2} - \E{X}^2 \by{definition} \\
+    \implies \E{X^2} &= \Var{X} + \E{X}^2 \\
+                     &= \sigma^2 + \mu^2. \by{given} \\
+    \therefore S_n^2 &\Plim \sigma^2 + \mu^2 - \mu^2 \\
+    \implies S_n^2 &\Plim \sigma^2 \qedhere
+  \end{alignat*}
+\end{subproof}
+
+Thus, $V \Plim \frac{n \sigma^2}{\sigma^2} = n$, a constant. 
+
+\begin{theorem}[Slutsky's Theorem]
+  If the sequences of random variables $X_n~\Dlim~X$, and $Y_n~\Dlim~c$,
+  a constant, then
+  \begin{alignat*}{3}
+    X_n + Y_n &\Dlim X + c \text{, and} \\
+    X_n Y_n &\Dlim cX.
+  \end{alignat*}
+\end{theorem}
+
+Since $Z \Dlim \N{0}{1}$, Slutsky's theorem implies that
+\begin{align*}
+  t_{n-1} = \ddfrac{Z}{\sqrt{\frac{V}{\nu}}} 
+        &\Dlim \ddfrac{\N{0}{1}}{\sqrt{\frac{n}{n-1}}} \\
+        \implies t_{n-1} &\Dlim \N{0}{1}  \qed
+\end{align*}
 
 
 % % INCLUDE CODE:
