@@ -320,7 +320,12 @@ The following algorithm calculates the KS test statistic for two given samples.
 
 \clearpage
 The following subroutine is an implementation of Algorithm~\ref{alg:ks_stat}. It computes an array of values $T_v(i)$ for each value of $X_i$. The test statistic $T_{n,m}$ is the maximum of these values.
-\lstinputlisting[language=python, firstline=76, lastline=130]{../hw7_kstest.py}
+\lstinputlisting[language=python,
+  rangeprefix=\#<<,
+  rangesuffix=>>,
+  includerangemarker=false,
+  linerange=begin__ks_2samp-end__ks_2samp
+  ]{../hw7_kstest.py}
 
 \clearpage
 An example two-sample KS-test is shown in Figure~\ref{fig:ks_test}.

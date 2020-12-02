@@ -73,6 +73,7 @@ def ks_2samp(X, Y, alpha=0.05):
 
 
 # TODO implement as binary search
+#<<begin__ks_2samp>>
 def _ks_2samp(X, Y):
     """Compute the Kolmogorov-Smirnov statistic on 2 samples.
 
@@ -128,6 +129,7 @@ def _ks_2samp(X, Y):
         js[-1] = j
 
     return Tv, js
+#<<end__ks_2samp>>
 
 
 def plot_cdfs(X, Y, fignum=1):
