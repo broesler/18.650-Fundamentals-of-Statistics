@@ -88,6 +88,7 @@ np.testing.assert_allclose(Tn, Tn_1)
 np.testing.assert_allclose(Tn, Tn_2)
 np.testing.assert_allclose(Tn, Tn_3)
 
+# TODO move to subroutine like `ks_test`
 # Estimate q_alpha of Sn
 M = 10000
 alpha = 0.05
@@ -109,7 +110,7 @@ pvalue  = np.sum(np.abs(Sv) > np.abs(Tn)) / M  # two-tailed p-value
 rho_s, pvalue_s = stats.spearmanr(R, Q)
 
 np.testing.assert_allclose(Tn, rho_s)
-# np.testing.assert_allclose(pvalue, pvalue_s, atol=1e-2)
+np.testing.assert_allclose(pvalue, pvalue_s, atol=1e-2)
 
 print(f"Tn:      {Tn:.4f}\nq_hat:   {q_hat:.4f}\np-value: {pvalue:.4f}") 
 print('scipy.stats.spearmanr values')

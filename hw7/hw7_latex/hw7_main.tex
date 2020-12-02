@@ -144,6 +144,8 @@
 \newcommand{\rhat}{\hat{r}}
 
 \newcommand{\Xnbar}{\overline{X}_n}
+\newcommand{\Rnbar}{\overline{R}_n}
+\newcommand{\Qnbar}{\overline{Q}_n}
 
 \DeclareMathOperator{\Ber}{Ber}
 % \DeclareMathOperator{\Var}{Var}
@@ -291,21 +293,21 @@ The following algorithm calculates the KS test statistic for two given samples.
   \caption{Calculate the KS test statistic $T_{n,m}$ for two samples.}
   \label{alg:ks_stat}
   \begin{algorithmic}[1]
-    \Require $X, Y$ are 1-D arrays of real numbers.
+    \Require $X, Y$ are vectors of real numbers.
     \Ensure $0 \le T_{n,m} \le 1$.
     \Function{Rank}{$A, k$}
       \State {\bfseries assert} $A$ is sorted in ascending order.
-      \State\Return $\#\{i=1,\dots,\text{length}(A) \colon k < A_i\}$
+      \State\Return $\#\{i=1,\dots,\dim A \colon k < A_i\}$
     \EndFunction
     \Procedure{KS2Sample}{$X, Y$}
-    \State $X_s \gets \{-\infty, \text{sort}(X)\}$
-    \State $Y_s \gets$ sort($Y$)
-    \State $n \gets$ length($X_s$)
-    \State $m \gets$ length($Y_s$)
-    \State $T_v \gets$ empty array of length $n$
+    \State $X_s \gets \{-\infty,$ \Call{Sort}{$X$}$\}$
+    \State $Y_s \gets$ \Call{Sort}{$Y$}
+    \State $n \gets \dim X_s$
+    \State $m \gets \dim Y_s$
+    \State $T_v \gets$ empty array of size $n$
     \ForAll{$i \in \{0, \dots, n-1\}$}
-      \State $j \gets$ \Call{rank}{$Y_s, X_s^{(i)}$} + 1
-      \State $k \gets$ \Call{rank}{$\{Y_s^{(\ell)}\}_{\ell=j+1}^m, X_s^{(i+1)}$}
+      \State $j \gets$ \Call{Rank}{$Y_s, X_s^{(i)}$} + 1
+      \State $k \gets$ \Call{Rank}{$\{Y_s^{(\ell)}\}_{\ell=j+1}^m, X_s^{(i+1)}$}
       + (j+1)
       \State $\displaystyle{T_v^{(i)} \gets 
         \max\mleft(\left|\frac{i}{n} - \frac{j}{m}\right|,
@@ -410,19 +412,19 @@ $q_\alpha$ given $\alpha$ is as follows.
 distribution of $T_{n,m}$ under $H_0$.}
   \label{alg:ks_q}
   \begin{algorithmic}
-    \Require $X, Y$ are 1-D arrays of real numbers. $M \in \mathbb{N}$. $\alpha
+    \Require $X, Y$ are vectors of real numbers. $M \in \mathbb{N}$. $\alpha
     \in (0, 1)$.
     \Ensure $q_\alpha \in [0, 1]$.
     \Procedure{KSQuantile}{$X, Y, M, \alpha$}
-      \State $n \gets$ length of $X$
-      \State $m \gets$ length of $Y$
-      \State $T_v \gets$ empty array of length $n$
+      \State $n \gets \dim X$
+      \State $m \gets \dim Y$
+      \State $T_v \gets$ empty array of size $n$
       \ForAll{$i \in \{0,\dots,M\}$}
         \State $X_s \gets$ sample of size $n$ from $\N{0}{1}$.
         \State $Y_s \gets$ sample of size $m$ from $\N{0}{1}$.
         \State $T_v^{(i)} \gets$ \Call{KS2Sample}{$X_s, Y_s$}
       \EndFor
-      \State $T_{vs} \gets$ \Call{sort}{$T_v$}
+      \State $T_{vs} \gets$ \Call{Sort}{$T_v$}
       \State $j \gets \ceil*{M\alpha}$
       \State \Return $T_{vs}^{(j)}$
     \EndProcedure
@@ -985,7 +987,7 @@ The ranks $R_1, \dots, R_n$ are \emph{not} independent because the rank of $X_i$
 in the sample is unique. Therefore, if you know that $R_1 = 1$, \emph{e.g.}, then
 $R_2,\dots,R_n \ne 1$.
 
-\subsection{Proof of Distribution of Ranks}
+\subsection{Proof of Distribution of Ranks} \label{subsec:3}
 \begin{prop}
   The distribution of the vector $(R_1, \dots, R_n)$ does \emph{not} depend on
   the distribution of $X_i$'s (and, similarly, the distribution of $(Q_1,
@@ -1008,17 +1010,174 @@ $R_2,\dots,R_n \ne 1$.
                      &= F_n\mleft(F_n^{-1}\mleft(\frac{t}{n}\mright)\mright)
   \end{align*}
   Since $F_n$ is a piecewise-constant function, $F_n \in \frac{1}{n} \{0, \dots, n\}$,
-  it only takes discrete values 
+  it only takes discrete values
   \[ \frac{\floor{t}}{n} \quad t \in [0, n], \]
   regardless of the sample on which it is based.
   Therefore,
-  \begin{alignat*}{3}
+  \begin{align*}
     \Prob{R_i \le t} &= \frac{\floor{t}}{n} \\
     \implies F_R(t) &= \frac{\floor{t}}{n} \\
     \implies f_R(t) &= \mathcal{U}(\{0,\dots,n\}) \\
     \implies F_R(t) &\indep F_X(t) \qedhere
+  \end{align*}
+\end{proof}
+An interpretation of this result is that $(R_1, \dots, R_n)$ is a permutation of
+the vector $(1, \dots, n)$, with equal probability of any permutation since the
+$X_i$'s are \iid.
+
+\subsection{The Null Hypothesis} \label{subsec:4}
+\begin{prop}
+  If $H_0$ is true, then $(R_1, \dots, R_n) \indep (Q_1, \dots, Q_n)$.
+\end{prop}
+
+\begin{proof}
+  Under $H_0$, $X_i \indep Y_i$, so
+  \[ \Prob{X = x \land Y = y} = \Prob{X=x}\Prob{Y=y} \]
+  Since the empirical cdfs $F_n$ and $G_n$ of $X_i$ and $Y_j$, respectively, are
+  monotonic and increasing, we can apply them to every value to get the expression
+  \[ \begin{split}
+      &\Prob{nF_n(X) = nF_n(x) \land nG_n(Y) = nG_n(y)} \\
+      &\quad = \Prob{nF_n(X)=nF_n(x)}\Prob{nG_n(Y)=nG_n(y)}.
+      \end{split}
+  \]
+  The rank $R_i = n F_n(X_i)$, and, similarly, $Q_j = n G_n(Y_j)$, therefore
+  \begin{align*}
+    \Prob{R_i = i \land Q_j = j} &= \Prob{R_i = i}\Prob{Q_j = j} \\
+    \implies R &\indep Q. \qedhere
+  \end{align*}
+\end{proof}
+
+\subsection{Conclusion Under the Null Hypothesis} \label{subsec:5}
+Under $H_0$, we have just shown that $R \indep Q$, so the joint distribution of
+the $2n$ random variables $R_1, \dots, R_n, Q_1, \dots, Q_n$ is a discrete
+uniform distribution on $[0, n]$, and does not depend on the distributions of
+the $X$'s or $Y$'s.
+
+\subsection{The Test Statistic} \label{subsec:6}
+Consider the test statistic
+\[ T_n \coloneqq \ddfrac{\sumi{i}{n}(R_i - \Rnbar)(Q_i - \Qnbar)}
+                        {\sqrt{\sumi{i}{n} (R_i - \Rnbar)^2 \sumi{i}{n} (Q_i - \Qnbar)^2}}. \]
+This test statistic is the empirical correlation between the two samples. If
+$H_0$ is true, then $T_n \to 0$. We will now show that $T_n$ has a much simpler
+expression.
+
+\subsubsection{}
+\begin{prop} \label{prop:rn1}
+  \[ \Rnbar = \Qnbar = \frac{n+1}{2} \]
+\end{prop}
+
+\begin{proof}
+  Because $R \indep Q$ and $R, Q$ are each permutations of $(1, \dots, n)$,
+  $\Rnbar = \Qnbar$.
+  \begin{alignat*}{3}
+    \Rnbar &\coloneqq \avg{i}{n} R_i \\
+           &= \avg{i}{n} i \by{range of $R_i$} \\
+           &= \frac{1}{n} \frac{n(n+1)}{2} \by{geometric series} \\
+   \implies \Rnbar &= \frac{n+1}{2} \tag*{\qedhere}
   \end{alignat*}
 \end{proof}
+
+\begin{prop} \label{prop:rn2}
+  \[  \sumi{i}{n} (R_i - \Rnbar)^2 = \sumi{i}{n} (Q_i - \Qnbar)^2 = \frac{n(n^2 - 1)}{12} \]
+\end{prop}
+
+\begin{proof}
+  The first equality is true because $R, Q$ are each permutations of $(1, \dots, n)$.
+  The sum evaluates to
+  \begin{alignat*}{3}
+    \sumi{i}{n} (R_i - \Rnbar)^2 &= \sumi{i}{n} (R_i^2 - 2\Rnbar R_i + \Rnbar^2) \\
+    &= \sumi{i}{n} \mleft(i^2 - 2 i \frac{n+1}{2} + \mleft(\frac{n+1}{2}\mright)^2 \mright) \\
+    &= \sumi{i}{n} i^2 - (n+1)\sumi{i}{n} i + \frac{(n+1)^2}{4} \sumi{i}{n} 1 \\
+    \intertext{Using the fact that $\sumi{i}{n} i^2 = \frac{n(n+1)(2n+1)}{6}$,
+      and the previous result,}
+    &= \frac{n(n+1)(2n+1)}{6} - (n+1) \frac{n(n+1)}{2} + \frac{n(n+1)^2}{4} \\
+    &= \frac{2n^3 + 3n^2 + n}{6} - \frac{n^3 + 2n^2 + n}{2} + \frac{n^3 + 2n^2 + n}{4}  \\
+    &= \frac{1}{12} (4n^3 + 6n^2 + 2n - 6n^3 - 12n^2 - 6n + 3n^3 + 6n^2 + 3n) \\
+    &= \frac{1}{12} (n^3 - n) \\
+    &= \frac{n(n^2 - 1)}{12} \tag*{\qedhere}
+  \end{alignat*}
+\end{proof}
+
+\subsubsection{}
+\begin{prop}
+  The test statistic can be written as
+  \[ T_n = \frac{12}{n(n^2 - 1)} \sumi{i}{n}R_iQ_i - \frac{3(n+1)}{n-1}. \]
+\end{prop}
+
+\begin{proof}
+Plugging the expressions from Propositions~\ref{prop:rn1} and~\ref{prop:rn2}
+into the definition of $T_n$,
+\begin{align*}
+  T_n &\coloneqq \ddfrac{\sumi{i}{n}(R_i - \Rnbar)(Q_i - \Qnbar)}
+                            {\sqrt{\sumi{i}{n} (R_i - \Rnbar)^2 \sumi{i}{n} (Q_i - \Qnbar)^2}} \\
+  &= \ddfrac{\sumi{i}{n}\mleft(R_i - \frac{n+1}{2}\mright)\mleft(Q_i - \frac{n+1}{2}\mright)}
+                            {\sqrt{\frac{n(n^2 - 1)}{12} \frac{n(n^2 - 1)}{12}}} \\
+  &= \ddfrac{\sumi{i}{n}\mleft(R_iQ_i 
+                              - \frac{n+1}{2}(R_i + Q_i) 
+                              + \mleft(\frac{n+1}{2}\mright)^2 \mright)}
+                            {\frac{n(n^2 - 1)}{12}} \\
+  &= \frac{12}{n(n^2 - 1)} \mleft[ \sumi{i}{n}R_iQ_i 
+  + \mleft(\frac{n+1}{2}\mright)^2  \sumi{i}{n} 1
+  - \frac{n+1}{2}\sumi{i}{n}(R_i + Q_i) \mright]
+\end{align*}
+The first term is as desired. The remaining two terms simplify to
+\begin{align*}
+  &\phantom{=} \frac{12}{n(n^2 - 1)} \mleft[ \mleft(\frac{n+1}{2}\mright)^2  \sumi{i}{n} 1
+  - \frac{n+1}{2}\sumi{i}{n}(R_i + Q_i) \mright]  \\
+  &= \frac{12}{n(n^2 - 1)} \mleft[ \frac{n(n+1)^2}{4} - \frac{n+1}{2}\sumi{i}{n}2i \mright] \\
+  &= \frac{12}{n(n^2 - 1)} \mleft[ \frac{n(n+1)^2}{4} - (n+1)\frac{n(n+1)}{2} \mright] \\
+  &= \frac{12}{n(n+1)(n-1)} \mleft[ \frac{n(n+1)^2}{4} - \frac{n(n+1)^2}{2} \mright] \\
+  &= \frac{12}{n-1} \mleft[ \frac{n+1}{4} - \frac{n+1}{2} \mright] \\
+  &= \frac{12}{n-1} \mleft[ -\frac{n+1}{4} \mright] \\
+  &= \frac{3(n+1)}{n-1}
+\end{align*}
+so the entire expression is proven.
+\end{proof}
+
+\subsection{The Test Statistic is Distributed as the Sample Variance}
+\begin{prop}
+  If $H_0 \colon X \indep Y$ is true, then
+  \[ T_n \sim S_n = \frac{12}{n(n^2 - 1)} \sumi{i}{n} R_i' Q_i' - \frac{3(n+1)}{n-1}, \]
+  where $(R_1', \dots, R_n')$ and $(Q_1', \dots, Q_n')$ are ranks of two \iid\
+  samples of $\U{0}{1}$.
+\end{prop}
+
+\begin{proof}
+  Using the previous arguments, the proof is as follows:
+  \begin{itemize}
+    \item By the argument in \S\ref{subsec:3}, the distributions of $R_i', Q_i'$ do not depend on the distributions of the underlying random variables.
+    \item By the argument in \S\ref{subsec:4}, the vector $(R_1', \dots, R_n')
+      \indep (Q_1', \dots, Q_n')$ under $H_0$, so their distribution is known,
+      and is the same discrete uniform distribution as $R, Q$.
+    \item By the argument in \S\ref{subsec:6}, $T_n = S_n(R, Q)$.
+  \end{itemize}
+  Therefore, by the Continuous Mapping Theorem, $T_n \sim S_n$.
+\end{proof}
+
+\subsection{Computing Quantiles of the Test Statistic}
+Let $\alpha \in (0, 1)$. Algorithm~\ref{alg:sn_q} approximates the $(1-\alpha)$-quantile
+of $S_n$, $q_\alpha$.
+
+\begin{algorithm}[!h]
+  \caption{Approximate $q_\alpha$, the $(1 - \alpha)$-quantile of the
+distribution of $S_n$ under $H_0$.}
+  \label{alg:sn_q}
+  \begin{algorithmic}
+    \Require $M, n \in \mathbb{N}$. $\alpha \in (0, 1)$.
+    \Ensure $q_\alpha \in [0, 1]$.
+    \Procedure{SnQuantile}{$n, M, \alpha$}
+      \State $S_v \gets$ empty array of size $M$
+      \ForAll{$i \in \{1,\dots,M\}$}
+        \State $R \gets$ random permutation of $(1, \dots, n)$.
+        \State $Q \gets$ random permutation of $(1, \dots, n)$.
+        \State $S_v^{(i)} \gets \frac{12}{n(n^2 - 1)} \langle R, Q \rangle - \frac{3(n+1)}{n-1}$
+      \EndFor
+      \State $S_{vs} \gets$ \Call{Sort}{$S_v$}
+      \State $j \gets \ceil*{M\alpha}$
+      \State \Return $S_{vs}^{(j)}$
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
 
 % % INCLUDE CODE:
 % \clearpage
