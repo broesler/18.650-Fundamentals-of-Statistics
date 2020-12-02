@@ -24,7 +24,6 @@ from matplotlib.gridspec import GridSpec
 from scipy import stats
 
 
-# Calculate the K-S test statistic
 def ks_2samp(X, Y, alpha=0.05):
     """Compute the Kolmogorov-Smirnov statistic on 2 samples.
 
@@ -281,7 +280,7 @@ should_be(Tv, [0.4, 0.3, 0.2])
 # -----------------------------------------------------------------------------
 np.random.seed(565656)
 n = 100
-m =  70
+m = 70
 
 # Define the distributions (independent, frozen)
 #   * "unknown" to the statistician performing the test
@@ -300,47 +299,53 @@ if Tnm > q_hat:
 else:
     print(f"Fail to reject null @ {100*pvalue:0.2g}%.")
 
-# Plot the results
+# ----------------------------------------------------------------------------- 
+#         Plot the ECDFs
+# -----------------------------------------------------------------------------
 fig, ax = plot_cdfs(X, Y)
 ax.set(title=r'Empirical CDF: $X \sim \mathcal{N}(0,1)$, $Y \sim \mathcal{N}(0, 2)$')
 # fig.savefig('./hw7_latex/figures/ks_test.pdf')
 
-# Plot distribution of the test statistic
-M = 1000
+# ----------------------------------------------------------------------------- 
+#         Plot distribution of the test statistic
+# -----------------------------------------------------------------------------
+M = 10000
 Sv = _sample_Tnm(n, m, M)  # samples of Tnm to estimate quantiles
-# Sv_norm = np.sqrt(n) * (Sv - Sv.mean()) / np.sqrt(Sv.var())
-Sv_norm = Sv
+Sv_norm = (Sv - Sv.mean()) / Sv.std()
 
+# Compute standard normal for comparison
 rv = stats.norm(0, 1)
 x = np.linspace(rv.ppf(0.001), rv.ppf(1 - 0.001), 1000)
 
-fig = plt.figure(2, clear=True, figsize=(12, 6))
-fig.suptitle(fr'$X \sim \mathcal{{N}}(0,1)$, $Y \sim \mathcal{{N}}(0, 2)$, n = {n}, m = {m}, M = {M}')
+fig = plt.figure(2, clear=True)
+fig.set_size_inches((8, 4), forward=True)
+fig.suptitle(fr'$X \sim \mathcal{{N}}(0,1)$, $Y \sim \mathcal{{N}}(0, 2)$, n = {n}, m = {m}, M = {M}',
+             fontweight='normal')
 gs = GridSpec(nrows=1, ncols=2)
 
 ax = fig.add_subplot(gs[0])
-sns.histplot(Sv_norm, stat='density', kde=True, ax=ax, label='KDE $S_n^M$')
-# ax.plot(x, rv.pdf(x), 'k-', label=r'$\mathcal{N}(0,1)$')
+sns.histplot(Sv_norm, stat='density', kde=True, ax=ax, label='KDE $S_n^M$', bins=50)
+ax.plot(x, rv.pdf(x), 'k-', label=r'$\mathcal{N}(0,1)$')
 ax.set(xlabel=r'$x$')
 ax.legend()
 
-# Compute qq plot
-Fn_inv = Sv_norm
-F_inv = stats.norm(0, 1).ppf([i/M for i in range(1, M+1)])
-
 ax = fig.add_subplot(gs[1])
-ax.plot(F_inv, F_inv, 'k-')
-ax.scatter(F_inv, Fn_inv, s=10, edgecolors='C0', c='None', zorder=99)
+sns.ecdfplot(Sv_norm, ax=ax, zorder=9, label=r'ECDF $S_n^M$')
+ax.plot(x, rv.cdf(x), 'k-', label=r'$\Phi(x)$')
+ax.set(xlabel=r'$x$')
+ax.legend()
 
-ax.set(xlabel=r'Theoretical Quantiles $\mathcal{N}(0, 1)$',
-       ylabel='Empirical Quantiles')
-
-# sns.ecdfplot(Sv_norm, ax=ax, zorder=9, label=r'ECDF $S_n^M$')
-# ax.plot(x, rv.cdf(x), 'k-', label=r'$\Phi(x)$')
-# ax.set(xlabel=r'$x$')
-# ax.legend(loc='upper left')
+# # Compute qq plot
+# Fn_inv = Sv_norm
+# F_inv = stats.norm(0, 1).ppf([i/M for i in range(1, M+1)])
+# ax.plot(F_inv, F_inv, 'k-')
+# ax.scatter(F_inv, Fn_inv, s=10, edgecolors='C0', c='None', zorder=99)
+# ax.set(xlabel=r'Theoretical Quantiles $\mathcal{N}(0, 1)$',
+#        ylabel='Empirical Quantiles')
 
 gs.tight_layout(fig)
+
+fig.savefig('./hw7_latex/figures/ks_dist.pdf')
 
 plt.show()
 # =============================================================================

@@ -435,8 +435,7 @@ distribution of $T_{n,m}$ under $H_0$.}
 \end{algorithm}
 
 A plot of the distribution of 
-\[ \frac{\sqrt{n} (T_{n,m}^M
-    - \overline{T}_{n,m}^M)}{\sqrt{\Var{T_{n,m}^M}}} \]
+\[ \frac{T_{n,m}^M - \overline{T}_{n,m}^M}{\sqrt{\Var{T_{n,m}^M}}} \]
 is shown in Figure~\ref{fig:Tnm} in comparison to a standard normal. The test
 statistic distribution has a much longer right tail than the standard normal.
 Since the asymptotic distribution of the test statistic is not readily found in
@@ -1139,7 +1138,8 @@ into the definition of $T_n$,
   + \mleft(\frac{n+1}{2}\mright)^2  \sumi{i}{n} 1
   - \frac{n+1}{2}\sumi{i}{n}(R_i + Q_i) \mright]
 \end{align*}
-The first term is as desired. The remaining two terms simplify to
+The first term matches the first term of the proposition. The remaining two
+terms simplify to
 \begin{align*}
   &\phantom{=} \frac{12}{n(n^2 - 1)} \mleft[ \mleft(\frac{n+1}{2}\mright)^2  \sumi{i}{n} 1
   - \frac{n+1}{2}\sumi{i}{n}(R_i + Q_i) \mright]  \\
@@ -1148,12 +1148,12 @@ The first term is as desired. The remaining two terms simplify to
   &= \frac{12}{n(n+1)(n-1)} \mleft[ \frac{n(n+1)^2}{4} - \frac{n(n+1)^2}{2} \mright] \\
   &= \frac{12}{n-1} \mleft[ \frac{n+1}{4} - \frac{n+1}{2} \mright] \\
   &= \frac{12}{n-1} \mleft[ -\frac{n+1}{4} \mright] \\
-  &= \frac{3(n+1)}{n-1}
+  &= \frac{3(n+1)}{n-1} \\
+  \implies T_n &= \frac{12}{n(n^2 - 1)} \sumi{i}{n}R_iQ_i - \frac{3(n+1)}{n-1}. \qedhere
 \end{align*}
-so the entire expression is proven.
 \end{proof}
 
-\subsection{The Test Statistic is Distributed as the Sample Variance}
+\subsection{The Distribution of the Test Statistic is Pivotal}
 \begin{prop}
   If $H_0 \colon X \indep Y$ is true, then
   \[ T_n \sim S_n = \frac{12}{n(n^2 - 1)} \sumi{i}{n} R_i' Q_i' - \frac{3(n+1)}{n-1}, \]
@@ -1192,7 +1192,7 @@ distribution of $S_n$ under $H_0$.}
         \State $S_v^{(i)} \gets \frac{12}{n(n^2 - 1)} \langle R, Q \rangle - \frac{3(n+1)}{n-1}$
       \EndFor
       \State $S_{vs} \gets$ \Call{Sort}{$S_v$}
-      \State $j \gets \ceil*{M\alpha}$
+      \State $j \gets \ceil*{M(1 - \alpha)}$
       \State \Return $S_{vs}^{(j)}$
     \EndProcedure
   \end{algorithmic}
@@ -1204,6 +1204,8 @@ Redefine the hypotheses in terms of the test statistic
   H_0 &\colon T_n = 0 \\
   H_1 &\colon T_n \ne 0
 \end{align*}
+with
+\[ T_n = \frac{12}{n(n^2 - 1)} \sumi{i}{n}R_iQ_i - \frac{3(n+1)}{n-1}. \]
 Let $\alpha \in (0, 1)$. The hypothesis test is then
 \[ \delta_\alpha = \indic{|T_n| \ge \hat{q}_{\alpha/2}^{(n, M)}} \]
 where $\hat{q}_{\alpha/2}^{(n, M)}$ is the estimated $(1 - \alpha)$-quantile
@@ -1215,7 +1217,21 @@ of $T_n$. The $p$-value for this test is
 where $S_v^{(j)}$ is the $j^{\text{th}}$ sample of $S_n$, as computed in
 Algorithm~\ref{alg:sn_q}.
 
-% TODO include subroutine code, plot of the distribution
+A plot of the distribution of 
+\[ \frac{S_n^M - \overline{S}_n^M}{\sqrt{\Var{S_n^M}}} \]
+is shown in Figure~\ref{fig:Sn} in comparison to a standard normal. The test
+statistic distribution has a much longer right tail than the standard normal.
+Since the asymptotic distribution of the test statistic is not readily found in
+theory, we rely on simulation via Algorithm~\ref{alg:sn_q} to estimate the
+quantiles.
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.95\textwidth]{indep_dist.pdf}
+  \caption{Plot of the distribution of the test statistic $S_n$, normalized to
+    compare with a standard normal distribution.}
+  \label{fig:Sn}
+\end{figure}
 
 
 % % INCLUDE CODE:
