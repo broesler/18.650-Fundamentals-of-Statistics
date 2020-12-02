@@ -431,6 +431,8 @@ distribution of $T_{n,m}$ under $H_0$.}
   \end{algorithmic}
 \end{algorithm}
 
+% TODO show plot of this distribution
+
 \subsubsection{The Hypothesis Test}
 Given the aproximation for $\hat{q}_\alpha$ for $q_\alpha$ from
 Algorithm~\ref{alg:ks_q}, we define a test with non-asymptotic level $\alpha$
@@ -1178,6 +1180,26 @@ distribution of $S_n$ under $H_0$.}
     \EndProcedure
   \end{algorithmic}
 \end{algorithm}
+
+\subsection{A Non-Asymptotic Hypothesis Test}
+Redefine the hypotheses in terms of the test statistic
+\begin{align*}
+  H_0 &\colon T_n = 0 \\
+  H_1 &\colon T_n \ne 0
+\end{align*}
+Let $\alpha \in (0, 1)$. The hypothesis test is then
+\[ \delta_\alpha = \indic{|T_n| \ge \hat{q}_{\alpha/2}^{(n, M)}} \]
+where $\hat{q}_{\alpha/2}^{(n, M)}$ is the estimated $(1 - \alpha)$-quantile
+of $T_n$. The $p$-value for this test is
+\begin{align*}
+  \text{$p$-value} &\coloneqq \Prob{|Z| \ge |T_n|} \\
+  &\approx \frac{\#\{j=1,\dots,M \colon |S_v^{(j)}| \ge |T_n|\}}{M}
+\end{align*}
+where $S_v^{(j)}$ is the $j^{\text{th}}$ sample of $S_n$, as computed in
+Algorithm~\ref{alg:sn_q}.
+
+% TODO include subroutine code, plot of the distribution
+
 
 % % INCLUDE CODE:
 % \clearpage
