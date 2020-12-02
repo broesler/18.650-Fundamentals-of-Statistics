@@ -63,7 +63,7 @@
 %-------------------------------------------------------------------------------
 % Define colors for code
 \usepackage{xcolor}
-\definecolor{gray}{rgb}{0.5, 0.5, 0.5}
+\definecolor{gray}{rgb}{0.6, 0.6, 0.6}
 \definecolor{mauve}{rgb}{0.58, 0, 0.82}
 \definecolor{dblue}{HTML}{0645AD}
 \definecolor{lblue}{HTML}{1F77B4}
@@ -409,7 +409,7 @@ distribution of $T_{n,m}$ under $H_0$. The quantile $q_\alpha$ is given by
 \end{align*}
 where $M \in \mathbb{N}$ is large, and $T_{n,m}^{(i)}$ is the $i^\text{th}$
 value in a sorted sample of $M$ test statistics. Thus, $q_\alpha$ can be
-approximated by choosing $i = \ceil{M\alpha}$. An algorithm to approximate
+approximated by choosing $i = \ceil{M(1 - \alpha)}$. An algorithm to approximate
 $q_\alpha$ given $\alpha$ is as follows.
 
 \begin{algorithm}[!h]
@@ -417,26 +417,38 @@ $q_\alpha$ given $\alpha$ is as follows.
 distribution of $T_{n,m}$ under $H_0$.}
   \label{alg:ks_q}
   \begin{algorithmic}
-    \Require $X, Y$ are vectors of real numbers. $M \in \mathbb{N}$. $\alpha
+    \Require $n = \dim X$. $m = \dim Y$. $M \in \mathbb{N}$. $\alpha
     \in (0, 1)$.
     \Ensure $q_\alpha \in [0, 1]$.
-    \Procedure{KSQuantile}{$X, Y, M, \alpha$}
-      \State $n \gets \dim X$
-      \State $m \gets \dim Y$
+    \Procedure{KSQuantile}{$n, m, M, \alpha$}
       \State $T_v \gets$ empty array of size $n$
       \ForAll{$i \in \{0,\dots,M\}$}
         \State $X_s \gets$ sample of size $n$ from $\N{0}{1}$.
         \State $Y_s \gets$ sample of size $m$ from $\N{0}{1}$.
-        \State $T_v^{(i)} \gets$ \Call{KS2Sample}{$X_s, Y_s$}
+        \State $T_v^{(i)} \gets$ \Call{KS2Sample}{$X_s, Y_s$} \Comment{defined in Algorithm~\ref{alg:ks_stat}}
       \EndFor
       \State $T_{vs} \gets$ \Call{Sort}{$T_v$}
-      \State $j \gets \ceil*{M\alpha}$
+      \State $j \gets \ceil*{M(1 - \alpha)}$
       \State \Return $T_{vs}^{(j)}$
     \EndProcedure
   \end{algorithmic}
 \end{algorithm}
 
-% TODO show plot of this distribution
+A plot of the distribution of 
+\[ \frac{\sqrt{n} (T_{n,m}^M
+    - \overline{T}_{n,m}^M)}{\sqrt{\Var{T_{n,m}^M}}} \]
+is shown in Figure~\ref{fig:Tnm} in comparison to a standard normal. The test
+statistic distribution has a much longer right tail than the standard normal.
+Since the asymptotic distribution of the test statistic is not readily found in
+theory, we rely on simulation via Algorithm~\ref{alg:ks_q} to estimate the
+quantiles.
+
+\begin{figure}[!h]
+  \centering
+  \includegraphics[width=0.95\textwidth]{ks_dist.pdf}
+  \caption{Empirical distribution of samples of the test statistic $T_{n,m}$.}
+  \label{fig:Tnm}
+\end{figure}
 
 \subsubsection{The Hypothesis Test}
 Given the aproximation for $\hat{q}_\alpha$ for $q_\alpha$ from
