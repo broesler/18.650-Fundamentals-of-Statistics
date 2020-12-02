@@ -305,10 +305,10 @@ The following algorithm calculates the KS test statistic for two given samples.
     \State $n \gets \dim X_s$
     \State $m \gets \dim Y_s$
     \State $T_v \gets$ empty array of size $n$
-    \ForAll{$i \in \{0, \dots, n-1\}$}
-      \State $j \gets$ \Call{Rank}{$Y_s, X_s^{(i)}$} + 1
-      \State $k \gets$ \Call{Rank}{$\{Y_s^{(\ell)}\}_{\ell=j+1}^m, X_s^{(i+1)}$}
-      + (j+1)
+    \ForAll{$i \in \{0, \dots, n\}$}
+      \State $j \gets j$ + \Call{Rank}{$\{Y_s^{(\ell)}\}_{\ell=j}^m, X_s^{(i)}$}
+      \Comment{Only search remaining $j$ values}
+      \State $k \gets j$ + \Call{Rank}{$\{Y_s^{(\ell)}\}_{\ell=j}^m, X_s^{(\min(i+1, n))}$}
       \State $\displaystyle{T_v^{(i)} \gets 
         \max\mleft(\left|\frac{i}{n} - \frac{j}{m}\right|,
               \left|\frac{i}{n} - \frac{k}{m}\right|\mright)}$
@@ -321,7 +321,7 @@ The following algorithm calculates the KS test statistic for two given samples.
 \clearpage
 The following subroutine is an implementation of Algorithm~\ref{alg:ks_stat}. It computes an array of values $T_v(i)$ for each value of $X_i$. The test statistic $T_{n,m}$ is the maximum of these values.
 \lstinputlisting[language=python,
-  rangeprefix=\#<<,
+  rangeprefix=\#\ <<,
   rangesuffix=>>,
   includerangemarker=false,
   linerange=begin__ks_2samp-end__ks_2samp

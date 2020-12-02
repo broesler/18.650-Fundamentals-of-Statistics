@@ -4,7 +4,7 @@
 #  Created: 2020-10-10 11:49
 #   Author: Bernie Roesler
 #
-"""
+r"""
   Description: Create Kolmogorov-Smirnov 2-sample test example.
 
   .. math::
@@ -25,7 +25,7 @@ from scipy import stats
 
 
 def ks_2samp(X, Y, alpha=0.05):
-    """Compute the Kolmogorov-Smirnov statistic on 2 samples.
+    r"""Compute the Kolmogorov-Smirnov statistic on 2 samples.
 
     Parameters
     ----------
@@ -84,12 +84,12 @@ def _sample_Tnm(n, m, M=1000):
     Xs = stats.norm(0, 1).rvs((n, M))
     Ys = stats.norm(0, 1).rvs((m, M))
     for i in range(M):
-        Tv[i] = np.max(_ks_2samp(Xs[:,i], Ys[:,i])[0])
+        Tv[i] = np.max(_ks_2samp(Xs[:, i], Ys[:, i])[0])
 
     return np.sort(Tv)
 
 
-#<<begin__ks_2samp>>
+# <<begin__ks_2samp>>
 def _ks_2samp(X, Y):
     """Compute the Kolmogorov-Smirnov statistic on 2 samples.
 
@@ -116,37 +116,40 @@ def _ks_2samp(X, Y):
     Tv = np.zeros(n+1)  # extra value at Fn = 0 (Xs -> -infty)
     js = np.zeros(n+1, dtype=int)
     j = 0
-    for i in range(n):
-        # TODO implement as binary search
+    for i in range(n+1):
         # Find greatest Ys point j s.t. Ys[j] <= Xs[i] and Xs[i] < Ys[j+1]
-        while j < m and Ys[j] <= Xs[i] and Xs[i] > Ys[j+1]:
-            j += 1
-
-        # If Gm(Y) rises before Fn(X), take diff between that point and 0.
-        if i == 0 and Ys[j] <= Xs[i]:
-            Tv[i] = j/m
-            continue
+        j += _rank(Ys[j:], Xs[i])  # only search remaining values
 
         test_lo = np.abs(i/n - j/m)
         j_lo = j
 
         # Find next greatest Ys point k s.t. Ys[k] < X[i+1]
-        while j < m and Ys[j] < Xs[i+1]:
-            j += 1
-        test_hi = np.abs(i/n - j/m)
-        j_hi = j
+        k = _rank(Ys[j:], Xs[min(i+1, n)]) + j
+        test_hi = np.abs(i/n - k/m)
+        j_hi = k
 
+        # Take the maximum distance, and corresponding index
         Tv[i] = np.max((test_lo, test_hi))
         js[i] = j_lo if np.argmax((test_lo, test_hi)) == 0 else j_hi
 
-    # Clean up last point
-    # any remaining Gm(Y) values get closer to 1
-    if j < m and Ys[j] > Xs[-1]:
-        Tv[-1] = 1 - j/m
-        js[-1] = j
-
     return Tv, js
-#<<end__ks_2samp>>
+# <<end__ks_2samp>>
+
+
+def _rank(A, k):
+    """Return the number of keys in `A` strictly less than `k`."""
+    assert all(A == sorted(A))
+    lo = 0
+    hi = len(A) - 1
+    while lo <= hi:
+        mid = (hi + lo) // 2
+        if k < A[mid]:
+            hi = mid - 1
+        elif k > A[mid]:
+            lo = mid + 1
+        else:  # k == A[mid]
+            return mid
+    return lo
 
 
 def plot_cdfs(X, Y, fignum=1):
@@ -168,19 +171,17 @@ def plot_cdfs(X, Y, fignum=1):
 
     # Compute the test statistic
     Tvs, js = _ks_2samp(X, Y)
-    i_max = np.argmax(Tvs) - 1
+    i_max = np.argmax(Tvs)
     j_max = js[i_max]
 
     # plot difference
-    y_ks0 = (i_max+1)/n
+    y_ks0 = i_max/n
     y_ks1 = j_max/m
 
     if y_ks0 > y_ks1:
-        x_ks = (Xs[i_max] + Ys[j_max]) / 2
+        x_ks = (Xs_plot[i_max] + Ys_plot[j_max+1]) / 2
     else:
-        x_ks = (Xs[i_max+1] + Ys[j_max]) / 2
-        y_ks1 = (j_max+1)/m
-
+        x_ks = (Xs_plot[i_max+1] + Ys_plot[j_max]) / 2
 
     fig = plt.figure(fignum, clear=True)
     ax = fig.add_subplot()
@@ -202,6 +203,7 @@ def plot_cdfs(X, Y, fignum=1):
            ylabel='$F_n$, $G_m$')
     ax.legend()
 
+    # import ipdb; ipdb.set_trace()
     return fig, ax
 
 
@@ -229,6 +231,7 @@ def run_test(n, m, plot=False, fignum=1):
 
     if plot:
         plot_cdfs(X, Y, fignum)
+        plt.show()
 
     return _ks_2samp(X, Y)[0]  # use helper to return entire vector of values
 
@@ -262,17 +265,17 @@ def should_be(a, b, name=None, verbose=False):
 # -----------------------------------------------------------------------------
 # 1. X rises before Y, L
 np.random.seed(565656)  # Y jumps before X
-Tv = run_test(n=5, m=2)
+Tv = run_test(n=5, m=2, plot=True)
 should_be(Tv, [0.0, 0.3, 0.1, 0.4, 0.2, 0.0])
 
 # 2. Y jumps before X, multiple Xs within a Y
 np.random.seed(123)
-Tv = run_test(n=5, m=2)
+Tv = run_test(n=5, m=2, plot=True)
 should_be(Tv, [0.5, 0.3, 0.1, 0.1, 0.3, 0.5])
 
 # 3. Y jumps before X, multiple Ys within an X
 np.random.seed(123)
-Tv = run_test(n=2, m=5)
+Tv = run_test(n=2, m=5, plot=True)
 should_be(Tv, [0.4, 0.3, 0.2])
 
 # -----------------------------------------------------------------------------
@@ -299,17 +302,17 @@ if Tnm > q_hat:
 else:
     print(f"Fail to reject null @ {100*pvalue:0.2g}%.")
 
-# ----------------------------------------------------------------------------- 
+# -----------------------------------------------------------------------------
 #         Plot the ECDFs
 # -----------------------------------------------------------------------------
 fig, ax = plot_cdfs(X, Y)
 ax.set(title=r'Empirical CDF: $X \sim \mathcal{N}(0,1)$, $Y \sim \mathcal{N}(0, 2)$')
-# fig.savefig('./hw7_latex/figures/ks_test.pdf')
+fig.savefig('./hw7_latex/figures/ks_test.pdf')
 
-# ----------------------------------------------------------------------------- 
+# -----------------------------------------------------------------------------
 #         Plot distribution of the test statistic
 # -----------------------------------------------------------------------------
-M = 10000
+M = 1000
 Sv = _sample_Tnm(n, m, M)  # samples of Tnm to estimate quantiles
 Sv_norm = (Sv - Sv.mean()) / Sv.std()
 
@@ -324,7 +327,7 @@ fig.suptitle(fr'$X \sim \mathcal{{N}}(0,1)$, $Y \sim \mathcal{{N}}(0, 2)$, n = {
 gs = GridSpec(nrows=1, ncols=2)
 
 ax = fig.add_subplot(gs[0])
-sns.histplot(Sv_norm, stat='density', kde=True, ax=ax, label='KDE $S_n^M$', bins=50)
+sns.histplot(Sv_norm, stat='density', kde=True, ax=ax, label='KDE $S_n^M$')
 ax.plot(x, rv.pdf(x), 'k-', label=r'$\mathcal{N}(0,1)$')
 ax.set(xlabel=r'$x$')
 ax.legend()
@@ -349,7 +352,7 @@ ax.set(xlabel=r'Theoretical Quantiles $\mathcal{N}(0, 1)$',
        )
 
 gs.tight_layout(fig)
-# fig.savefig('./hw7_latex/figures/ks_dist.pdf')
+fig.savefig('./hw7_latex/figures/ks_dist.pdf')
 
 plt.show()
 # =============================================================================
