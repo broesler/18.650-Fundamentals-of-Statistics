@@ -47,32 +47,49 @@ def ks_2samp(X, Y, alpha=0.05):
     --------
     scipy.stats.ks_2samp
     """
-    Tnm = np.max(_ks_2samp(X, Y)[0])  # the test statistic
-
-    # Simulate M iid copies Tn(1), ..., Tn(M) of the test statistic.
-    # Note: Under the null, Tn is *pivotal*, so it does not depend on the
-    # underlying distributions of X and Y.
     M = 1000  # number of samples to take
     n = len(X)
     m = len(Y)
-    Tv = np.zeros(M)
-    for i in range(M):
-        # Sample from two arbitrary distributions
-        Xs = stats.norm(0, 1).rvs(n)
-        Ys = stats.norm(0, 1).rvs(m)
-        Tv[i] = np.max(_ks_2samp(Xs, Ys)[0])
+
+    Tnm = np.max(_ks_2samp(X, Y)[0])  # the test statistic
+    Tvs = _sample_Tnm(n, m, M)  # samples of Tnm to estimate quantiles
 
     # Estimate the (1-alpha) quantile of Tn
     # take value s.t. M*(1-alpha) values are > Tv[q]
-    Tvs = np.sort(Tv)
-
     q_hat = Tvs[np.ceil(M*(1 - alpha)).astype(int)]
     pvalue = np.sum(Tvs > Tnm) / M
 
     return Tnm, pvalue, q_hat
 
 
-# TODO implement as binary search
+def _sample_Tnm(n, m, M=1000):
+    """Simulate M iid copies Tn(1), ..., Tn(M) of the test statistic.
+
+    .. note:: Under the null, Tn is *pivotal*, so it does not depend on the
+              underlying distributions of X and Y.
+
+    Parameters
+    ----------
+    n, m : int
+        Number of data points in each sample.
+    M : int
+        Number of samples to take of the test statistic.
+
+    Returns
+    -------
+    Tvs : (M,) ndarray
+        Sorted samples of the test statistic for computation of quantiles.
+    """
+    Tv = np.zeros(M)
+    # Sample from two arbitrary distributions
+    Xs = stats.norm(0, 1).rvs((n, M))
+    Ys = stats.norm(0, 1).rvs((m, M))
+    for i in range(M):
+        Tv[i] = np.max(_ks_2samp(Xs[:,i], Ys[:,i])[0])
+
+    return np.sort(Tv)
+
+
 #<<begin__ks_2samp>>
 def _ks_2samp(X, Y):
     """Compute the Kolmogorov-Smirnov statistic on 2 samples.
