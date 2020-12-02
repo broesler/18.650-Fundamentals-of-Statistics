@@ -437,7 +437,8 @@ distribution of $T_{n,m}$ under $H_0$.}
 A plot of the distribution of 
 \[ \frac{T_{n,m}^M - \overline{T}_{n,m}^M}{\sqrt{\Var{T_{n,m}^M}}} \]
 is shown in Figure~\ref{fig:Tnm} in comparison to a standard normal. The test
-statistic distribution has a much longer right tail than the standard normal.
+statistic distribution is skewed to the left, and has a longer right tail than
+the standard normal.
 Since the asymptotic distribution of the test statistic is not readily found in
 theory, we rely on simulation via Algorithm~\ref{alg:ks_q} to estimate the
 quantiles.
@@ -1219,11 +1220,14 @@ Algorithm~\ref{alg:sn_q}.
 
 A plot of the distribution of 
 \[ \frac{S_n^M - \overline{S}_n^M}{\sqrt{\Var{S_n^M}}} \]
-is shown in Figure~\ref{fig:Sn} in comparison to a standard normal. The test
-statistic distribution has a much longer right tail than the standard normal.
-Since the asymptotic distribution of the test statistic is not readily found in
-theory, we rely on simulation via Algorithm~\ref{alg:sn_q} to estimate the
-quantiles.
+is shown in Figure~\ref{fig:Sn} in comparison to a standard normal. The
+underlying samples are each taken from an arbitrary
+$\operatorname{Exp}(\lambda=1)$ to demonstrate the independence of the test
+statistic distribution on the underlying sample distribution. This test
+statistic is indeed normally distributed, although the parameters of the
+distribution are not immediately apparent from our derivation. Since the
+asymptotic distribution of the test statistic is not readily found in theory, we
+rely on simulation via Algorithm~\ref{alg:sn_q} to estimate the quantiles.
 
 \begin{figure}[!h]
   \centering

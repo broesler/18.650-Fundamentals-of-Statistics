@@ -330,22 +330,26 @@ ax.set(xlabel=r'$x$')
 ax.legend()
 
 ax = fig.add_subplot(gs[1])
-sns.ecdfplot(Sv_norm, ax=ax, zorder=9, label=r'ECDF $S_n^M$')
-ax.plot(x, rv.cdf(x), 'k-', label=r'$\Phi(x)$')
-ax.set(xlabel=r'$x$')
-ax.legend()
+# sns.ecdfplot(Sv_norm, ax=ax, zorder=9, label=r'ECDF $S_n^M$')
+# ax.plot(x, rv.cdf(x), 'k-', label=r'$\Phi(x)$')
+# ax.set(xlabel=r'$x$')
+# ax.legend()
 
-# # Compute qq plot
-# Fn_inv = Sv_norm
-# F_inv = stats.norm(0, 1).ppf([i/M for i in range(1, M+1)])
-# ax.plot(F_inv, F_inv, 'k-')
-# ax.scatter(F_inv, Fn_inv, s=10, edgecolors='C0', c='None', zorder=99)
-# ax.set(xlabel=r'Theoretical Quantiles $\mathcal{N}(0, 1)$',
-#        ylabel='Empirical Quantiles')
+# Compute qq plot
+# fig = plt.figure(3, clear=True)
+# ax = fig.add_subplot()
+Fn_inv = Sv_norm
+F_inv = stats.norm(0, 1).ppf([i/M for i in range(1, M+1)])
+ax.plot(F_inv, F_inv, 'k-')
+ax.scatter(F_inv, Fn_inv, s=10, edgecolors='C0', c='None', zorder=99)
+ax.set(xlabel=r'Theoretical Quantiles $\mathcal{N}(0, 1)$',
+       ylabel='Empirical Quantiles',
+       xlim=(-4, 4),
+       ylim=(-4, 4.75)
+       )
 
 gs.tight_layout(fig)
-
-fig.savefig('./hw7_latex/figures/ks_dist.pdf')
+# fig.savefig('./hw7_latex/figures/ks_dist.pdf')
 
 plt.show()
 # =============================================================================
