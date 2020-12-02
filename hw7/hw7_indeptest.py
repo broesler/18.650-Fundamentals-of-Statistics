@@ -18,10 +18,58 @@ import seaborn as sns
 from matplotlib.gridspec import GridSpec
 
 sns.set_style('whitegrid')
-rng = np.random.default_rng()
+rng = np.random.default_rng(seed=565656)
+
+# TODO rename _test
+def spearmanr(X, Y, alpha=0.05):
+    """Calculate Spearman's rank order correlation for two samples.
+
+    Parameters
+    ----------
+    X, Y : (N, 1) array_like
+        Arrays of data over which to calculate the statistic.
+    alpha : float \in (0, 1)
+        Level of the test.
+
+    Returns
+    -------
+    correlation : float
+        The value of the statistic
+    pvalue : float \in [0, 1]
+        The two-sided p-value for a hypothesis test where H_0 : X \indep Y.
+
+    See Also
+    --------
+    scipy.stats.spearmanr
+    """
+    assert len(X) == len(Y)
+    n = len(X)
+    M = 10000
+
+    # Calculate the test statistic
+    Tn  = _spearmanr(X, Y, kind='simple')
+
+    # Estimate q_alpha of Sn
+    Svs = _sample_Sn(n, M)
+
+    # Calculate statistics
+    q_hat   = Svs[np.floor(M*(1 - alpha/2)).astype(int)]
+    pvalue  = np.sum(np.abs(Svs) > np.abs(Tn)) / M  # two-tailed p-value
+
+    return Tn, pvalue, q_hat
 
 
-def spearmanr(X, Y, kind='def'):
+def _sample_Sn(n, M):
+    """Simulate M iid copies of the test statistic."""
+    Sv = np.zeros(M)
+    for i in range(M):
+        Rp = rng.permutation(R)
+        Qp = rng.permutation(Q)
+        Sv[i] = 12 / (n*(n**2 - 1)) * Rp.dot(Qp) - 3*(n+1)/(n-1)
+    return np.sort(Sv)
+
+
+def _spearmanr(X, Y, kind='bydef'):
     """Calculate Spearman's rank order correlation for two samples.
 
     Parameters
@@ -66,8 +114,12 @@ def spearmanr(X, Y, kind='def'):
 # ----------------------------------------------------------------------------- 
 #         Run an experiment
 # -----------------------------------------------------------------------------
+np.random.seed(565656)
 n = 100
-dist = stats.expon(1)  # distribution from which to sample 
+alpha = 0.05
+
+# dist = stats.expon(1)  # distribution from which to sample (arbitrary)
+dist = stats.norm(0, 1)
 
 X = dist.rvs(n)
 Y = dist.rvs(n)
@@ -79,32 +131,19 @@ Q = Y.argsort() + 1
 # Tn = Pearson's correlation coefficient of ranks
 #    = Spearman's rank correlation coefficient (aka "Spearman's rho")
 
-Tn_1 = spearmanr(X, Y, kind='bydef')
-Tn   = spearmanr(X, Y, kind='simple')
-Tn_2 = spearmanr(X, Y, kind='meanvar')
-Tn_3 = spearmanr(X, Y, kind='noties')
+Tn_1 = _spearmanr(X, Y, kind='bydef')
+Tn   = _spearmanr(X, Y, kind='simple')
+Tn_2 = _spearmanr(X, Y, kind='meanvar')
+Tn_3 = _spearmanr(X, Y, kind='noties')
 
 np.testing.assert_allclose(Tn, Tn_1)
 np.testing.assert_allclose(Tn, Tn_2)
 np.testing.assert_allclose(Tn, Tn_3)
 
-# TODO move to subroutine like `ks_test`
-# Estimate q_alpha of Sn
-M = 10000
-alpha = 0.05
-
-Sv = np.zeros(M)
-for i in range(M):
-    Rp = rng.permutation(R)
-    Qp = rng.permutation(Q)
-    Sv[i] = 12 / (n*(n**2 - 1)) * Rp.dot(Qp) - 3*(n+1)/(n-1)
-
-Sv.sort()
-
-# Calculate statistics
-q_hat   = Sv[np.floor(M*(1 - alpha/2)).astype(int)]
+# Calculate our test statistic
+# TODO compare with API of scipy.stats.spearmanr
+Tn, pvalue, q_hat = spearmanr(X, Y, alpha=alpha)
 d_alpha = np.abs(Tn) > q_hat
-pvalue  = np.sum(np.abs(Sv) > np.abs(Tn)) / M  # two-tailed p-value
 
 # Compare to actual scipy values
 rho_s, pvalue_s = stats.spearmanr(R, Q)
@@ -112,7 +151,7 @@ rho_s, pvalue_s = stats.spearmanr(R, Q)
 np.testing.assert_allclose(Tn, rho_s)
 np.testing.assert_allclose(pvalue, pvalue_s, atol=1e-2)
 
-print(f"Tn:      {Tn:.4f}\nq_hat:   {q_hat:.4f}\np-value: {pvalue:.4f}") 
+print(f"Tn:      {Tn:.4f}\np-value: {pvalue:.4f}\nq_hat:   {q_hat:.4f}") 
 print('scipy.stats.spearmanr values')
 print(f"rho_s:   {rho_s:.4f}\np-value: {pvalue_s:.4f}") 
 
@@ -123,9 +162,11 @@ else:
 
 
 # ----------------------------------------------------------------------------- 
-#         Plot the distribution of Sn vs. N(0, sigma**2)
+#         Plot the distribution of Sn vs. N(0, 1)
 # -----------------------------------------------------------------------------
 # Normalize Sv (under H0, Sv -> 0 as n -> infty)
+M = 10000
+Sv = _sample_Sn(n, M)
 Sv_norm = np.sqrt(n) * Sv
 
 rv = stats.norm(0, 1)  
