@@ -988,10 +988,8 @@ Define the hypotheses
 \end{align*}
 For $i = 1, \dots, n$, let $R_i$ be the \emph{rank} of $X_i$ in the sample $X_1,
 \dots, X_n$. The rank function is defined as
-\begin{equation} \label{eq:R_i}
-  R_i = \operatorname{rank}(X_i) \coloneqq \#\{j \colon X_j \le X_i, \; i \ne j\} 
-\end{equation}
-\ie if $X_i = \min\limits_j X_j$, then $R_i = 1$, and if $X_i = \max\limits_j
+\[ R_i = \operatorname{rank}(X_i) \coloneqq \#\{j \colon X_j \le X_i\}  \]
+\ie if $X_i = \min_j X_j$, then $R_i = 1$, and if $X_i = \max_j
 X_j$, then $R_j = n$. 
 Similarly, let $Q_i$ be the rank of $Y_i$ in $Y_1, \dots, Y_n$.
 
@@ -1015,7 +1013,7 @@ $R_2,\dots,R_n \ne 1$.
 
 \begin{proof}
   Given the definition of $R_i$
-  \[ R_i = \operatorname{rank}(X_i) \coloneqq \#\{j \colon X_j \le X_i, \; i \ne j\}, \tag{\ref{eq:R_i}} \]
+  \[ R_i = \operatorname{rank}(X_i) \coloneqq \#\{j \colon X_j \le X_i \]
   we can determine its distribution. 
   Let 
   \[ F_n(t) = \avg{i}{n} \indic{X_i \le t} \] 
@@ -1023,26 +1021,29 @@ $R_2,\dots,R_n \ne 1$.
   We can then rewrite the definition of the rank as
   \[ R_i = \sumi{j}{n} \indic{X_j \le X_i} = n F_n(X_i). \]
   The cdf of $R_i$, $F_R(t)$ is then
-  \begin{align*}{3}
+  \begin{align*}
     \Prob{R_i \le t} &= \Prob{n F_n(X_i) \le t} \\
-                     &= \Prob{X_i \le F_n^{-1}\mleft(\frac{t}{n}\mright)} \\
-                     &= F_n\mleft(F_n^{-1}\mleft(\frac{t}{n}\mright)\mright)
+                     &= \Prob{X_i \le F_n^{-1}\mleft(\tfrac{t}{n}\mright)} \\
+                     &= F_n\mleft(F_n^{-1}\mleft(\tfrac{t}{n}\mright)\mright)
   \end{align*}
-  Since $F_n$ is a piecewise-constant function, $F_n \in \frac{1}{n} \{0, \dots, n\}$,
-  it only takes discrete values
-  \[ \frac{\floor{t}}{n} \quad t \in [0, n], \]
-  regardless of the sample on which it is based.
+  Since $F_n$ is a piecewise-constant function, $F_n^{-1}$ does not exist. To
+  avoid ambiguity, define
+  \[ F_n^{-1}(p) = \inf\{x \colon F_n(x) \ge p\} \]
+  where $p \in (0, 1)$. Given the definition of the empirical cdf, its inverse
+  can only take the discrete values $X_1, \dots, X_n$, so 
+  \[  F_n\mleft(F_n^{-1}\mleft(\tfrac{t}{n}\mright)\mright) 
+      = \frac{\floor{t}}{n} \quad t \in [0, n] \]
   Therefore,
   \begin{align*}
-    \Prob{R_i \le t} &= \frac{\floor{t}}{n} \\
-    \implies F_R(t) &= \frac{\floor{t}}{n} \\
+    \Prob{R_i \le t} &= \frac{\floor{t}}{n} \quad t \in [0, n] \\
+                    &= \mleft\{0, \tfrac{1}{n}, \tfrac{2}{n}, \dots, 1\mright\} \\
+    \implies F_R(t) &= \mleft\{0, \tfrac{1}{n}, \tfrac{2}{n}, \dots, 1\mright\} \\
     \implies f_R(t) &= \mathcal{U}(\{0,\dots,n\}) \\
     \implies F_R(t) &\indep F_X(t) \qedhere
   \end{align*}
 \end{proof}
 An interpretation of this result is that $(R_1, \dots, R_n)$ is a permutation of
-the vector $(1, \dots, n)$, with equal probability of any permutation since the
-$X_i$'s are \iid.
+the vector $(1, \dots, n)$, with equal probability of any permutation.
 
 \subsection{The Null Hypothesis} \label{subsec:4}
 \begin{prop}
