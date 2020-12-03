@@ -13,7 +13,7 @@
 \usepackage{mleftright}
 \usepackage{enumerate}
 \usepackage{array, multirow}
-\usepackage[ruled]{algorithm}
+\usepackage[section, ruled]{algorithm}
 \usepackage{algpseudocode}
 \usepackage{url}
 \usepackage[font=small, hypcap=true]{caption}                % link to top of figures and subfigures
@@ -289,16 +289,12 @@ Let
 
 \clearpage
 The following algorithm calculates the KS test statistic for two given samples.
-\begin{algorithm}[!h]
+\begin{algorithm}[H]
   \caption{Calculate the KS test statistic $T_{n,m}$ for two samples.}
   \label{alg:ks_stat}
   \begin{algorithmic}[1]
     \Require $X, Y$ are vectors of real numbers.
     \Ensure $0 \le T_{n,m} \le 1$.
-    \Function{Rank}{$A, k$}
-      \State {\bfseries assert} $A$ is sorted in ascending order.
-      \State\Return $\#\{i=1,\dots,\dim A \colon k < A_i\}$
-    \EndFunction
     \Procedure{KS2Sample}{$X, Y$}
     \State $X_s \gets \{-\infty,$ \Call{Sort}{$X$}$\}$
     \State $Y_s \gets$ \Call{Sort}{$Y$}
@@ -313,13 +309,19 @@ The following algorithm calculates the KS test statistic for two given samples.
         \max\mleft(\left|\frac{i}{n} - \frac{j}{m}\right|,
               \left|\frac{i}{n} - \frac{k}{m}\right|\mright)}$
     \EndFor
-    \State\Return $\max\limits_i T_v$
+    \State\Return $\max_i T_v$
     \EndProcedure
+    \Function{Rank}{$A, k$}
+      \State {\bfseries assert} $A$ is sorted in ascending order.
+      \State\Return $\#\{i=1,\dots,\dim A \colon k < A_i\}$
+    \EndFunction
   \end{algorithmic}
 \end{algorithm}
 
 \clearpage
-The following subroutine is an implementation of Algorithm~\ref{alg:ks_stat}. It computes an array of values $T_v(i)$ for each value of $X_i$. The test statistic $T_{n,m}$ is the maximum of these values.
+The following subroutine is an implementation of Algorithm~\ref{alg:ks_stat}. It
+computes an array of values $T_v(i)$ for each value of $X_i$. The test statistic
+$T_{n,m}$ is the maximum of these values.
 \lstinputlisting[language=python,
   rangeprefix=\#\ <<,
   rangesuffix=>>,
@@ -412,7 +414,7 @@ value in a sorted sample of $M$ test statistics. Thus, $q_\alpha$ can be
 approximated by choosing $i = \ceil{M(1 - \alpha)}$. An algorithm to approximate
 $q_\alpha$ given $\alpha$ is as follows.
 
-\begin{algorithm}[!h]
+\begin{algorithm}[H]
   \caption{Approximate $q_\alpha$, the $(1 - \alpha)$-quantile of the
 distribution of $T_{n,m}$ under $H_0$.}
   \label{alg:ks_q}
@@ -848,7 +850,7 @@ a relationship are independent of each other. In a given population, 1000 people
 consider yourself as happy?'' and ``Are you involved in a relationship?''. The
 answers are summarized in Table~\ref{tab:tab1}.
 
-\begin{table}[!h]
+\begin{table}[H]
   \setlength{\tabcolsep}{8pt}
   \def\arraystretch{1.1}
   \caption{}
@@ -1054,15 +1056,17 @@ the vector $(1, \dots, n)$, with equal probability of any permutation.
   Under $H_0$, $X_i \indep Y_i$, so
   \[ \Prob{X = x \land Y = y} = \Prob{X=x}\Prob{Y=y} \]
   Since the empirical cdfs $F_n$ and $G_n$ of $X_i$ and $Y_j$, respectively, are
-  monotonic and increasing, we can apply them to every value to get the expression
+  monotonically increasing, we can apply them to every value to get the expression
   \[ \begin{split}
       &\Prob{nF_n(X) = nF_n(x) \land nG_n(Y) = nG_n(y)} \\
       &\quad = \Prob{nF_n(X)=nF_n(x)}\Prob{nG_n(Y)=nG_n(y)}.
       \end{split}
   \]
-  The rank $R_i = n F_n(X_i)$, and, similarly, $Q_j = n G_n(Y_j)$, therefore
+  The rank $R_i = n F_n(X_i)$, and, similarly, $Q_j = n G_n(Y_j)$. The
+  non-random values $nF_n(x)$ and $nG_n(y)$ are arbitrary integers in
+  $(0, \dots, n)$, which we denote by $k$ and $\ell$. Therefore,
   \begin{align*}
-    \Prob{R_i = i \land Q_j = j} &= \Prob{R_i = i}\Prob{Q_j = j} \\
+    \Prob{R_i = k \land Q_j = \ell} &= \Prob{R_i = k}\Prob{Q_j = \ell} \\
     \implies R &\indep Q. \qedhere
   \end{align*}
 \end{proof}
@@ -1081,19 +1085,25 @@ This test statistic is the empirical correlation between the two samples. If
 $H_0$ is true, then $T_n \to 0$. We will now show that $T_n$ has a much simpler
 expression.
 
-\subsubsection{}
+\subsubsection{Simplifying the Rank Averages}
 \begin{prop} \label{prop:rn1}
   \[ \Rnbar = \Qnbar = \frac{n+1}{2} \]
 \end{prop}
 
 \begin{proof}
-  Because $R \indep Q$ and $R, Q$ are each permutations of $(1, \dots, n)$,
-  $\Rnbar = \Qnbar$.
+  Because $R \indep Q$ and $R, Q$ are each permutations of $(1, \dots, n)$, the
+  first equality is true.
   \begin{alignat*}{3}
     \Rnbar &\coloneqq \avg{i}{n} R_i \\
-           &= \avg{i}{n} i \by{range of $R_i$} \\
+           &= \avg{i}{n} i \by{permutation of $(1, \dots, n)$} \\
+           &= \avg{i}{n} Q_i \by{$R \indep Q$} \\
+    \implies \Rnbar &= \Qnbar.
+  \end{alignat*}
+  Recognize the average as a geometric series
+  \begin{alignat*}{3}
+    \Rnbar &= \avg{i}{n} \\
            &= \frac{1}{n} \frac{n(n+1)}{2} \by{geometric series} \\
-   \implies \Rnbar &= \frac{n+1}{2} \tag*{\qedhere}
+   \implies \Rnbar = \Qnbar &= \frac{n+1}{2}. \tag*{\qedhere}
   \end{alignat*}
 \end{proof}
 
@@ -1118,41 +1128,41 @@ expression.
   \end{alignat*}
 \end{proof}
 
-\subsubsection{}
+\subsubsection{The Test Statistic Simplified}
 \begin{prop}
   The test statistic can be written as
   \[ T_n = \frac{12}{n(n^2 - 1)} \sumi{i}{n}R_iQ_i - \frac{3(n+1)}{n-1}. \]
 \end{prop}
 
 \begin{proof}
-Plugging the expressions from Propositions~\ref{prop:rn1} and~\ref{prop:rn2}
-into the definition of $T_n$,
-\begin{align*}
-  T_n &\coloneqq \ddfrac{\sumi{i}{n}(R_i - \Rnbar)(Q_i - \Qnbar)}
-                            {\sqrt{\sumi{i}{n} (R_i - \Rnbar)^2 \sumi{i}{n} (Q_i - \Qnbar)^2}} \\
-  &= \ddfrac{\sumi{i}{n}\mleft(R_i - \frac{n+1}{2}\mright)\mleft(Q_i - \frac{n+1}{2}\mright)}
-                            {\sqrt{\frac{n(n^2 - 1)}{12} \frac{n(n^2 - 1)}{12}}} \\
-  &= \ddfrac{\sumi{i}{n}\mleft(R_iQ_i 
-                              - \frac{n+1}{2}(R_i + Q_i) 
-                              + \mleft(\frac{n+1}{2}\mright)^2 \mright)}
-                            {\frac{n(n^2 - 1)}{12}} \\
-  &= \frac{12}{n(n^2 - 1)} \mleft[ \sumi{i}{n}R_iQ_i 
-  + \mleft(\frac{n+1}{2}\mright)^2  \sumi{i}{n} 1
-  - \frac{n+1}{2}\sumi{i}{n}(R_i + Q_i) \mright]
-\end{align*}
-The first term matches the first term of the proposition. The remaining two
-terms simplify to
-\begin{align*}
-  &\phantom{=} \frac{12}{n(n^2 - 1)} \mleft[ \mleft(\frac{n+1}{2}\mright)^2  \sumi{i}{n} 1
-  - \frac{n+1}{2}\sumi{i}{n}(R_i + Q_i) \mright]  \\
-  &= \frac{12}{n(n^2 - 1)} \mleft[ \frac{n(n+1)^2}{4} - \frac{n+1}{2}\sumi{i}{n}2i \mright] \\
-  &= \frac{12}{n(n^2 - 1)} \mleft[ \frac{n(n+1)^2}{4} - (n+1)\frac{n(n+1)}{2} \mright] \\
-  &= \frac{12}{n(n+1)(n-1)} \mleft[ \frac{n(n+1)^2}{4} - \frac{n(n+1)^2}{2} \mright] \\
-  &= \frac{12}{n-1} \mleft[ \frac{n+1}{4} - \frac{n+1}{2} \mright] \\
-  &= \frac{12}{n-1} \mleft[ -\frac{n+1}{4} \mright] \\
-  &= \frac{3(n+1)}{n-1} \\
-  \implies T_n &= \frac{12}{n(n^2 - 1)} \sumi{i}{n}R_iQ_i - \frac{3(n+1)}{n-1}. \qedhere
-\end{align*}
+  Plugging the expressions from Propositions~\ref{prop:rn1} and~\ref{prop:rn2}
+  into the definition of $T_n$,
+  \begin{align*}
+    T_n &\coloneqq \ddfrac{\sumi{i}{n}(R_i - \Rnbar)(Q_i - \Qnbar)}
+                              {\sqrt{\sumi{i}{n} (R_i - \Rnbar)^2 \sumi{i}{n} (Q_i - \Qnbar)^2}} \\
+    &= \ddfrac{\sumi{i}{n}\mleft(R_i - \frac{n+1}{2}\mright)\mleft(Q_i - \frac{n+1}{2}\mright)}
+                              {\sqrt{\frac{n(n^2 - 1)}{12} \frac{n(n^2 - 1)}{12}}} \\
+    &= \ddfrac{\sumi{i}{n}\mleft(R_iQ_i 
+                                - \frac{n+1}{2}(R_i + Q_i) 
+                                + \mleft(\frac{n+1}{2}\mright)^2 \mright)}
+                              {\frac{n(n^2 - 1)}{12}} \\
+    &= \frac{12}{n(n^2 - 1)} \mleft[ \sumi{i}{n}R_iQ_i 
+    + \mleft(\frac{n+1}{2}\mright)^2  \sumi{i}{n} 1
+    - \frac{n+1}{2}\sumi{i}{n}(R_i + Q_i) \mright]
+  \end{align*}
+  The first term matches the first term of the proposition. The remaining two
+  terms simplify to
+  \begin{align*}
+    &\phantom{=} \frac{12}{n(n^2 - 1)} \mleft[ \mleft(\frac{n+1}{2}\mright)^2  \sumi{i}{n} 1
+    - \frac{n+1}{2}\sumi{i}{n}(R_i + Q_i) \mright]  \\
+    &= \frac{12}{n(n^2 - 1)} \mleft[ \frac{n(n+1)^2}{4} - \frac{n+1}{2}\sumi{i}{n}2i \mright] \\
+    &= \frac{12}{n(n^2 - 1)} \mleft[ \frac{n(n+1)^2}{4} - (n+1)\frac{n(n+1)}{2} \mright] \\
+    &= \frac{12}{n(n+1)(n-1)} \mleft[ \frac{n(n+1)^2}{4} - \frac{n(n+1)^2}{2} \mright] \\
+    &= \frac{12}{n-1} \mleft[ \frac{n+1}{4} - \frac{n+1}{2} \mright] \\
+    &= \frac{12}{n-1} \mleft[ -\frac{n+1}{4} \mright] \\
+    &= \frac{3(n+1)}{n-1} \\
+    \implies T_n &= \frac{12}{n(n^2 - 1)} \sumi{i}{n}R_iQ_i - \frac{3(n+1)}{n-1}. \qedhere
+  \end{align*}
 \end{proof}
 
 \subsection{The Distribution of the Test Statistic is Pivotal}
@@ -1179,7 +1189,7 @@ terms simplify to
 Let $\alpha \in (0, 1)$. Algorithm~\ref{alg:sn_q} approximates the $(1-\alpha)$-quantile
 of $S_n$, $q_\alpha$.
 
-\begin{algorithm}[!h]
+\begin{algorithm}[H]
   \caption{Approximate $q_\alpha$, the $(1 - \alpha)$-quantile of the
 distribution of $S_n$ under $H_0$.}
   \label{alg:sn_q}
