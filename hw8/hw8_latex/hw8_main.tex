@@ -103,6 +103,8 @@
 
 \newcommand{\T}{\top} % transpose symbol
 \newcommand{\vect}[1]{\boldsymbol{\mathbf{#1}}} % use BOTH to cover all cases
+\newcommand{\ith}{$i^\mathrm{th}$}
+\newcommand{\jth}{$j^\mathrm{th}$}
 
 % Misc.
 \newcommand{\ie}{\emph{i.e.\ }}
@@ -148,14 +150,16 @@
 \newcommand{\Qnbar}{\overline{Q}_n}
 
 % Vectors/Matrices
-\newcommand{\Xm}{\mathbb{X}}
-\newcommand{\Ym}{\mathbb{Y}}
-\newcommand{\Xv}{\vect{X}}
-\newcommand{\Yv}{\vect{Y}}
-\newcommand{\Bv}{\vect{\beta}}
-\newcommand{\ev}{\vect{\varepsilon}}
+\newcommand{\Xm}{\vect{X}}
+\newcommand{\Bv}{\beta}
+\newcommand{\Bvh}{\hat{\beta}}
+\newcommand{\ve}{\varepsilon}
+
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator*{\argmax}{argmax}
 
 \DeclareMathOperator{\Ber}{Ber}
+\DeclareMathOperator{\Exp}{Exp}
 % \DeclareMathOperator{\Var}{Var}
 % \DeclareMathOperator{\Cov}{Cov}
 
@@ -173,21 +177,67 @@
 \maketitle
 
 \section{Heteroscedastic Regression}
-Let the characteristics $(\Xv_i, y_i)$ of $n$ individuals $(i = 1, \dots, n)$ be
-observed, where $y_i \in \R$ is the dependent variable, and $\Xv_i \in \R^p$ is
+Let the characteristics $(X_i, y_i)$ of $n$ individuals $(i = 1, \dots, n)$ be
+observed, where $y_i \in \R$ is the dependent variable, and $X_i \in \R^p$ is
 the vector of deterministic explanatory variables. The goal is to estimate the
 vector of coefficients $\Bv = (\beta_1, \dots, \beta_n)^\T$ in the linear
 regression
-\[ y_i = \Xv_i^\T \Bv + \varepsilon_i, \quad i = 1, \dots, n. \]
-Assume that the model is heteroscedastic, \ie\ the error terms $\varepsilon_i$
-are not \iid, but $\ev = (\varepsilon_1, \dots, \varepsilon_n)^\T$ is Gaussian,
+\[ y_i = X_i^\T \Bv + \ve_i, \quad i = 1, \dots, n. \]
+Assume that the model is heteroscedastic, \ie\ the error terms $\ve_i$
+are not \iid, but $\ve = (\ve_1, \dots, \ve_n)^\T$ is Gaussian,
 centered, with known invertible covariance matrix $\Sigma$. Let $\Xm \in \R^{n
   \times p}$ be the matrix
-\[ \Xm = \begin{bmatrix} - \Xv_1^\T - \\ \vdots \\ - \Xv_n^\T - \end{bmatrix} \]
-and $\Yv = (y_1, \dots, y_n)^\T$.
+\[ \Xm = \begin{bmatrix} - X_1^\T - \\ \vdots \\ - X_n^\T - \end{bmatrix} \]
+and $Y = (y_1, \dots, y_n)^\T$.
 
-Consider
+Consider the estimator
+\[ \Bvh = \argmin_{\Bv \in \R^p} (Y - \Xm\Bv)^\T \Sigma^{-1} (Y - \Xm\Bv). \]
 
-\clearpage
+\subsection{The Estimator Under Homoscedasticity}
+\begin{prop}
+  If the errors are homoscedastic, \ie\ $\Sigma = \sigma^2 I_n$, where $\sigma^2 > 0$, and
+  $I_n$ is the $n \times n$ identity matrix, then $\Bvh$ reduces to the least
+  squares estimator
+  \[ \beta_\mathrm{LSE} = (Y - \Xm\Bv)^\T(Y - \Xm\Bv). \]
+\end{prop}
+
+\begin{proof}
+  \begin{alignat*}{3}
+    \Bvh &\coloneqq \argmin_{\Bv \in \R^p} (Y - \Xm\Bv)^\T \Sigma^{-1} (Y - \Xm\Bv) \\
+         &= \argmin_{\Bv \in \R^p} (Y - \Xm\Bv)^\T (\sigma^2 I_n)^{-1} (Y - \Xm\Bv) \\
+         &= \argmin_{\Bv \in \R^p} \frac{1}{\sigma^2} (Y - \Xm\Bv)^\T I_n (Y - \Xm\Bv) \by{inverse rules} \\
+         &= \argmin_{\Bv \in \R^p} \frac{1}{\sigma^2} (Y - \Xm\Bv)^\T (Y - \Xm\Bv) \by{definition of identity} \\
+    \implies \Bvh &= \argmin_{\Bv \in \R^p} (Y - \Xm\Bv)^\T (Y - \Xm\Bv) = \beta_\mathrm{LSE} \by{$\sigma^2 > 0$ and constant} \qedhere
+  \end{alignat*}
+\end{proof}
+
+\subsection{The Maximum Likelihood Estimator}
+\begin{prop}
+  The estimator $\Bvh$ is the maximum likelihood estimator.
+\end{prop}
+
+\begin{proof}
+  If $\ve \sim \N{0}{\Sigma}$, then
+  \[ f(Y) = \frac{1}{(2\pi)^\frac{n}{2} \det \Sigma^{\frac{1}{2}}}
+      \exp \mleft[-\frac{1}{2} (Y - \Xm\Bv)^\T \Sigma^{-1} (Y - \Xm\Bv) \mright]. \]
+  The likelihood is defined as
+  \[ L(Y; \Xm, \Bv, \Sigma) = L(\Bv, \Sigma) =  \prod_{i=1}^n f(Y_i). \]
+  To maximize the likelihood, we take the log-likelihood
+  \begin{align*}
+    \ell(\Bv, \Sigma) &= \log L(\Bv, \Sigma) \\
+    &= \log \prod_{i=1}^n f(Y_i) \\
+    &= \sumi{i}{n} \log f(Y_i) \\
+    &= \log \frac{1}{(2\pi)^\frac{n}{2} \det \Sigma^{\frac{1}{2}}}
+      \exp \mleft[-\frac{1}{2} (Y - \Xm\Bv)^\T \Sigma^{-1} (Y - \Xm\Bv) \mright] \\
+    &= -\frac{n}{2} \log 2\pi - \frac{1}{2} \log \det \Sigma 
+        - \frac{1}{2} (Y - \Xm\Bv)^\T \Sigma^{-1} (Y - \Xm\Bv) \\
+    \intertext{When maximizing with respect to $\Bv$, we can ignore terms
+      that are not functions of $\Bv$,}
+    \therefore \Bvh_\mathrm{MSE} &\coloneqq \argmax_{\Bv \in \R^p} \ell(\Bv, \Sigma) \\
+    &= \argmax_{\Bv \in \R^p} - \frac{1}{2} (Y - \Xm\Bv)^\T \Sigma^{-1} (Y - \Xm\Bv) \\
+    \implies \Bvh = \Bvh_\mathrm{MSE} &= \argmin_{\Bv \in \R^p} (Y - \Xm\Bv)^\T \Sigma^{-1} (Y - \Xm\Bv)   \qedhere
+  \end{align*}
+\end{proof}
+
 \end{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
