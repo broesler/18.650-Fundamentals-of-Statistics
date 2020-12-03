@@ -151,6 +151,7 @@
 
 % Vectors/Matrices
 \newcommand{\Xm}{\vect{X}}
+\newcommand{\Yv}{\vect{Y}}
 \newcommand{\Bv}{\beta}
 \newcommand{\Bvh}{\hat{\beta}}
 \newcommand{\ve}{\varepsilon}
@@ -158,6 +159,7 @@
 \DeclareMathOperator*{\argmin}{argmin}
 \DeclareMathOperator*{\argmax}{argmax}
 
+\DeclareMathOperator{\rank}{rank}
 \DeclareMathOperator{\Ber}{Ber}
 \DeclareMathOperator{\Exp}{Exp}
 % \DeclareMathOperator{\Var}{Var}
@@ -184,30 +186,37 @@ vector of coefficients $\Bv = (\beta_1, \dots, \beta_n)^\T$ in the linear
 regression
 \[ y_i = X_i^\T \Bv + \ve_i, \quad i = 1, \dots, n. \]
 Assume that the model is heteroscedastic, \ie\ the error terms $\ve_i$
-are not \iid, but $\ve = (\ve_1, \dots, \ve_n)^\T$ is Gaussian,
-centered, with known invertible covariance matrix $\Sigma$. Let $\Xm \in \R^{n
-  \times p}$ be the matrix
-\[ \Xm = \begin{bmatrix} - X_1^\T - \\ \vdots \\ - X_n^\T - \end{bmatrix} \]
-and $Y = (y_1, \dots, y_n)^\T$.
+are not \iid, but $\ve = (\ve_1, \dots, \ve_n)^\T \in \R^n$ is Gaussian,
+centered, with known invertible covariance matrix $\Sigma \in \R^{n \times n}$.
+Let $\Xm \in \R^{n \times p}$ be the matrix
+\[ \Xm = \begin{bmatrix} 
+            \text{---} X_1^\T \text{---} \\
+            \vdots \\ 
+            \text{---} X_n^\T \text{---} 
+          \end{bmatrix} 
+\]
+and $\Yv = (y_1, \dots, y_n)^\T \in \R^n$.
+The linear regression is then
+\[ \Yv = \Xm\Bv + \ve. \]
 
 Consider the estimator
-\[ \Bvh = \argmin_{\Bv \in \R^p} (Y - \Xm\Bv)^\T \Sigma^{-1} (Y - \Xm\Bv). \]
+\[ \Bvh = \argmin_{\Bv \in \R^p} (\Yv - \Xm\Bv)^\T \Sigma^{-1} (\Yv - \Xm\Bv). \]
 
 \subsection{The Estimator Under Homoscedasticity}
 \begin{prop}
-  If the errors are homoscedastic, \ie\ $\Sigma = \sigma^2 I_n$, where $\sigma^2 > 0$, and
-  $I_n$ is the $n \times n$ identity matrix, then $\Bvh$ reduces to the least
+  If the errors are homoscedastic, \ie\ $\Sigma = \sigma^2 \vect{I}_n$, where $\sigma^2 > 0$, and
+  $\vect{I}_n$ is the $n \times n$ identity matrix, then $\Bvh$ reduces to the least
   squares estimator
-  \[ \beta_\mathrm{LSE} = (Y - \Xm\Bv)^\T(Y - \Xm\Bv). \]
+  \[ \beta_\mathrm{LSE} = (\Yv - \Xm\Bv)^\T(\Yv - \Xm\Bv). \]
 \end{prop}
 
 \begin{proof}
   \begin{alignat*}{3}
-    \Bvh &\coloneqq \argmin_{\Bv \in \R^p} (Y - \Xm\Bv)^\T \Sigma^{-1} (Y - \Xm\Bv) \\
-         &= \argmin_{\Bv \in \R^p} (Y - \Xm\Bv)^\T (\sigma^2 I_n)^{-1} (Y - \Xm\Bv) \\
-         &= \argmin_{\Bv \in \R^p} \frac{1}{\sigma^2} (Y - \Xm\Bv)^\T I_n (Y - \Xm\Bv) \by{inverse rules} \\
-         &= \argmin_{\Bv \in \R^p} \frac{1}{\sigma^2} (Y - \Xm\Bv)^\T (Y - \Xm\Bv) \by{definition of identity} \\
-    \implies \Bvh &= \argmin_{\Bv \in \R^p} (Y - \Xm\Bv)^\T (Y - \Xm\Bv) = \beta_\mathrm{LSE} \by{$\sigma^2 > 0$ and constant} \qedhere
+    \Bvh &\coloneqq \argmin_\Bv (\Yv - \Xm\Bv)^\T \Sigma^{-1} (\Yv - \Xm\Bv) \\
+         &= \argmin_\Bv (\Yv - \Xm\Bv)^\T (\sigma^2 \vect{I}_n)^{-1} (\Yv - \Xm\Bv) \\
+         &= \argmin_\Bv \frac{1}{\sigma^2} (\Yv - \Xm\Bv)^\T \vect{I}_n (\Yv - \Xm\Bv) \by{inverse rules} \\
+         &= \argmin_\Bv \frac{1}{\sigma^2} (\Yv - \Xm\Bv)^\T (\Yv - \Xm\Bv) \by{definition of identity} \\
+    \implies \Bvh &= \argmin_\Bv (\Yv - \Xm\Bv)^\T (\Yv - \Xm\Bv) = \beta_\mathrm{LSE} \by{$\sigma^2 > 0$ and constant} \tag*{\qedhere}
   \end{alignat*}
 \end{proof}
 
@@ -218,26 +227,123 @@ Consider the estimator
 
 \begin{proof}
   If $\ve \sim \N{0}{\Sigma}$, then
-  \[ f(Y) = \frac{1}{(2\pi)^\frac{n}{2} \det \Sigma^{\frac{1}{2}}}
-      \exp \mleft[-\frac{1}{2} (Y - \Xm\Bv)^\T \Sigma^{-1} (Y - \Xm\Bv) \mright]. \]
+  \[ f_Y(\Yv) = \frac{1}{\sqrt{(2\pi)^n \det \Sigma}}
+      \exp \mleft[-\frac{1}{2} (\Yv - \Xm\Bv)^\T \Sigma^{-1} (\Yv - \Xm\Bv) \mright]. \]
   The likelihood is defined as
-  \[ L(Y; \Xm, \Bv, \Sigma) = L(\Bv, \Sigma) =  \prod_{i=1}^n f(Y_i). \]
+  \begin{align*}
+    L(\Bv; \Sigma) &\coloneqq \prod_{i=1}^m f_Y(\Yv_i)  \\
+    &= \frac{1}{\sqrt{(2\pi)^n \det \Sigma}}
+      \exp \mleft[-\frac{1}{2} (\Yv - \Xm\Bv)^\T \Sigma^{-1} (\Yv - \Xm\Bv) \mright]
+  \end{align*}
   To maximize the likelihood, we take the log-likelihood
   \begin{align*}
-    \ell(\Bv, \Sigma) &= \log L(\Bv, \Sigma) \\
-    &= \log \prod_{i=1}^n f(Y_i) \\
-    &= \sumi{i}{n} \log f(Y_i) \\
-    &= \log \frac{1}{(2\pi)^\frac{n}{2} \det \Sigma^{\frac{1}{2}}}
-      \exp \mleft[-\frac{1}{2} (Y - \Xm\Bv)^\T \Sigma^{-1} (Y - \Xm\Bv) \mright] \\
-    &= -\frac{n}{2} \log 2\pi - \frac{1}{2} \log \det \Sigma 
-        - \frac{1}{2} (Y - \Xm\Bv)^\T \Sigma^{-1} (Y - \Xm\Bv) \\
-    \intertext{When maximizing with respect to $\Bv$, we can ignore terms
-      that are not functions of $\Bv$,}
-    \therefore \Bvh_\mathrm{MSE} &\coloneqq \argmax_{\Bv \in \R^p} \ell(\Bv, \Sigma) \\
-    &= \argmax_{\Bv \in \R^p} - \frac{1}{2} (Y - \Xm\Bv)^\T \Sigma^{-1} (Y - \Xm\Bv) \\
-    \implies \Bvh = \Bvh_\mathrm{MSE} &= \argmin_{\Bv \in \R^p} (Y - \Xm\Bv)^\T \Sigma^{-1} (Y - \Xm\Bv)   \qedhere
+    \ell(\Bv; \Sigma) &= \log L(\Bv, \Sigma) \\
+    &= \log \frac{1}{\sqrt{(2\pi)^n \det \Sigma}}
+      \exp \mleft[-\frac{1}{2} (\Yv - \Xm\Bv)^\T \Sigma^{-1} (\Yv - \Xm\Bv) \mright] \\
+    &= -\frac{1}{2} \mleft[n \log 2\pi + \log \det \Sigma 
+        + (\Yv - \Xm\Bv)^\T \Sigma^{-1} (\Yv - \Xm\Bv) \mright] \\
+    \intertext{When maximizing with respect to $\Bv$, we ignore terms that are
+      not functions of $\Bv$,}
+    \therefore \Bvh_\mathrm{MSE} &\coloneqq \argmax_\Bv \ell(\Bv; \Sigma) \\
+    &= \argmax_\Bv -\frac{1}{2} \mleft[n \log 2\pi + \log \det \Sigma 
+        + (\Yv - \Xm\Bv)^\T \Sigma^{-1} (\Yv - \Xm\Bv) \mright] \\
+    \implies \Bvh = \Bvh_\mathrm{MSE} &= \argmin_\Bv (\Yv - \Xm\Bv)^\T \Sigma^{-1} (\Yv - \Xm\Bv)   \qedhere
   \end{align*}
 \end{proof}
+
+\subsection{A Sufficient Condition on the Dependent Matrix}
+\begin{prop}
+  A sufficient condition on the dependent matrix $\Xm$ for the estimator $\Bv$ to
+  be uniquely defined is
+  \[ \rank \Xm = p \le n. \]
+\end{prop}
+
+\begin{proof}
+  Given the data, the error in the linear regression
+  \[ \Yv = \Xm\Bv + \ve \]
+  is minimized by projecting $\Yv$ onto the column space of $\Xm$,
+  $\mathcal{C}(\Xm)$, by multiplying each side by $\Xm^\T$,
+  \[ \Xm^\T\Yv = \Xm^\T\Xm\Bvh \]
+  such that
+  \[ \Bvh = (\Xm^\T\Xm)^{-1} \Xm^\T \Yv. \]
+  This expression is unique if the inverse $(\Xm^\T\Xm)^{-1}$ is unique and non-singular.
+  Since
+  \[ \rank \Xm^\T\Xm = \rank \Xm, \]
+  for any matrix $X$, and $\Xm^\T \Xm \in \R^{p \times p}$, $\rank \Xm = p$ is
+  a sufficient condition for the existence of the inverse, and thus for the
+  uniqueness of $\Bvh$.
+\end{proof}
+
+\subsection{The Heteroscedastic Estimator}
+\begin{prop}
+  The optimal heteroscedastic estimator is
+  \[ \Bvh = (\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xm^\T \Sigma^{-1} \Yv. \]
+\end{prop}
+
+\begin{proof}
+  \begin{align*}
+    \Bvh &\coloneqq \argmin_t (\Yv - \Xm t)^\T \Sigma^{-1} (\Yv - \Xm t) \\
+    &= \Yv^\T \Sigma^{-1} \Yv + t^\T \Xm^\T \Sigma^{-1} \Xm t - 2t^\T
+    \Xm^\T \Sigma^{-1} \Yv.
+  \end{align*}
+  The gradient with respect to $t$ is
+  \begin{align*}
+    \nabla_t &= 2 \Xm^\T \Sigma^{-1} \Xm t - 2 \Xm^\T \Sigma^{-1} \Yv \\
+             &= 0 \quad \text{for } t = \Bvh \\
+    \implies& \Xm^\T \Sigma^{-1} \Xm \Bvh = \Xm^\T \Sigma^{-1} \Yv \\
+    \implies& \Bvh = (\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xm^\T \Sigma^{-1} \Yv
+    \qedhere
+  \end{align*}
+\end{proof}
+
+\begin{prop}
+  The estimator is normally distributed, with mean and variance
+  \[ \Bvh \sim \N{\Bv}{(\Xm^\T \Sigma^{-1} \Xm)^{-1}}. \]
+\end{prop}
+
+\begin{proof}
+  From our expression for $\Bvh$, insert the expression for the data $\Yv
+  = \Xm\Bv + \ve$
+  \begin{align*}
+    \Bvh &= (\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xm^\T \Sigma^{-1} \Yv \\
+         &= (\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xm^\T \Sigma^{-1} (\Xm\Bv + \ve) \\
+         &= (\Xm^\T \Sigma^{-1} \Xm)^{-1} (\Xm^\T \Sigma^{-1} \Xm)\Bv 
+          + (\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xm^\T \Sigma^{-1} \ve \\
+         &= \Bv + (\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xm^\T \Sigma^{-1} \ve.
+  \end{align*}
+  Let
+  \[ B = (\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xm^\T \Sigma^{-1} \]
+  be the error coefficient matrix, such that
+  \[ \Bvh = \Bv + B\ve. \]
+
+  \begin{theorem} \label{thm:Bx}
+    If $X \sim \N{0}{\Sigma}$, then $a + BX \sim \N{a}{B \Sigma B^\T}$,
+    for any constant vector $a$, matrix $B$ and invertible covariance matrix
+    $\Sigma$.
+  \end{theorem}
+
+  Since $\ve \sim \N{0}{\Sigma}$, by Theorem~\ref{thm:Bx},
+  \[ \Bvh \sim \N{\Bv}{B \Sigma B^\T}. \]
+  The covariance matrix is then
+  \begin{alignat*}{3}
+    B \Sigma B^\T &= (\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xm^\T \Sigma^{-1} \Sigma
+                    ((\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xm^\T \Sigma^{-1})^\T \\
+                  &= (\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xm^\T 
+                    ((\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xm^\T \Sigma^{-1})^\T \\
+                  &= (\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xm^\T 
+                    {\Sigma^{-1}}^\T \Xm {(\Xm^\T \Sigma^{-1} \Xm)^{-1}}^\T \\
+                  &= (\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xm^\T 
+                    {\Sigma^\T}^{-1} \Xm {(\Xm^\T \Sigma^{-1} \Xm)^\T}^{-1}
+                    \by{${(A^{-1})}^\T = {(A^\T)}^{-1}$} \\
+                  &= (\Xm^\T \Sigma^{-1} \Xm)^{-1} 
+                     (\Xm^\T \Sigma^{-1} \Xm) (\Xm^\T \Sigma^{-1} \Xm)^{-1}
+                    \by{$\Sigma^\T = \Sigma$} \\
+                  &= (\Xm^\T \Sigma^{-1} \Xm)^{-1} 
+  \end{alignat*}
+  so the estimator $\Bvh$ is indeed distributed normally
+  \[ \Bvh \sim \N{\Bv}{(\Xm^\T \Sigma^{-1} \Xm)^{-1}}. \qedhere \]
+\end{proof}
+
 
 \end{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

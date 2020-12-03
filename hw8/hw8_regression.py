@@ -11,7 +11,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
+# import pandas as pd
 import seaborn as sns
 
 import statsmodels.api as sm
@@ -25,10 +25,11 @@ rng = np.random.default_rng(seed=seed)
 
 sns.set_style('whitegrid')
 
-# ----------------------------------------------------------------------------- 
+# -----------------------------------------------------------------------------
 #         Define true parameters
 # -----------------------------------------------------------------------------
 beta = np.array([[1.0, 0.5]]).T  # (p, 1)
+# beta = np.array([[1.0, 0.5, 0.25]]).T  # (p, 1)  # TODO rewrite for p > 2
 
 n = 100        # number of observations
 p = beta.size  # number of parameters
@@ -41,13 +42,13 @@ sigma_sq = 1.0  # variance of the error
 err_dist = stats.norm(0, sigma_sq)
 eps = err_dist.rvs(size=(n, 1), random_state=seed)
 
-X = np.c_[np.ones_like(x), x]  # (n, p) assume deterministic
+X = np.c_[np.ones(x.shape[0]), x]  # (n, p) assume deterministic
 Y = X @ beta + eps             # (n, 1) noisy observations
 
 # "true" line
-n_s = 50  # number of "predictions" to make
-x_s = np.linspace(-1, 11, n_s)
-X_s = np.c_[np.ones_like(x_s), x_s]
+n_s = 100  # number of "predictions" to make
+x_s = np.tile(np.linspace(-1, 11, n_s).reshape(-1, 1), (1, p-1)).squeeze()
+X_s = np.c_[np.ones(x_s.shape[0]), x_s]
 Y_s = X_s @ beta  # no noise
 
 # Estimate the parameters
@@ -63,7 +64,7 @@ eps_hat = Y - Y_hat       # residuals (estimate of the actual epsilon)
 # *linear* in x, decreasing with increasing x. Appears to be independent of
 # slope sign or magnitude.
 
-# ----------------------------------------------------------------------------- 
+# -----------------------------------------------------------------------------
 #         Compute Statistics on the Fit
 # -----------------------------------------------------------------------------
 # Centered data
@@ -75,8 +76,9 @@ TSS = float(yc.T @ yc)            # == np.sum((Y - Y.mean())**2)  # total sum of
 ESS = TSS - RSS
 Rsq = 1 - RSS/TSS                 # == ESS / TSS  # explained variance
 
-# covariance in the data: Cov(X, Y) 
-r = float(xc.T @ yc / np.sqrt(xc.T @ xc * yc.T @ yc))  # manually compute
+# TODO rewrite for x \in R^(n,p-1)
+# covariance in the data: Cov(X, Y)
+r = float(xc.T @ yc / np.sqrt((xc.T @ xc) * (yc.T @ yc)))  # manually compute
 r_p, pval = stats.pearsonr(x.squeeze(), Y.squeeze())   # compute using scipy
 
 np.testing.assert_allclose(Rsq, r**2)
@@ -98,7 +100,7 @@ ci_b = np.c_[beta_hat - s, beta_hat + s]  # (p, 2)
 # Compute F-statistic
 # Define the null hypothesis H_0: G\beta = \lambda
 G = np.eye(beta_hat.size)      # (k, p) restriction coefficients matrix
-G[0,0] = 0                     # do not include constant term in restrictions
+G[0, 0] = 0                     # do not include constant term in restrictions
 lam = np.zeros_like(beta_hat)  # (k, 1) restriction values
 k = np.linalg.matrix_rank(G)
 
@@ -119,11 +121,13 @@ F_pvalue = 1 - stats.f(k, n - p).cdf(F)
 Tn = (beta_hat / np.sqrt(sigma_hat_sq * gamma)).squeeze()
 pvalues = 2*(1 - beta_dist.cdf(np.abs(Tn)))
 
+# FIXME this code fails if n != n_s (needs for loop)
 # Prediction interval (*see* Wasserman, Theorem 13.11, Exercise 13.10)
 za = stats.norm(0, 1).ppf(1 - alpha/2)
 xd_s = x - x_s
 xi_hat2 = sigma_hat_sq * (1 + 1/n * np.sum((x - x_s)**2, axis=0) / np.sum(xc**2))  # (n_s, 1)
 Yh_bands = np.c_[Y_s_hat.squeeze() - za * np.sqrt(xi_hat2), Y_s_hat.squeeze() + za * np.sqrt(xi_hat2)]
+
 
 # Bootstrap a confidence interval for the *function* fit
 def bootstrap(X, Y, n_boot=10000):
@@ -141,11 +145,12 @@ def bootstrap(X, Y, n_boot=10000):
         sh2_dist[i] = float(eps_hat.T @ eps_hat) / (n - p)
     return boot_dist, sh2_dist
 
+
 beta_boots, sh2_boots = bootstrap(X, Y)    # (p,   n_boot)
 Y_hat_boots = X_s @ beta_boots  # (n_s, n_boot)
 err_bands = np.quantile(Y_hat_boots, (alpha/2, 1 - alpha/2), axis=1).T  # (n_s, p)
 
-# TODO 
+# TODO
 #   * AIC
 #   * BIC
 #   * adjusted Rsq?
@@ -154,7 +159,7 @@ err_bands = np.quantile(Y_hat_boots, (alpha/2, 1 - alpha/2), axis=1).T  # (n_s, 
 llf     = float(-n/2 * np.log(2*np.pi*sigma_sq)     - 1/(2*sigma_sq)     * (eps.T     @ eps))
 llf_hat = float(-n/2 * np.log(2*np.pi*sigma_hat_sq) - 1/(2*sigma_hat_sq) * (eps_hat.T @ eps_hat))
 
-# ----------------------------------------------------------------------------- 
+# -----------------------------------------------------------------------------
 #         Compare vs statsmodels function
 # -----------------------------------------------------------------------------
 res = sm.OLS(Y, X).fit()
@@ -178,7 +183,7 @@ np.testing.assert_allclose(llf_hat,            res.llf,        atol=1e-1)
 # df = pd.DataFrame(np.c_[x, Y], columns=['x', 'y'])
 # sns.jointplot(x='x', y='y', data=df, kind='reg')
 
-# ----------------------------------------------------------------------------- 
+# -----------------------------------------------------------------------------
 #         Plots
 # -----------------------------------------------------------------------------
 fig = plt.figure(1, clear=True)
