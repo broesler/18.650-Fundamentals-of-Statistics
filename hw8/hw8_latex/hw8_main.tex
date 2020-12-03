@@ -1,0 +1,193 @@
+\documentclass[letterpaper, reqno]{amsart}
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[comma, compress, numbers, square]{natbib}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{bbm}  % for indicator function
+\usepackage{centernot}
+\usepackage{mathtools}
+\usepackage{mleftright}
+\usepackage{enumerate}
+\usepackage{array, multirow}
+\usepackage[section, ruled]{algorithm}
+\usepackage{algpseudocode}
+\usepackage{url}
+\usepackage[font=small, hypcap=true]{caption}                % link to top of figures and subfigures
+\usepackage[font=small, hypcap=true, list=true]{subcaption}   % use for subfigures instead of {subfigure}
+
+\usepackage{hyperref}
+\usepackage{nameref}  % refer to unnumbered sections
+\hypersetup{
+    linktoc=all,    % link table of contents to sections
+    colorlinks,
+    allcolors=black,
+    urlcolor=dblue,
+  }
+
+% Declare theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{prop}{Proposition}[section]
+
+\renewcommand{\qedsymbol}{\ensuremath{\blacksquare}}
+
+% new environment for proofs of claims within proofs
+\newenvironment{subproof}[1][\proofname]{%
+  \renewcommand{\qedsymbol}{\ensuremath{\square}}%
+  \begin{proof}[#1]%
+}{%
+  \end{proof}%
+}
+
+\numberwithin{equation}{section}
+
+% lists as 1., 2., ...
+\renewcommand{\labelenumi}{\theenumi.}
+
+% Letter subsections
+\renewcommand{\thesubsubsection}{\thesubsection(\alph{subsubsection})}
+
+% number only specific equation in, say, align* environment
+\newcommand{\numberthis}{\addtocounter{equation}{1}\tag{\theequation}}
+
+% Algorithm
+% \renewcommand{\algorithmicrequire}{\textbf{Input:}}
+% \renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+%-------------------------------------------------------------------------------
+%     {listings + color} package options
+%-------------------------------------------------------------------------------
+% Define colors for code
+\usepackage{xcolor}
+\definecolor{gray}{rgb}{0.6, 0.6, 0.6}
+\definecolor{mauve}{rgb}{0.58, 0, 0.82}
+\definecolor{dblue}{HTML}{0645AD}
+\definecolor{lblue}{HTML}{1F77B4}
+
+\usepackage{listings}
+\lstset{
+  language = Python,
+  basicstyle = \scriptsize\ttfamily,
+  numbers = left,
+  numberstyle = \tiny\color{gray},
+  stepnumber = 1,
+  numbersep = 8pt,
+  breaklines = true,
+  keywordstyle = \bfseries\color{lblue},
+  commentstyle = \color{gray},
+  % stringstyle = \color{mauve}
+}
+
+% Place loose figures at actual top of page
+% \makeatletter
+%   \setlength{\@fptop}{0pt}
+% \makeatother
+
+%-------------------------------------------------------------------------------
+% NO HYPHENATION
+%-------------------------------------------------------------------------------
+\tolerance=1
+\emergencystretch=\maxdimen
+\hyphenpenalty=10000
+\hbadness=10000
+
+%==============================================================================
+% General macros
+%==============================================================================
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+
+\newcommand{\T}{\top} % transpose symbol
+\newcommand{\vect}[1]{\boldsymbol{\mathbf{#1}}} % use BOTH to cover all cases
+
+% Misc.
+\newcommand{\ie}{\emph{i.e.\ }}
+\newcommand{\eg}{\emph{e.g.\ }}
+
+% Use for fractions with large terms
+\newcommand{\ddfrac}[2]{\frac{\displaystyle #1}{\displaystyle #2}}
+
+% Derivatives
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\ddx}[2]{\frac{\dd #1}{\dd #2}}
+\newcommand{\dx}[1]{\,\dd #1} % for inside integration
+
+% Probability helpers
+\newcommand{\Prob}[1]{\mathbb{P}\mleft[#1\mright]}
+\newcommand{\E}[1]{\mathbb{E}\mleft[#1\mright]}
+\newcommand{\V}[1]{\mathbb{V}\mleft[#1\mright]}
+\newcommand{\Var}[1]{\operatorname{Var}\mleft(#1\mright)}
+\newcommand{\Cov}[1]{\operatorname{Cov}\mleft(#1\mright)}
+\newcommand{\R}{\mathbb{R}}  % real numbers
+\newcommand{\N}[2]{\mathcal{N}\mleft( #1, #2 \mright)}
+\newcommand{\U}[2]{\mathcal{U}\mleft(\mleft[ #1, #2 \mright]\mright)}
+\newcommand{\indep}{\perp \!\!\! \perp}  % "is independent from"
+\newcommand{\nindep}{\centernot\indep}
+\newcommand{\indic}[1]{\mathbbm{1}\!\mleft\{#1\mright\}} % indicator function
+\newcommand{\iid}{i.i.d.}
+
+\newcommand{\sumi}[2]{\sum_{#1=1}^{#2}}
+\newcommand{\avg}[2]{\frac{1}{#2}\sumi{#1}{#2}}
+
+\newcommand{\by}[1]{&\quad&\text{(#1)}}
+
+\newcommand{\Alim}{\xrightarrow[n \to \infty]{\text{a.s.}}}
+\newcommand{\Plim}{\xrightarrow[n \to \infty]{\mathbb{P}}}
+\newcommand{\Dlim}{\xrightarrow[n \to \infty]{(d)}}
+
+\newcommand{\phat}{\hat{p}}
+\newcommand{\qhat}{\hat{q}}
+\newcommand{\rhat}{\hat{r}}
+
+\newcommand{\Xnbar}{\overline{X}_n}
+\newcommand{\Rnbar}{\overline{R}_n}
+\newcommand{\Qnbar}{\overline{Q}_n}
+
+% Vectors/Matrices
+\newcommand{\Xm}{\mathbb{X}}
+\newcommand{\Ym}{\mathbb{Y}}
+\newcommand{\Xv}{\vect{X}}
+\newcommand{\Yv}{\vect{Y}}
+\newcommand{\Bv}{\vect{\beta}}
+\newcommand{\ev}{\vect{\varepsilon}}
+
+\DeclareMathOperator{\Ber}{Ber}
+% \DeclareMathOperator{\Var}{Var}
+% \DeclareMathOperator{\Cov}{Cov}
+
+%%%% TITLE ----------------------------
+\title[Homework 8 -- Problem \thesection]{18.650 Fundamentals of Statistics\\{\large Homework 8}}
+\author{Bernie Roesler}
+\date{\today}
+%%%%
+
+%%%%%%% BEGIN DOCUMENT ----------------
+\begin{document}
+
+\graphicspath{{./figures/}}
+
+\maketitle
+
+\section{Heteroscedastic Regression}
+Let the characteristics $(\Xv_i, y_i)$ of $n$ individuals $(i = 1, \dots, n)$ be
+observed, where $y_i \in \R$ is the dependent variable, and $\Xv_i \in \R^p$ is
+the vector of deterministic explanatory variables. The goal is to estimate the
+vector of coefficients $\Bv = (\beta_1, \dots, \beta_n)^\T$ in the linear
+regression
+\[ y_i = \Xv_i^\T \Bv + \varepsilon_i, \quad i = 1, \dots, n. \]
+Assume that the model is heteroscedastic, \ie\ the error terms $\varepsilon_i$
+are not \iid, but $\ev = (\varepsilon_1, \dots, \varepsilon_n)^\T$ is Gaussian,
+centered, with known invertible covariance matrix $\Sigma$. Let $\Xm \in \R^{n
+  \times p}$ be the matrix
+\[ \Xm = \begin{bmatrix} - \Xv_1^\T - \\ \vdots \\ - \Xv_n^\T - \end{bmatrix} \]
+and $\Yv = (y_1, \dots, y_n)^\T$.
+
+Consider
+
+\clearpage
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
