@@ -133,7 +133,6 @@ def _ks_2samp(X, Y):
         js[i] = j_lo if np.argmax((test_lo, test_hi)) == 0 else j_hi
 
     return Tv, js
-# <<end__ks_2samp>>
 
 
 def _rank(A, k):
@@ -150,6 +149,7 @@ def _rank(A, k):
         else:  # k == A[mid]
             return mid
     return lo
+# <<end__ks_2samp>>
 
 
 def plot_cdfs(X, Y, fignum=1):

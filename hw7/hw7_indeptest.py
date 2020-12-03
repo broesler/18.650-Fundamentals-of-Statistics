@@ -22,9 +22,9 @@ seed = 565656
 rng = np.random.default_rng(seed=seed)
 np.random.seed(seed)
 
-# TODO rename _test
-def spearmanr(X, Y, alpha=0.05):
-    """Calculate Spearman's rank order correlation for two samples.
+
+def spearmanr_test(X, Y, alpha=0.05):
+    r"""Calculate Spearman's rank order correlation for two samples.
 
     Parameters
     ----------
@@ -39,6 +39,8 @@ def spearmanr(X, Y, alpha=0.05):
         The value of the statistic
     pvalue : float \in [0, 1]
         The two-sided p-value for a hypothesis test where H_0 : X \indep Y.
+    q_hat : float
+        An estimate of the (1 - `alpha`)-quantile of the test statistic.
 
     See Also
     --------
@@ -55,8 +57,8 @@ def spearmanr(X, Y, alpha=0.05):
     Svs = _sample_Sn(n, M)
 
     # Calculate statistics
-    q_hat   = Svs[np.ceil(M*(1 - alpha/2)).astype(int)]
-    pvalue  = np.sum(np.abs(Svs) > np.abs(Tn)) / M  # two-tailed p-value
+    q_hat  = Svs[np.ceil(M*(1 - alpha/2)).astype(int)]
+    pvalue = np.sum(np.abs(Svs) > np.abs(Tn)) / M  # two-tailed p-value
 
     return Tn, pvalue, q_hat
 
@@ -72,7 +74,7 @@ def _sample_Sn(n, M):
 
 
 def _spearmanr(X, Y, kind='bydef'):
-    """Calculate Spearman's rank order correlation for two samples.
+    r"""Calculate Spearman's rank order correlation for two samples.
 
     Parameters
     ----------
@@ -142,7 +144,7 @@ np.testing.assert_allclose(Tn, Tn_2)
 np.testing.assert_allclose(Tn, Tn_3)
 
 # Calculate our test statistic
-Tn, pvalue, q_hat = spearmanr(X, Y, alpha=alpha)
+Tn, pvalue, q_hat = spearmanr_test(X, Y, alpha=alpha)
 d_alpha = np.abs(Tn) > q_hat
 
 # Compare to actual scipy values
@@ -159,7 +161,6 @@ if d_alpha:
     print(f"Reject null, p-value = {100*pvalue:0.2g}%.")
 else:
     print(f"Fail to reject null, p-value = {100*pvalue:0.2g}%.")
-
 
 # -----------------------------------------------------------------------------
 #         Plot the distribution of Sn vs. N(0, 1)

@@ -54,8 +54,6 @@ for i, (dist, label) in enumerate(zip(dists, labels)):
            xlim=(-3, 3))
     ax.grid('on')
 
-# TODO plot each distribution vs a standard normal for visual comparison
-
 gs.tight_layout(fig)
 plt.show()
 
