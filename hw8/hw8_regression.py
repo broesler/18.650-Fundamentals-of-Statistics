@@ -64,6 +64,13 @@ eps_hat = Y - Y_hat       # residuals (estimate of the actual epsilon)
 # *linear* in x, decreasing with increasing x. Appears to be independent of
 # slope sign or magnitude.
 
+# Define the projection matrices
+P = X @ XTXi @ X.T
+Pp = np.eye(P.shape[0]) - P
+
+np.testing.assert_allclose(P @ X, X)
+np.testing.assert_allclose(Pp @ X, np.zeros_like(X))
+
 # -----------------------------------------------------------------------------
 #         Compute Statistics on the Fit
 # -----------------------------------------------------------------------------

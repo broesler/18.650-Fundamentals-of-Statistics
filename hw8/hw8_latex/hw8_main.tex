@@ -187,9 +187,12 @@ the vector of deterministic explanatory variables. The goal is to estimate the
 vector of coefficients $\Bv = (\beta_1, \dots, \beta_n)^\T$ in the linear
 regression
 \[ y_i = X_i^\T \Bv + \ve_i, \quad i = 1, \dots, n. \]
-Assume that the model is heteroscedastic, \ie\ the error terms $\ve_i$
+Assume that the model is \emph{heteroscedastic}, \ie\ the error terms $\ve_i$
 are not \iid, but $\ve = (\ve_1, \dots, \ve_n)^\T \in \R^n$ is Gaussian,
 centered, with known invertible covariance matrix $\Sigma \in \R^{n \times n}$.
+Typically,
+\[ \Sigma = \begin{bmatrix} \sigma_1 && \\ & \ddots & \\ && \sigma_n \end{bmatrix} \]
+although any symmetric, invertible matrix is valid.
 Let $\Xm \in \R^{n \times p}$ be the matrix
 \[ \Xm = \begin{bmatrix} 
             \text{---} X_1^\T \text{---} \\
@@ -456,6 +459,33 @@ Consider the estimator
     &= \tr P'\Sigma P' \by{Theorem~\ref{thm:Bx}} \\
     \implies \norm*{\Yv - \Xm\Bvh}_2^2 &= \tr P'\Sigma P' \tag*{\qedhere}
   \end{alignat*}
+\end{proof}
+
+\begin{prop}
+  In the homoscedastic case, where $\Sigma = \sigma^2 \vect{I}_n$, the norm of
+  the residuals is  
+  \[ \norm*{\Yv - \Xm\Bvh}_2^2 = \sigma^2 (n - p). \]
+\end{prop}
+
+\begin{proof}
+  In the homoscedastic case, where $\Sigma = \sigma^2 \vect{I}_n$, this expression
+  evaluates to 
+  \begin{alignat*}{3}
+    \norm*{\Yv - \Xm\Bvh}_2^2 &= \tr P'(\sigma^2 \vect{I}_n) P' \\
+    &= \sigma^2 \tr P' P' \by{trace property} \\
+    &= \sigma^2 \tr P' \by {$P'$ is idempotent}
+  \end{alignat*}
+  It is property of projection matrices that their eigenvalues can be only 0 or 1.
+  The trace of $P'$ is then equal to the number of its non-zero eigenvalues.
+  Since $P'$ is a projection onto the null space of $\Xm^\T$, it has non-zero
+  eigenvalues equal to the dimension of that null space.
+  For $\Xm \in \R^{n \times p}$,
+  \[ \dim\mathscr{N}(\Xm^\T) = n - \dim \mathscr{C}(\Xm). \]
+  The dimension of the column space is the rank
+  \[ \dim \mathscr{C}(\Xm) = \rank \Xm = p, \]
+  as required for the uniqueness of $\Bvh$. Thus,
+  \[ \tr P' = \dim\mathscr{N}(\Xm^\T) = n - p, \]
+  \[ \implies \norm*{\Yv - \Xm\Bvh}_2^2 = \sigma^2 (n - p). \qedhere \]
 \end{proof}
 
 \end{document}
