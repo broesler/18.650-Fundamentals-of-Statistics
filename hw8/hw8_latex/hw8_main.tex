@@ -10,6 +10,7 @@
 \usepackage{bbm}  % for indicator function
 \usepackage{centernot}
 \usepackage{mathtools}
+\usepackage{mathrsfs}  % mathscr
 \usepackage{mleftright}
 \usepackage{enumerate}
 \usepackage{array, multirow}
@@ -100,11 +101,13 @@
 %==============================================================================
 \DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
 \DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
 
 \newcommand{\T}{\top} % transpose symbol
 \newcommand{\vect}[1]{\boldsymbol{\mathbf{#1}}} % use BOTH to cover all cases
 \newcommand{\ith}{$i^\mathrm{th}$}
 \newcommand{\jth}{$j^\mathrm{th}$}
+% \newcommand{\norm}[1]{{\lVert {#1} \rVert}_2}
 
 % Misc.
 \newcommand{\ie}{\emph{i.e.\ }}
@@ -155,15 +158,14 @@
 \newcommand{\Bv}{\beta}
 \newcommand{\Bvh}{\hat{\beta}}
 \newcommand{\ve}{\varepsilon}
+\newcommand{\Ebh}{\mathbb{E}[\Bvh]}
 
 \DeclareMathOperator*{\argmin}{argmin}
 \DeclareMathOperator*{\argmax}{argmax}
-
+\DeclareMathOperator{\tr}{tr}
 \DeclareMathOperator{\rank}{rank}
 \DeclareMathOperator{\Ber}{Ber}
-\DeclareMathOperator{\Exp}{Exp}
-% \DeclareMathOperator{\Var}{Var}
-% \DeclareMathOperator{\Cov}{Cov}
+
 
 %%%% TITLE ----------------------------
 \title[Homework 8 -- Problem \thesection]{18.650 Fundamentals of Statistics\\{\large Homework 8}}
@@ -262,7 +264,7 @@ Consider the estimator
   Given the data, the error in the linear regression
   \[ \Yv = \Xm\Bv + \ve \]
   is minimized by projecting $\Yv$ onto the column space of $\Xm$,
-  $\mathcal{C}(\Xm)$, by multiplying each side by $\Xm^\T$,
+  $\mathscr{C}(\Xm)$, by multiplying each side by $\Xm^\T$,
   \[ \Xm^\T\Yv = \Xm^\T\Xm\Bvh \]
   such that
   \[ \Bvh = (\Xm^\T\Xm)^{-1} \Xm^\T \Yv. \]
@@ -296,7 +298,7 @@ Consider the estimator
   \end{align*}
 \end{proof}
 
-\begin{prop}
+\begin{prop} \label{prop:BvN}
   The estimator is normally distributed, with mean and variance
   \[ \Bvh \sim \N{\Bv}{(\Xm^\T \Sigma^{-1} \Xm)^{-1}}. \]
 \end{prop}
@@ -322,7 +324,8 @@ Consider the estimator
     $\Sigma$.
   \end{theorem}
 
-  Since $\ve \sim \N{0}{\Sigma}$, by Theorem~\ref{thm:Bx},
+  Since the error is assumed to be normally distributed,
+  $\ve \sim \N{0}{\Sigma}$, by Theorem~\ref{thm:Bx},
   \[ \Bvh \sim \N{\Bv}{B \Sigma B^\T}. \]
   The covariance matrix is then
   \begin{alignat*}{3}
@@ -344,6 +347,116 @@ Consider the estimator
   \[ \Bvh \sim \N{\Bv}{(\Xm^\T \Sigma^{-1} \Xm)^{-1}}. \qedhere \]
 \end{proof}
 
+\subsection{Bias and Quadratic Risk of the Estimator}
+\begin{prop} \label{prop:bhat_nobias}
+  The estimator $\Bvh$ is unbiased.
+\end{prop}
+
+\begin{proof}
+  \begin{alignat*}{3}
+    \mathrm{Bias}_\Bv(\Bvh) &\coloneqq \E{\Bvh - \Bv} \\
+    &= \Ebh - \E{\Bv} \by{linearity of expectation} \\
+    &= \Ebh - \Bv \\
+    &= \Bv - \Bv \by{Proposition~\ref{prop:BvN}} \\
+    &= 0 \tag*{\qedhere}
+  \end{alignat*}
+\end{proof}
+
+\begin{prop}
+  The risk of the estimator $\Bvh$ is the trace of its covariance matrix.
+\end{prop}
+
+\begin{proof}
+  \begin{alignat*}{3}
+    \mathrm{Risk}_\Bv(\Bvh) &\coloneqq \E{(\Bvh - \Bv)^\T(\Bvh - \Bv)} \\
+    &= \E{\norm*{\Bvh - \Bv}_2^2} \\
+    &= \E{\norm*{\Bvh - \Ebh + \Ebh - \Bv}_2^2} \\
+    &= \E{\norm*{\Bvh - \Ebh}_2^2 
+      + 2(\Bvh - \Ebh)^\T (\Ebh - \Bv)
+      + \norm*{\Ebh - \Bv}_2^2} \\
+    &= \E{\norm*{\Bvh - \Ebh}_2^2}
+      + 2\E{(\Bvh - \Ebh)^\T (\Ebh - \Bv)} 
+      + \E{\norm*{\Ebh - \Bv}_2^2}.
+  \end{alignat*}
+  The second term is identically zero.
+  \[ 2\E{(\Bvh - \Ebh)^\T (\Ebh - \Bv)} = 2\E{(\Bvh - \Ebh)^\T}(\Ebh - \Bv) \]
+  because $\Ebh - \Bv$ is deterministic, and 
+  \[ \E{(\Bvh - \Ebh)^\T} = 0 \]
+  by definition. The risk is then
+  \[ \mathrm{Risk}_\Bv(\Bvh) = \E{\norm*{\Bvh - \Ebh}_2^2} + \E{\norm*{\Ebh - \Bv}_2^2}. \]
+  The second term becomes
+  \[ \E{\norm*{\Ebh - \Bv}_2^2} = \norm*{\Ebh - \Bv}_2^2 \]
+  because the argument is deterministic. We recognize this expression as the
+  norm of the bias.
+  \[ \norm*{\Ebh - \Bv}_2^2 = \norm*{\mathrm{Bias}_\Bv(\Bvh)}_2^2. \]
+  To evaluate the first term we apply the following theorem,
+  \begin{theorem} \label{thm:normnorm}
+    If $X \sim \N{0}{\Sigma}$, then $\norm*{X}_2^2 = \tr \Sigma$.
+  \end{theorem}
+  to see that
+  \begin{align}
+    \E{\norm*{\Bvh - \Ebh}_2^2} &= \E{\tr (\Xm^\T \Sigma^{-1} \Xm)^{-1}} \\
+    &= \tr (\Xm^\T \Sigma^{-1} \Xm)^{-1} \\
+    &= \tr \Var{\Bvh}.
+  \end{align}
+  \[ \therefore \mathrm{Risk}_\Bv(\Bvh) = \tr \Var{\Bvh} + \norm*{\mathrm{Bias}_\Bv(\Bvh)}_2^2. \]
+  As shown by the proof of Proposition~\ref{prop:bhat_nobias}, $\Bvh$ is
+  unbiased, so
+  \begin{align*}
+    \mathrm{Risk}_\Bv(\Bvh) &= \tr \Var{\Bvh}  \\
+    \implies \mathrm{Risk}_\Bv(\Bvh) &= \tr (\Xm^\T \Sigma^{-1} \Xm)^{-1}.
+    \qedhere
+  \end{align*}
+\end{proof}
+
+\subsection*{Appendix}
+\begin{quote}
+  \emph{Q: What is the prediction error of the estimator?}
+\end{quote}
+
+\begin{prop}
+  The prediction error, defined as the expected value of the sum of squared
+  residuals, is
+  \[ \E{\norm*{\Yv - \Xm\Bvh}_2^2} = \tr P' \Sigma P', \]
+  where $P'$ is the projection matrix onto the nullspace of $\Xm^\T$,
+  $\mathscr{N}(\Xm^\T)$.
+\end{prop}
+
+\begin{proof}
+  The residuals can be expressed as
+  \begin{align*}
+    \Yv - \Xm\Bvh &= \Yv - \Xm B \Yv \\
+    &= (\vect{I}_n - \Xm B) \Yv
+  \end{align*}
+  where
+  \[ B = (\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xm^\T \Sigma^{-1}. \]
+  Let $P \in \R^{n \times n}$ be the projection matrix that maps onto the column
+  space of $\Xm$, $\mathscr{C}(\Xm)$:
+  \[ P = \Xm B =  \Xm (\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xm^\T \Sigma^{-1}. \]
+  Then, let $P' \in \R^{n \times n}$ be the projection matrix onto
+  $\mathscr{N}(\Xm^\T)$, which is orthogonal to $\mathscr{C}(\Xm)$.
+  \[ P' = \vect{I}_n - \Xm B 
+        = \vect{I}_n - \Xm (\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xm^\T \Sigma^{-1}. \]
+  The residuals are then
+  \[ \Yv - \Xm\Bvh = (\vect{I}_n - P)\Yv = P'\Yv. \]
+  We can substitute the expression for the $\Yv$ to obtain
+  \begin{align*}
+    \Yv - \Xm\Bvh &= P' \Yv \\
+    &= P' (\Xm\Bv + \ve) \\
+    &= P'\Xm\Bv + P'\ve.
+  \end{align*}
+  The projection of $\Xm$ onto the nullspace of its own transpose $P'\Xm\Bv$ is
+  always zero,
+  \[ \implies \Yv - \Xm\Bvh = P'\ve. \]
+  The norm of the residuals is then
+  \begin{alignat*}{3}
+    \norm*{\Yv - \Xm\Bvh}_2^2 = \norm*{P'\Yv}_2^2 &= \norm*{P'\ve}_2^2 \\
+    &= \norm*{\N{0}{P'\Sigma P'^\T}}_2^2 \by{Theorem~\ref{thm:normnorm}} \\
+    &= \norm*{\N{0}{P'\Sigma P'}}_2^2 \by{$P'^\T = P'$} \\
+    &= \tr P'\Sigma P' \by{Theorem~\ref{thm:Bx}} \\
+    \implies \norm*{\Yv - \Xm\Bvh}_2^2 &= \tr P'\Sigma P' \tag*{\qedhere}
+  \end{alignat*}
+\end{proof}
 
 \end{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
