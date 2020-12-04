@@ -190,9 +190,11 @@ regression
 Assume that the model is \emph{heteroscedastic}, \ie\ the error terms $\ve_i$
 are not \iid, but $\ve = (\ve_1, \dots, \ve_n)^\T \in \R^n$ is Gaussian,
 centered, with known invertible covariance matrix $\Sigma \in \R^{n \times n}$.
-Typically,
-\[ \Sigma = \begin{bmatrix} \sigma_1 && \\ & \ddots & \\ && \sigma_n \end{bmatrix} \]
-although any symmetric, invertible matrix is valid.
+Often, the errors are assumed to be independent, but not identically
+distributed. In this case, the covariance matrix is diagonal,
+\[ \Sigma = \begin{bmatrix} \sigma_1^2 && \\ & \ddots & \\ && \sigma_n^2 \end{bmatrix}. \]
+In the case where errors are also not independent, $\Sigma$ will have non-zero
+off-diagonal entries, but is valid as long as it is symmetric and invertible. 
 Let $\Xm \in \R^{n \times p}$ be the matrix
 \[ \Xm = \begin{bmatrix} 
             \text{---} X_1^\T \text{---} \\
@@ -219,7 +221,7 @@ Consider the estimator
   \begin{alignat*}{3}
     \Bvh &\coloneqq \argmin_\Bv (\Yv - \Xm\Bv)^\T \Sigma^{-1} (\Yv - \Xm\Bv) \\
          &= \argmin_\Bv (\Yv - \Xm\Bv)^\T (\sigma^2 \vect{I}_n)^{-1} (\Yv - \Xm\Bv) \\
-         &= \argmin_\Bv \frac{1}{\sigma^2} (\Yv - \Xm\Bv)^\T \vect{I}_n (\Yv - \Xm\Bv) \by{inverse rules} \\
+         &= \argmin_\Bv \frac{1}{\sigma^2} (\Yv - \Xm\Bv)^\T \vect{I}_n (\Yv - \Xm\Bv) \by{inverse properties} \\
          &= \argmin_\Bv \frac{1}{\sigma^2} (\Yv - \Xm\Bv)^\T (\Yv - \Xm\Bv) \by{definition of identity} \\
     \implies \Bvh &= \argmin_\Bv (\Yv - \Xm\Bv)^\T (\Yv - \Xm\Bv) = \beta_\mathrm{LSE} \by{$\sigma^2 > 0$ and constant} \tag*{\qedhere}
   \end{alignat*}

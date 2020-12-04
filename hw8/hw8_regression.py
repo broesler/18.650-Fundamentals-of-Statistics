@@ -29,7 +29,8 @@ sns.set_style('whitegrid')
 #         Define true parameters
 # -----------------------------------------------------------------------------
 beta = np.array([[1.0, 0.5]]).T  # (p, 1)
-# beta = np.array([[1.0, 0.5, 0.25]]).T  # (p, 1)  # TODO rewrite for p > 2
+# TODO rewrite for p > 2
+# beta = np.array([[1.0, 0.5, 0.25]]).T  # (p, 1)
 
 n = 100        # number of observations
 p = beta.size  # number of parameters
@@ -47,7 +48,7 @@ Y = X @ beta + eps             # (n, 1) noisy observations
 
 # "true" line
 n_s = 100  # number of "predictions" to make
-x_s = np.tile(np.linspace(-1, 11, n_s).reshape(-1, 1), (1, p-1)).squeeze()
+x_s = np.linspace(-1, 11, n_s)
 X_s = np.c_[np.ones(x_s.shape[0]), x_s]
 Y_s = X_s @ beta  # no noise
 
@@ -67,9 +68,8 @@ eps_hat = Y - Y_hat       # residuals (estimate of the actual epsilon)
 # Define the projection matrices
 P = X @ XTXi @ X.T
 Pp = np.eye(P.shape[0]) - P
-
 np.testing.assert_allclose(P @ X, X)
-np.testing.assert_allclose(Pp @ X, np.zeros_like(X))
+np.testing.assert_allclose(Pp @ X, np.zeros_like(X), atol=1e-12)
 
 # -----------------------------------------------------------------------------
 #         Compute Statistics on the Fit
@@ -85,7 +85,7 @@ Rsq = 1 - RSS/TSS                 # == ESS / TSS  # explained variance
 
 # TODO rewrite for x \in R^(n,p-1)
 # covariance in the data: Cov(X, Y)
-r = float(xc.T @ yc / np.sqrt((xc.T @ xc) * (yc.T @ yc)))  # manually compute
+r = float(xc.T @ yc / np.sqrt(xc.T @ xc * yc.T @ yc))  # manually compute
 r_p, pval = stats.pearsonr(x.squeeze(), Y.squeeze())   # compute using scipy
 
 np.testing.assert_allclose(Rsq, r**2)
