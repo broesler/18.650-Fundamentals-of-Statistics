@@ -128,6 +128,7 @@
 \newcommand{\V}[1]{\mathbb{V}\mleft[#1\mright]}
 \newcommand{\Var}[1]{\operatorname{Var}\mleft(#1\mright)}
 \newcommand{\Cov}[1]{\operatorname{Cov}\mleft(#1\mright)}
+\newcommand{\Li}[1]{\mathcal{L}\mleft( #1 \mright)}  % likelihood
 \newcommand{\R}{\mathbb{R}}  % real numbers
 \newcommand{\N}[2]{\mathcal{N}\mleft( #1, #2 \mright)}
 \newcommand{\U}[2]{\mathcal{U}\mleft(\mleft[ #1, #2 \mright]\mright)}
@@ -426,7 +427,7 @@ Consider the estimator
   The prediction error, defined as the expected value of the sum of squared
   residuals, is
   \[ \E{\norm*{\Yv - \Xm\Bvh}_2^2} = \tr P' \Sigma P', \]
-  where $P'$ is the projection matrix onto the nullspace of $\Xm^\T$,
+  where $P'$ is the projection matrix onto the null space of $\Xm^\T$,
   $\mathscr{N}(\Xm^\T)$.
 \end{prop}
 
@@ -453,7 +454,7 @@ Consider the estimator
     &= P' (\Xm\Bv + \ve) \\
     &= P'\Xm\Bv + P'\ve.
   \end{align*}
-  The projection of $\Xm$ onto the nullspace of its own transpose $P'\Xm\Bv$ is
+  The projection of $\Xm$ onto the null space of its own transpose $P'\Xm\Bv$ is
   always zero,
   \[ \implies \Yv - \Xm\Bvh = P'\ve. \]
   The norm of the residuals is then
@@ -492,6 +493,109 @@ Consider the estimator
   as required for the uniqueness of $\Bvh$. Thus,
   \[ \tr P' = \dim\mathscr{N}(\Xm^\T) = n - p, \]
   \[ \implies \norm*{\Yv - \Xm\Bvh}_2^2 = \sigma^2 (n - p). \qedhere \]
+\end{proof}
+
+\clearpage
+\section{Linear Regression with Random Design}
+Consider the \iid\ pairs of random variables $(X_i, Y_i)$, $i = 1, \dots, n$,
+where $X_i~\in~\R^p$ $(p \ge 1)$, and $Y_i \in \R$. For each $i$, write
+\[ Y_i = X_i^\T \Bv + \ve_i, \]
+where $\E{\ve_i = 0}$, $\Cov{X_i, \ve_i} = 0$, and $\Bv \in \R^p$ is an unknown
+vector that we want to estimate. Assume $\forall x \in \R^p$, $\ve_1$ has
+a density conditional on $X_1 = x$, denoted $f_x$, and $X_1$ has a density $g$.
+In other words,
+\begin{align*}
+  f_x(t) &= \Prob{\ve_1 = t | X_1 = x}, \\
+  g(t) &= \Prob{X_1 = t}.
+\end{align*}
+
+\subsection{The Likelihood}
+The likelihood function is the product of the probabilities of the data, given
+the parameters:
+\begin{alignat*}{3}
+  \Li{X, Y; \Bv} &\coloneqq \prod_{i=1}^n f(X_i, Y_i) \\
+  &= \prod_{i=1}^n f_X(X_i) f_{Y|X}(Y_i | X_i) \by{law of total probability} \\
+  &= \prod_{i=1}^n f_X(X_i) \times \prod_{i=1}^n f_{Y|X}(Y_i | X_i) \\
+  &= \prod_{i=1}^n g(X_i) \times \prod_{i=1}^n f_{Y|X}(Y_i | X_i) \by{definition of $g$}.
+\end{alignat*}
+
+\begin{prop}
+  The probability of $Y_i$ given $X_i$ is equal to the probability of the error
+  $\ve_i$ given $X_i$:
+  \[ f_{Y|X}(Y_i | X_i) = f_x\mleft(Y_i - X_i^\T\Bv\mright). \]
+\end{prop}
+
+\begin{proof}
+  \begin{alignat*}{3}
+    f_{Y|X}(Y_i | X_i) &= f_{Y|X}(X_i^\T \Bv + \ve_i | X_i) \\
+    &= \Prob{Y_i = X_i^\T \Bv + \ve_i | X_i} \by{density definition} \\
+    &= \Prob{\ve_i = Y_i - X_i^\T\Bv | X_i} \by{algebraic manipulation} \\
+    &= f_x\mleft(Y_i - X_i^\T\Bv\mright). \by{definition of $f_x$} \tag*{\qedhere}
+  \end{alignat*}
+\end{proof}
+
+Therefore, the likelihood is
+\[ \Li{X, Y; \Bv} = \prod_{i=1}^n g(X_i) \times \prod_{i=1}^n f_x\mleft(Y_i - X_i^\T\Bv\mright). \]
+
+\subsection{The Maximum Likelihood Estimator}
+\begin{prop}
+  The maximum likelihood estimator, $\Bvh$, does not depend on the distribution
+  of the design random variables $X$, $g$.
+\end{prop}
+
+\begin{proof}
+  The maximum likelihood estimator is the $\Bvh$ that maximizes the likelihood
+  function
+  \[ \Bvh \coloneqq \argmax_{\Bv \in \R^p} \prod_{i=1}^n g(X_i) 
+    \times \prod_{i=1}^n f_x\mleft(Y_i - X_i^\T\Bv\mright). \]
+  Since $g(x) = \Prob{X_1 = x}$ does not depend on $\Bv$, the definition of
+  $\Bvh$ is equivalent to
+  \[ \iff \Bvh = \argmax_\Bv \prod_{i=1}^n f_x\mleft(Y_i - X_i^\T\Bv\mright) \]
+  which itself does not depend on $g$.
+\end{proof}
+
+\subsection{Gaussian Error}
+Assume that $\ve_1 \indep X_1$ and $\ve_1 \sim \N{0}{\sigma^2}$.
+
+\subsubsection{The Conditional Error Density}
+Given $X_1$, $\ve_1 = Y_1 - X_1^\T\Bv$, so
+\[ f_x = \frac{1}{\sqrt{2\pi\sigma^2}} \exp \mleft[\frac{-(Y_1 - X_1^\T\Bv)^2}{2\sigma^2}\mright]. \]
+
+\subsubsection{The Least Square Estimator}
+Since $X_1, \dots, X_n \in \R^p$ are \iid, the rank of
+\[ \Xm = \begin{bmatrix} 
+            \text{---} X_1^\T \text{---} \\
+            \vdots \\ 
+            \text{---} X_n^\T \text{---} 
+          \end{bmatrix} 
+\]
+is almost surely $p$.
+
+\begin{theorem}
+  Under the assumption of normal error $\ve_1 \sim \N{0}{\sigma^2}$, the maximum
+  likelihood estimator is equal to the least squares estimator.
+\end{theorem}
+
+\begin{proof}
+  First, we write down the least squares estimator
+  \begin{align*}
+    \Bvh_\mathrm{LSE} &\coloneqq \argmin_{\Bv \in \R^p} \ve^\T \ve \\
+                      &= \argmin_{\Bv \in \R^p} (\Yv - \Xm^\T\Bvh)^\T (\Yv - \Xm^\T\Bvh).
+  \end{align*}
+  The maximum likelihood estimator is found by
+  \begin{align*}
+    \Bvh_\mathrm{MLE} &= \argmax_\Bv \prod_{i=1}^n f_x\mleft(Y_i - X_i^\T\Bv\mright) \\
+    &\iff \argmax_\Bv \prod_{i=1}^n \frac{1}{\sqrt{2\pi\sigma^2}} \exp \mleft[\frac{-(Y_i - X_i^\T\Bv)^2}{2\sigma^2}\mright] \\
+    &\iff \argmax_\Bv \frac{1}{(2\pi\sigma^2)^\frac{n}{2}} 
+      \exp \mleft[\frac{-(\Yv - \Xm^\T\Bv)^\T(\Yv - \Xm^\T\Bv)}{2\sigma^2}\mright] \\
+    &\iff \argmax_\Bv \log \frac{1}{(2\pi\sigma^2)^\frac{n}{2}} 
+      \exp \mleft[\frac{-(\Yv - \Xm^\T\Bv)^\T(\Yv - \Xm^\T\Bv)}{2\sigma^2}\mright] \\
+    &\iff \argmax_\Bv -\frac{1}{2}\mleft[ n\log 2\pi\sigma^2 
+          + \frac{1}{\sigma^2} (\Yv - \Xm^\T\Bv)^\T(\Yv - \Xm^\T\Bv) \mright] \\
+    &\iff \argmin_\Bv \frac{1}{\sigma^2} (\Yv - \Xm^\T\Bv)^\T(\Yv - \Xm^\T\Bv) \\
+    &\iff \argmin_\Bv (\Yv - \Xm^\T\Bv)^\T(\Yv - \Xm^\T\Bv). \\
+    \therefore \Bvh_\mathrm{MLE} = \Bvh_\mathrm{LSE} &= \argmin_\Bv (\Yv - \Xm^\T\Bv)^\T(\Yv - \Xm^\T\Bv). \qedhere
+  \end{align*}
 \end{proof}
 
 \end{document}
