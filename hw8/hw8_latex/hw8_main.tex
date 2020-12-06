@@ -418,7 +418,7 @@ Consider the estimator
   \end{align*}
 \end{proof}
 
-\subsection*{Appendix}
+\subsection*{Appendix} \label{app:prediction_error}
 \begin{quote}
   Q: What is the prediction error of the estimator?
 \end{quote}
@@ -426,8 +426,8 @@ Consider the estimator
 \begin{prop}
   The prediction error, defined as the expected value of the sum of squared
   residuals, is
-  \[ \E{\norm*{\Yv - \Xm\Bvh}_2^2} = \tr P' \Sigma P', \]
-  where $P'$ is the projection matrix onto the null space of $\Xm^\T$,
+  \[ \E{\norm*{\Yv - \Xm\Bvh}_2^2} = \tr M \Sigma M, \]
+  where $M$ is the projection matrix onto the null space of $\Xm^\T$,
   $\mathscr{N}(\Xm^\T)$.
 \end{prop}
 
@@ -439,31 +439,31 @@ Consider the estimator
   \end{align*}
   where
   \[ B = (\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xm^\T \Sigma^{-1}. \]
-  Let $P \in \R^{n \times n}$ be the projection matrix that maps onto the column
+  Let $H \in \R^{n \times n}$ be the projection matrix that maps onto the column
   space of $\Xm$, $\mathscr{C}(\Xm)$:
-  \[ P = \Xm B =  \Xm (\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xm^\T \Sigma^{-1}. \]
-  Then, let $P' \in \R^{n \times n}$ be the projection matrix onto
+  \[ H = \Xm B =  \Xm (\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xm^\T \Sigma^{-1}. \]
+  Then, let $M \in \R^{n \times n}$ be the projection matrix onto
   $\mathscr{N}(\Xm^\T)$, which is orthogonal to $\mathscr{C}(\Xm)$.
-  \[ P' = \vect{I}_n - \Xm B 
+  \[ M = \vect{I}_n - \Xm B 
         = \vect{I}_n - \Xm (\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xm^\T \Sigma^{-1}. \]
   The residuals are then
-  \[ \Yv - \Xm\Bvh = (\vect{I}_n - P)\Yv = P'\Yv. \]
+  \[ \Yv - \Xm\Bvh = (\vect{I}_n - H)\Yv = M\Yv. \]
   We can substitute the expression for the $\Yv$ to obtain
   \begin{align*}
-    \Yv - \Xm\Bvh &= P' \Yv \\
-    &= P' (\Xm\Bv + \ve) \\
-    &= P'\Xm\Bv + P'\ve.
+    \Yv - \Xm\Bvh &= M \Yv \\
+    &= M (\Xm\Bv + \ve) \\
+    &= M\Xm\Bv + M\ve.
   \end{align*}
-  The projection of $\Xm$ onto the null space of its own transpose $P'\Xm\Bv$ is
+  The projection of $\Xm$ onto the null space of its own transpose $M\Xm\Bv$ is
   always zero,
-  \[ \implies \Yv - \Xm\Bvh = P'\ve. \]
+  \[ \implies \Yv - \Xm\Bvh = M\ve. \]
   The norm of the residuals is then
   \begin{alignat*}{3}
-    \norm*{\Yv - \Xm\Bvh}_2^2 = \norm*{P'\Yv}_2^2 &= \norm*{P'\ve}_2^2 \\
-    &= \norm*{\N{0}{P'\Sigma P'^\T}}_2^2 \by{\Cref{thm:normnorm}} \\
-    &= \norm*{\N{0}{P'\Sigma P'}}_2^2 \by{$P'^\T = P'$} \\
-    &= \tr P'\Sigma P' \by{\Cref{thm:Bx}} \\
-    \implies \norm*{\Yv - \Xm\Bvh}_2^2 &= \tr P'\Sigma P' \tag*{\qedhere}
+    \norm*{\Yv - \Xm\Bvh}_2^2 = \norm*{M\Yv}_2^2 &= \norm*{M\ve}_2^2 \\
+    &= \norm*{\N{0}{M\Sigma M^\T}}_2^2 \by{\Cref{thm:normnorm}} \\
+    &= \norm*{\N{0}{M\Sigma M}}_2^2 \by{$M^\T = M$} \\
+    &= \tr M\Sigma M \by{\Cref{thm:Bx}} \\
+    \implies \norm*{\Yv - \Xm\Bvh}_2^2 &= \tr M\Sigma M \tag*{\qedhere}
   \end{alignat*}
 \end{proof}
 
@@ -477,21 +477,21 @@ Consider the estimator
   In the homoscedastic case, where $\Sigma = \sigma^2 \vect{I}_n$, this expression
   evaluates to 
   \begin{alignat*}{3}
-    \norm*{\Yv - \Xm\Bvh}_2^2 &= \tr P'(\sigma^2 \vect{I}_n) P' \\
-    &= \sigma^2 \tr P' P' \by{trace property} \\
-    &= \sigma^2 \tr P' \by {$P'$ is idempotent}
+    \norm*{\Yv - \Xm\Bvh}_2^2 &= \tr M(\sigma^2 \vect{I}_n) M \\
+    &= \sigma^2 \tr M M \by{trace property} \\
+    &= \sigma^2 \tr M \by {$M$ is idempotent}
   \end{alignat*}
   It is property of projection matrices that their eigenvalues $\lambda_i \in
   \{0, 1\}$ only.
-  The trace of $P'$ is then equal to the number of its non-zero eigenvalues.
-  Since $P'$ is a projection onto the null space of $\Xm^\T$, it has non-zero
+  The trace of $M$ is then equal to the number of its non-zero eigenvalues.
+  Since $M$ is a projection onto the null space of $\Xm^\T$, it has non-zero
   eigenvalues equal to the dimension of that null space.
   For $\Xm \in \R^{n \times p}$,
   \[ \dim\mathscr{N}(\Xm^\T) = n - \dim \mathscr{C}(\Xm). \]
   The dimension of the column space is the rank
   \[ \dim \mathscr{C}(\Xm) = \rank \Xm = p, \]
   as required for the uniqueness of $\Bvh$. Thus,
-  \[ \tr P' = \dim\mathscr{N}(\Xm^\T) = n - p, \]
+  \[ \tr M = \dim\mathscr{N}(\Xm^\T) = n - p, \]
   \[ \implies \norm*{\Yv - \Xm\Bvh}_2^2 = \sigma^2 (n - p). \qedhere \]
 \end{proof}
 
@@ -535,7 +535,7 @@ the parameters:
 \end{proof}
 
 Therefore, the likelihood is
-\[ \Li{X, Y; \Bv} = \prod_{i=1}^n g(X_i) \times \prod_{i=1}^n f_x\mleft(Y_i - X_i^\T\Bv\mright). \]
+  \[ \Li{X, Y; \Bv} = \prod_{i=1}^n g(X_i) \times \prod_{i=1}^n f_x\mleft(Y_i - X_i^\T\Bv\mright). \]
 
 \subsection{The Maximum Likelihood Estimator}
 \begin{prop}
@@ -555,7 +555,8 @@ Therefore, the likelihood is
 \end{proof}
 
 \subsection{Gaussian Error}
-Assume that $\ve_1 \indep X_1$ and $\ve_1 \sim \N{0}{\sigma^2}$.
+Assume that $\ve_1 \indep X_1$ and $\ve_1 \sim \N{0}{\sigma^2}$,
+with $0~<~\sigma^2~<~\infty$.
 
 \subsubsection{The Conditional Error Density}
 Given $X_1$, $\ve_1 = Y_1 - X_1^\T\Bv$, so
@@ -580,23 +581,194 @@ is almost surely $p$.
   First, we write down the least squares estimator
   \begin{align*}
     \Bvh_\mathrm{LSE} &\coloneqq \argmin_{\Bv \in \R^p} \ve^\T \ve \\
-                      &= \argmin_{\Bv \in \R^p} (\Yv - \Xm^\T\Bvh)^\T (\Yv - \Xm^\T\Bvh).
+                      &= \argmin_{\Bv \in \R^p} (\Yv - \Xm\Bv)^\T (\Yv - \Xm\Bv).
+  \end{align*}
+  Under the assumption of normality, we can write down the log-likelihood.
+  \begin{align*}
+    \Li{X, Y; \Bv, \sigma^2} &\propto \prod_{i=1}^n f_x\mleft(Y_i - X_i^\T\Bv\mright) \\
+    &= \prod_{i=1}^n \frac{1}{\sqrt{2\pi\sigma^2}} 
+       \exp \mleft[\frac{-(Y_i - X_i^\T\Bv)^2}{2\sigma^2}\mright] \\
+    &= \frac{1}{(2\pi\sigma^2)^\frac{n}{2}} 
+       \exp \mleft[\frac{-(\Yv - \Xm\Bv)^\T(\Yv - \Xm\Bv)}{2\sigma^2}\mright] \\
+    \implies \ell(X, Y; \Bv, \sigma^2) &= \log\mleft( \frac{1}{(2\pi\sigma^2)^\frac{n}{2}} 
+       \exp \mleft[\frac{-(\Yv - \Xm\Bv)^\T(\Yv - \Xm\Bv)}{2\sigma^2}\mright]
+       \mright) \\
+    \implies \ell(X, Y; \Bv, \sigma^2) &= -\frac{1}{2}\mleft[ n\log 2\pi + n \log\sigma^2 
+          + \frac{1}{\sigma^2} (\Yv - \Xm\Bv)^\T(\Yv - \Xm\Bv) \mright]. \numberthis \label{eq:likelihood}
   \end{align*}
   The maximum likelihood estimator is found by
   \begin{align*}
-    \Bvh_\mathrm{MLE} &= \argmax_\Bv \prod_{i=1}^n f_x\mleft(Y_i - X_i^\T\Bv\mright) \\
-    &\iff \argmax_\Bv \prod_{i=1}^n \frac{1}{\sqrt{2\pi\sigma^2}} \exp \mleft[\frac{-(Y_i - X_i^\T\Bv)^2}{2\sigma^2}\mright] \\
-    &\iff \argmax_\Bv \frac{1}{(2\pi\sigma^2)^\frac{n}{2}} 
-      \exp \mleft[\frac{-(\Yv - \Xm^\T\Bv)^\T(\Yv - \Xm^\T\Bv)}{2\sigma^2}\mright] \\
-    &\iff \argmax_\Bv \log \frac{1}{(2\pi\sigma^2)^\frac{n}{2}} 
-      \exp \mleft[\frac{-(\Yv - \Xm^\T\Bv)^\T(\Yv - \Xm^\T\Bv)}{2\sigma^2}\mright] \\
-    &\iff \argmax_\Bv -\frac{1}{2}\mleft[ n\log 2\pi\sigma^2 
-          + \frac{1}{\sigma^2} (\Yv - \Xm^\T\Bv)^\T(\Yv - \Xm^\T\Bv) \mright] \\
-    &\iff \argmin_\Bv \frac{1}{\sigma^2} (\Yv - \Xm^\T\Bv)^\T(\Yv - \Xm^\T\Bv) \\
-    &\iff \argmin_\Bv (\Yv - \Xm^\T\Bv)^\T(\Yv - \Xm^\T\Bv). \\
-    \therefore \Bvh_\mathrm{MLE} = \Bvh_\mathrm{LSE} &= \argmin_\Bv (\Yv - \Xm^\T\Bv)^\T(\Yv - \Xm^\T\Bv). \qedhere
+    \Bvh_\mathrm{MLE} &= \argmax_\Bv \ell\mleft(X, Y; \Bv, \sigma^2\mright) \\
+    &\iff \argmax_\Bv -\frac{1}{2}\mleft[ n\log 2\pi + n\log\sigma^2 
+          + \frac{1}{\sigma^2} (\Yv - \Xm\Bv)^\T(\Yv - \Xm\Bv) \mright] \\
+    &\iff \argmin_\Bv \frac{1}{\sigma^2} (\Yv - \Xm\Bv)^\T(\Yv - \Xm\Bv) \\
+    &\iff \argmin_\Bv (\Yv - \Xm\Bv)^\T(\Yv - \Xm\Bv). \\
+    \therefore \Bvh_\mathrm{MLE} &= \Bvh_\mathrm{LSE} = \argmin_\Bv (\Yv - \Xm\Bv)^\T(\Yv - \Xm\Bv). \qedhere
   \end{align*}
 \end{proof}
+
+The maximum likelihood estimator occurs at the location where the partial
+derivative with respect to $\Bv$.
+\begin{alignat*}{3}
+  \nabla_\Bv &= -2\Xm^\T(\Yv - \Xm\Bvh) = 0 \\
+  &= \Xm^\T\Yv - \Xm^\T\Xm\Bvh = 0 \\
+  \implies &\Xm^\T\Yv = \Xm^\T\Xm\Bvh \\
+  \implies &\Bvh = (\Xm^\T\Xm)^{-1}\Xm^\T\Yv.
+\end{alignat*}
+Since $\rank \Xm = p$, $(\Xm^\T\Xm)^{-1} \in \R^{p \times p}$ exists and is
+unique, so $\Bvh$ is a unique estimator. We have also shown, incidentally, that
+$\Bvh$ is the maximum likelihood estimator regardless of the value of
+$\sigma^2$. The only requirement on the errors $\ve_i$ is that they be \iid, such
+that $\sigma^2$ is finite and constant.
+
+\subsection{The Distribution of the MLE}
+\begin{prop}
+  Given $\Xm$, the MLE of the regression coefficients is normally distributed,
+  centered about the true parameter, with variance proportional to the error
+  variance:
+  \[ \Bvh|\Xm \sim \N{\Bv}{ \sigma^2 (\Xm^\T \Xm)^{-1}}. \]
+\end{prop}
+
+\begin{proof}
+  The distribution of $\Bvh$ can be determined from the distribution of the
+  residuals.
+  \begin{align*}
+    \Bvh &= (\Xm^\T \Xm)^{-1} \Xm^\T \Yv \\
+        &= (\Xm^\T \Xm)^{-1} \Xm^\T (\Xm \Bv + \ve) \\
+        &= (\Xm^\T \Xm)^{-1} (\Xm^\T \Xm) \Bv 
+          + (\Xm^\T \Xm)^{-1} \Xm^\T \ve \\
+        &= \Bv + (\Xm^\T \Xm)^{-1} \Xm^\T \ve.
+  \end{align*}
+  By \Cref{thm:Bx} and the assumption of normality of errors,
+  \begin{align*}
+    \ve &\sim \N{0}{\sigma^2 \vect{I}_n} \\
+    \implies B\ve &\sim \N{0}{\sigma^2 B B^\T}.
+  \end{align*}
+  Thus,
+    \[ \Bvh|\Xm \sim \N{\Bv}{\sigma^2 B B^\T} \]
+  where
+  \[ B = (\Xm^\T \Xm)^{-1} \Xm^\T. \]
+  The variance of the estimator is then proportional to
+  \begin{alignat*}{3}
+    B B^\T &= (\Xm^\T \Xm)^{-1} \Xm^\T ((\Xm^\T \Xm)^{-1} \Xm^\T)^\T  \\
+          &= (\Xm^\T \Xm)^{-1} \Xm^\T \Xm ((\Xm^\T \Xm)^{-1})^\T  \by{transpose properties} \\
+          &= ((\Xm^\T \Xm)^{-1})^\T \by{multiplicative inverse} \\
+          &= ((\Xm^\T \Xm)^\T)^{-1} \by{$\Xm^\T\Xm$ square and invertible} \\
+          &= (\Xm^\T \Xm)^{-1}, \by{$\Xm^\T\Xm$ symmetric}
+  \end{alignat*}
+  so its distribution is
+  \[ \Bvh|\Xm \sim \N{\Bv}{ \sigma^2 (\Xm^\T \Xm)^{-1}}. \qedhere \]
+\end{proof}
+
+\subsection{Bias of the MLE}
+\begin{prop}
+  The MLE is unbiased.
+\end{prop}
+
+\begin{proof}
+  \begin{alignat*}{3}
+    \mathrm{Bias}_\Bv(\Bvh) &= \E{\Bvh - \Bv} \\
+    &= \Ebh - \E{\Bv} \by{linearity of expectation} \\
+    &= \Ebh - \Bv \by{$\Bv$ is constant} \\
+    &= \E{\mathbb{E}[\Bvh|\Xm]} - \Bv \by{law of total expectation} \\
+    &= \E{\Bv} - \Bv \by{distribution of $\Bvh|\Xm$ is normal} \\
+    &= \Bv - \Bv \by{$\Bv$ is constant} \\
+    &= 0. \tag*{\qedhere}
+  \end{alignat*}
+\end{proof}
+
+\subsection{MLE of the Variance}
+\begin{prop}
+  The maximum likelihood estimator of the variance is
+  \[ \hat{\sigma}^2_\mathrm{MLE} = \tfrac{1}{n} \hat{\ve}^\T \hat{\ve} 
+    = \tfrac{1}{n} (\Yv - \Xm\Bvh)^\T (\Yv - \Xm\Bvh). \]
+\end{prop}
+
+\begin{proof}
+  To maximize the likelihood with respect to the variance, we take the gradient
+  of~\Cref{eq:likelihood} w.r.t.\ $\sigma^2$
+  \begin{align*}
+    \nabla_{\sigma^2} &= -\frac{n}{2\sigma^2} + \frac{1}{2(\sigma^2)^2}(\Yv - \Xm\Bv)^\T(\Yv - \Xm\Bv) \\
+    \implies \nabla_{\sigma^2}(\hat{\sigma}^2) &= -\frac{n}{2\hat{\sigma}^2} 
+      + \frac{1}{2(\hat{\sigma}^2)^2}(\Yv - \Xm\Bv)^\T(\Yv - \Xm\Bv) = 0 \\
+    \implies \frac{n}{2\hat{\sigma}^2} &= \frac{1}{2(\hat{\sigma}^2)^2}(\Yv - \Xm\Bv)^\T(\Yv - \Xm\Bv) \\
+    \implies \hat{\sigma}^2 &= \tfrac{1}{n}(\Yv - \Xm\Bv)^\T(\Yv - \Xm\Bv).
+  \end{align*}
+  The value of $\Bv$ can be estimated by the maximum likelihood estimator for
+  $\Bv$, $\Bvh$, since we have already shown that $\Bvh$ is optimal, independent
+  of the value of $\sigma^2$. Thus,
+  \[ \hat{\sigma}^2_\mathrm{MLE} = \tfrac{1}{n}(\Yv - \Xm\Bvh)^\T(\Yv - \Xm\Bvh). \qedhere \]
+\end{proof}
+
+\subsection{An Unbiased Estimator of the Variance}
+\begin{prop}
+  The maximum likelihood estimator of the variance is biased, given the design.
+\end{prop}
+
+\begin{proof}
+  \begin{alignat*}{3}
+    \mathrm{Bias}_{\sigma^2}(\hat{\sigma}_\mathrm{MLE}^2) &= \E{\hat{\sigma}_\mathrm{MLE}^2 - \sigma^2} \\
+    &= \E{\hat{\sigma}_\mathrm{MLE}^2} - \E{\sigma^2} \by{linearity of expectation} \\
+    &= \E{\hat{\sigma}_\mathrm{MLE}^2} - \sigma^2 \by{$\sigma^2$ is constant} \\
+    &= \E{\E{\tfrac{1}{n}(\Yv - \Xm\Bvh)^\T(\Yv - \Xm\Bvh) | \Xm}} - \sigma^2. \by{law of total expectation}
+  \end{alignat*}
+  We have already shown in the~\nameref{app:prediction_error} that the norm of
+  the residuals, under the assumption of normality, is 
+  \[ (\Yv - \Xm\Bvh)^\T(\Yv - \Xm\Bvh) = \sigma^2 (n - p) \]
+  where $\rank \Xm = p$. Thus,
+  \begin{align*}
+    \mathrm{Bias}_{\sigma^2}(\hat{\sigma}_\mathrm{MLE}^2) &= \E{\E{\tfrac{1}{n}
+        \sigma^2 (n - p) | \Xm}} - \sigma^2 \\
+    &= \frac{n-p}{n} \E{\E{\sigma^2 | \Xm}} - \sigma^2 \\
+    &= \frac{n-p}{n} \E{\sigma^2} - \sigma^2 \\
+    &= \frac{n-p}{n} \sigma^2 - \sigma^2 \numberthis \label{eq:Es2} \\
+    &= \frac{(n-p)\sigma^2 - n\sigma^2}{n} \\
+    \implies \mathrm{Bias}_{\sigma^2}(\hat{\sigma}_\mathrm{MLE}^2) &= -\frac{p}{n} \sigma^2 \ne 0. \qedhere
+  \end{align*}
+\end{proof}
+Although the MLE of $\sigma^2$ is \emph{consistent} ($\mathrm{Bias} \to 0$ as $n
+\to \infty$), it has non-zero bias for finite $\sigma^2$, $p$, $n$ and $p \le n$.
+
+\begin{prop}
+  An unbiased estimator of the variance is
+  \[ \hat{\sigma}^2 = \frac{1}{n-p} (\Yv - \Xm\Bvh)^\T(\Yv - \Xm\Bvh). \]
+\end{prop}
+
+\begin{proof}
+  To eliminate the bias in our estimator, we would like the expectation of the MLE
+  estimator to be equal to $\sigma^2$. We see from~\Cref{eq:Es2} that the
+  expectation of the MLE estimator is
+  \[ \E{\hat{\sigma}^2_\mathrm{MLE}} = \frac{n-p}{n} \sigma^2. \]
+  To remove the bias, define the estimator
+  \[ \hat{\sigma}^2 = \lambda \hat{\sigma}^2_\mathrm{MLE}, \]
+  where $\lambda$ is a constant parameter to be determined, such that
+  \[ \E{\hat{\sigma}^2} = \sigma^2. \]
+  The bias is then
+  \begin{align*}
+    \mathrm{Bias}_{\sigma^2}(\hat{\sigma}^2) &= \E{\hat{\sigma}^2} - \sigma^2 \\
+    &= \sigma^2 - \sigma^2 \\
+    &= 0.
+  \end{align*}
+  The parameter $\lambda$ is found by computing the expectation
+  \begin{align*}
+    \E{\hat{\sigma}^2} &= \E{\E{\hat{\sigma}^2 | \Xm}} \\
+    &= \E{\E{\lambda \hat{\sigma}^2_\mathrm{MLE} | \Xm}} \\
+    &= \lambda \E{\E{\hat{\sigma}^2_\mathrm{MLE} | \Xm}} \\
+    &= \lambda \frac{n-p}{n} \sigma^2 = \sigma^2 \\
+    \implies \lambda &= \frac{n}{n-p}.
+  \end{align*}
+  Thus,
+  \begin{align*}
+    \hat{\sigma}^2 &= \frac{n}{n-p} \hat{\sigma}^2_\mathrm{MLE} \\
+    &= \E{\hat{\sigma}^2_\mathrm{MLE}}\E{\hat{\sigma}^2_\mathrm{MLE}}\frac{n}{n-p} \frac{1}{n}(\Yv - \Xm\Bvh)^\T(\Yv - \Xm\Bvh) \\
+  \implies \hat{\sigma}^2  &\coloneqq \frac{1}{n-p} (\Yv - \Xm\Bvh)^\T(\Yv - \Xm\Bvh).
+  \end{align*}
+\end{proof}
+
+Given $\Xm$, the conditional distribution of the unbiased estimator is
+\[ \frac{(n-p)\hat{\sigma}^2}{\sigma^2} \Big| \Xm \sim \chi^2_{n-p} \]
+by Cochran's theorem, under the assumption that the errors are \iid\ Gaussian.
+
 
 \end{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
