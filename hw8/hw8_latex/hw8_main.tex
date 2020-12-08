@@ -14,6 +14,7 @@
 \usepackage{mleftright}
 \usepackage{enumerate}
 \usepackage{array, multirow}
+\usepackage{tcolorbox}
 \usepackage[section, ruled]{algorithm}
 \usepackage{algpseudocode}
 \usepackage{url}
@@ -561,8 +562,8 @@ Assume that $\ve_1 \indep X_1$ and $\ve_1 \sim \N{0}{\sigma^2}$,
 with $0~<~\sigma^2~<~\infty$.
 
 \subsubsection{The Conditional Error Density}
-Given $X_1$, $\ve_1 = Y_1 - X_1^\T\Bv$, so
-\[ f_x = \frac{1}{\sqrt{2\pi\sigma^2}} \exp \mleft[\frac{-(Y_1 - X_1^\T\Bv)^2}{2\sigma^2}\mright]. \]
+Given $X_1 = x_1$, $\ve_1 = y_1 - x_1^\T\Bv$, so
+\[ f_x = \frac{1}{\sqrt{2\pi\sigma^2}} \exp \mleft[\frac{-(y_1 - x_1^\T\Bv)^2}{2\sigma^2}\mright]. \]
 
 \subsubsection{The Least Square Estimator}
 Since $X_1, \dots, X_n \in \R^p$ are \iid, the rank of
@@ -575,7 +576,7 @@ Since $X_1, \dots, X_n \in \R^p$ are \iid, the rank of
 is almost surely $p$.
 
 \begin{theorem}
-  Under the assumption of normal error $\ve_1 \sim \N{0}{\sigma^2}$, the maximum
+  Under the assumption of normal error, $\ve_1 \sim \N{0}{\sigma^2}$, the maximum
   likelihood estimator is equal to the least squares estimator.
 \end{theorem}
 
@@ -585,22 +586,22 @@ is almost surely $p$.
     \Bvh_\mathrm{LSE} &\coloneqq \argmin_{\Bv \in \R^p} \ve^\T \ve \\
                       &= \argmin_{\Bv \in \R^p} (\Yv - \Xm\Bv)^\T (\Yv - \Xm\Bv).
   \end{align*}
-  Under the assumption of normality, we can write down the log-likelihood.
+  Under the assumption of normality, we can write down the conditional log-likelihood.
   \begin{align*}
-    \Li{X, Y; \Bv, \sigma^2} &\propto \prod_{i=1}^n f_x\mleft(Y_i - X_i^\T\Bv\mright) \\
+    \Li{x, y; \Bv, \sigma^2} &\propto \prod_{i=1}^n f_x\mleft(y_i - x_i^\T\Bv\mright) \\
     &= \prod_{i=1}^n \frac{1}{\sqrt{2\pi\sigma^2}} 
-       \exp \mleft[\frac{-(Y_i - X_i^\T\Bv)^2}{2\sigma^2}\mright] \\
+       \exp \mleft[\frac{-(y_i - x_i^\T\Bv)^2}{2\sigma^2}\mright] \\
     &= \frac{1}{(2\pi\sigma^2)^\frac{n}{2}} 
        \exp \mleft[\frac{-(\Yv - \Xm\Bv)^\T(\Yv - \Xm\Bv)}{2\sigma^2}\mright] \\
-    \implies \ell(X, Y; \Bv, \sigma^2) &= \log\mleft( \frac{1}{(2\pi\sigma^2)^\frac{n}{2}} 
+    \implies \ell(x, y; \Bv, \sigma^2) &= \log\mleft( \frac{1}{(2\pi\sigma^2)^\frac{n}{2}} 
        \exp \mleft[\frac{-(\Yv - \Xm\Bv)^\T(\Yv - \Xm\Bv)}{2\sigma^2}\mright]
        \mright) \\
-    \implies \ell(X, Y; \Bv, \sigma^2) &= -\frac{1}{2}\mleft[ n\log 2\pi + n \log\sigma^2 
+    \implies \ell(x, y; \Bv, \sigma^2) &= -\frac{1}{2}\mleft[ n\log 2\pi + n \log\sigma^2 
           + \frac{1}{\sigma^2} (\Yv - \Xm\Bv)^\T(\Yv - \Xm\Bv) \mright]. \numberthis \label{eq:likelihood}
   \end{align*}
   The maximum likelihood estimator is found by
   \begin{align*}
-    \Bvh_\mathrm{MLE} &= \argmax_\Bv \ell\mleft(X, Y; \Bv, \sigma^2\mright) \\
+    \Bvh_\mathrm{MLE} &= \argmax_\Bv \ell\mleft(x, y; \Bv, \sigma^2\mright) \\
     &\iff \argmax_\Bv -\frac{1}{2}\mleft[ n\log 2\pi + n\log\sigma^2 
           + \frac{1}{\sigma^2} (\Yv - \Xm\Bv)^\T(\Yv - \Xm\Bv) \mright] \\
     &\iff \argmin_\Bv \frac{1}{\sigma^2} (\Yv - \Xm\Bv)^\T(\Yv - \Xm\Bv) \\
@@ -610,7 +611,11 @@ is almost surely $p$.
 \end{proof}
 
 The maximum likelihood estimator occurs at the location where the partial
-derivative with respect to $\Bv$.
+derivative of the log-likelihood with respect to $\Bv$ is zero.%
+\footnote{The classification of
+  the critical point as a ``maximum'' is confirmed by inspecting the second
+  derivative, $\nabla_\Bv^2 = 2\Xm^\T \Xm$. The matrix $\Xm^\T \Xm$ is
+  positive definite, so the cricital point is indeed a maximum.}
 \begin{alignat*}{3}
   \nabla_\Bv &= -2\Xm^\T(\Yv - \Xm\Bvh) = 0 \\
   &= \Xm^\T\Yv - \Xm^\T\Xm\Bvh = 0 \\
@@ -625,9 +630,9 @@ that $\sigma^2$ is finite and constant.
 
 \subsection{The Distribution of the MLE} \label{sec:dist_mle}
 \begin{prop}
-  Given $\Xm$, the MLE of the regression coefficients is normally distributed,
-  centered about the true parameter, with variance proportional to the error
-  variance:
+  Given the design, the MLE of the regression coefficients is normally
+  distributed, centered about the true parameter, with variance proportional to
+  the error variance:
   \[ \Bvh|\Xm \sim \N{\Bv}{ \sigma^2 (\Xm^\T \Xm)^{-1}}. \]
 \end{prop}
 
@@ -643,8 +648,8 @@ that $\sigma^2$ is finite and constant.
   \end{align*}
   By \Cref{thm:Bx} and the assumption of normality of errors,
   \begin{align*}
-    \ve &\sim \N{\mu}{\sigma^2 \vect{I}_n} \\
-    \implies B\ve &\sim \N{0}{\sigma^2 B B^\T}.
+    \ve &\sim \N{0}{\sigma^2 \vect{I}_n} \\
+    \implies \Bv + B\ve &\sim \N{\Bv}{\sigma^2 B B^\T}.
   \end{align*}
   Thus,
     \[ \Bvh|\Xm \sim \N{\Bv}{\sigma^2 B B^\T} \]
@@ -658,9 +663,12 @@ that $\sigma^2$ is finite and constant.
           &= ((\Xm^\T \Xm)^\T)^{-1} \by{$\Xm^\T\Xm$ square and invertible} \\
           &= (\Xm^\T \Xm)^{-1}, \by{$\Xm^\T\Xm$ symmetric}
   \end{alignat*}
-  so its distribution is
+  so its conditional distribution is
   \[ \Bvh|\Xm \sim \N{\Bv}{ \sigma^2 (\Xm^\T \Xm)^{-1}}. \qedhere \]
 \end{proof}
+% NOTE we can write this proof by finding the expectation and variance of \Bvh
+% conditional on X *without* the assumption of normality, then introduce
+% normality to give the actual distribution for given expectation and variance.
 
 \subsection{Bias of the MLE}
 \begin{prop}
@@ -679,7 +687,7 @@ that $\sigma^2$ is finite and constant.
   \end{alignat*}
 \end{proof}
 
-\subsection{MLE of the Variance}
+\subsection{MLE of the Error Variance}
 \begin{prop}
   The maximum likelihood estimator of the variance is
   \[ \hat{\sigma}^2_\mathrm{MLE} = \tfrac{1}{n} \hat{\ve}^\T \hat{\ve} 
@@ -697,7 +705,7 @@ that $\sigma^2$ is finite and constant.
     \implies \hat{\sigma}^2 &= \tfrac{1}{n}(\Yv - \Xm\Bv)^\T(\Yv - \Xm\Bv).
   \end{align*}
   The value of $\Bv$ can be estimated by the maximum likelihood estimator for
-  $\Bv$, $\Bvh$, since we have already shown that $\Bvh$ is optimal, independent
+  $\Bv$, $\Bvh$, since we have already shown that $\Bvh$ is optimal regardless
   of the value of $\sigma^2$. Thus,
   \[ \hat{\sigma}^2_\mathrm{MLE} = \tfrac{1}{n}(\Yv - \Xm\Bvh)^\T(\Yv - \Xm\Bvh). \qedhere \]
 \end{proof}
@@ -762,7 +770,7 @@ Although the MLE of $\sigma^2$ is \emph{consistent} ($\mathrm{Bias} \to 0$ as $n
   Thus,
   \begin{align*}
     \hat{\sigma}^2 &= \frac{n}{n-p} \hat{\sigma}^2_\mathrm{MLE} \\
-    &= \E{\hat{\sigma}^2_\mathrm{MLE}}\E{\hat{\sigma}^2_\mathrm{MLE}}\frac{n}{n-p} \frac{1}{n}(\Yv - \Xm\Bvh)^\T(\Yv - \Xm\Bvh) \\
+    &= \frac{n}{n-p} \frac{1}{n}(\Yv - \Xm\Bvh)^\T(\Yv - \Xm\Bvh) \\
   \implies \hat{\sigma}^2  &\coloneqq \frac{1}{n-p} (\Yv - \Xm\Bvh)^\T(\Yv - \Xm\Bvh). \qedhere
   \end{align*}
 \end{proof}
@@ -783,7 +791,7 @@ Let $\Bv = (a, b)^\T$ so the regression is
 \subsubsection{The Least Squares Estimators}
 The least squares estimators (LSEs) for $(a, b) = (\hat{a}, \hat{b})$ are defined as 
 \[ (\hat{a}, \hat{b})_\mathrm{LSE} = \argmin_{a, b \in \R} \avg{i}{n}{(Y_i - (a + bX_i))^2}. \]
-The estimators can be shown to be
+The estimators can be shown to be % show in Appendix?
 \begin{align*}
   \hat{b} &= \ddfrac{\avg{i}{n}{X_iY_i} - \left(\avg{i}{n}{X_i}\right)\left(\avg{i}{n}{Y_i}\right)}
                     {\avg{i}{n}{X_i^2} - \avg{i}{n}{Y_i^2}} \\
@@ -808,8 +816,10 @@ The estimators can be shown to be
     \iff \E{Y} &= a + b\E{X}, \text{ and} \numberthis \label{eq:EA} \\
     \iff \E{XY} &= a\E{X} + b\E{X^2}. \numberthis \label{eq:EB}
   \end{align*}
-  By subtracting $\E{X} \times \text{\Cref{eq:EA}}$ from \Cref{eq:EB}, we get
-  \[ \E{XY} - \E{X}\E{Y} = b(\E{X^2} - \E{X}^2) \]
+  By subtracting $\E{X} \times \text{\Cref{eq:EA}}$ from \Cref{eq:EB}, we
+  eliminate $a$ from the expression to find $b$
+  \[ \E{XY} - \E{X}\E{Y} = b(\E{X^2} - \E{X}^2), \]
+  which implies
   \begin{align*}
     \implies b &= \frac{\E{XY} - \E{X}\E{Y}}{\E{X^2} - \E{X}^2} \\
                &= \frac{\Cov{X, Y}}{\Var{X}}.
@@ -817,7 +827,7 @@ The estimators can be shown to be
   Substituting this expression for $b$ into \Cref{eq:EA} gives
   \[ a = \E{Y} - b\E{X}. \]
 
-  We can reduce the expressions for $(\hat{a}, \hat{b})$ as follows
+  We see the convergence of the expressions for $(\hat{a}, \hat{b})$ as follows
   \begin{alignat*}{3}
     \avg{i}{n}{X_i} \Plim \E{X} \by{LLN} \\
     \avg{i}{n}{X_i^2} \Plim \E{X^2} \by{CMT} \\
@@ -844,8 +854,23 @@ is normally distributed $\ve_1 \sim \N{0}{\sigma^2}$.
   By the Central Limit Theorem,
   \[ ((\hat{a}, \hat{b}) - (a, b)) \Dlim \N{0}{\Var{(\hat{a}, \hat{b})}}. \]
   In \Cref{sec:dist_mle}, we showed that, given the design,
-  \[ \Var{\Bvh} = \sigma^2 (\Xm^\T\Xm)^{-1}. \qedhere \]
+  \[ \Var{\Bvh|\Xm} = \sigma^2 (\Xm^\T\Xm)^{-1}. \qedhere \]
 \end{proof}
+
+\begin{tcolorbox}
+  \emph{Note.}
+  The unconditional variance is given by the law of total variance
+  \begin{align*}
+    \Var{\Bvh} &= \Var{\E{\Bvh|\Xm}} + \E{\Var{\Bvh|\Xm}} \\
+              &= \Var{\Bv} + \E{\sigma^2 (\Xm^\T\Xm)^{-1}} \\
+              &= \E{\sigma^2 (\Xm^\T\Xm)^{-1}} \\
+    \implies \Var{\Bvh} &= \sigma^2 \E{(\Xm^\T\Xm)^{-1}}.
+  \end{align*}
+  This result shows that the variance of the estimator for random design is the
+  expectation of the variance of the estimator for fixed design, \ie\ the
+  variance of the fixed design estimator is an unbiased estimate of the variance
+  in the random design estimator.
+\end{tcolorbox}
 
 To give the asymptotic variance in terms of the moments of $X$, we compute the
 matrix product $\Xm^\T\Xm$, and invert it. The matrix $\Xm$ is defined in
@@ -894,7 +919,7 @@ The determinant is
   \det \Xm^\T \Xm &= 1 \times \Xsqbar - \Xnbar \times \Xnbar \\
   &= \Xsqbar - \Xnbar^2 \eqqcolon S_n^2.
 \end{align*}
-where $S_n^2$ is the \emph{design sample variance}.
+where $S_n^2$ is the \emph{sample variance of the design}.
 The entire inverse is
 \[ (\Xm^\T \Xm)^{-1} = \frac{1}{n S_n^2}
   \begin{bmatrix}
@@ -904,13 +929,13 @@ The entire inverse is
 \]
 so the variance of the estimator is
 {\everymath{\displaystyle}
-\[ \Var{\Bvh} = \frac{\sigma^2}{n S_n^2}
+\[ \Var{\Bvh|\Xm} = \frac{\sigma^2}{n S_n^2}
   \begin{bmatrix}
     \phantom{-}\avg{i}{n} X_i^2 & -\avg{i}{n}X_i \\
     -\avg{i}{n}X_i   & 1
   \end{bmatrix},
-\] which is asymptotically
-\[ \Var{\Bvh} = \frac{\sigma^2}{n \Var{X}}
+\] which is asymptotically (by the law of large numbers)
+\[ \Var{\Bvh|\Xm} = \frac{\sigma^2}{n \Var{X}}
   \begin{bmatrix}
     \phantom{-}\E{X^2}  & -\E{X} \\
     -\E{X}              & 1
