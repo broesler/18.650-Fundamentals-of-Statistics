@@ -134,7 +134,7 @@
 \newcommand{\U}[2]{\mathcal{U}\mleft(\mleft[ #1, #2 \mright]\mright)}
 \newcommand{\indep}{\perp \!\!\! \perp}  % "is independent from"
 \newcommand{\nindep}{\centernot\indep}
-\newcommand{\indic}[1]{\mathbbm{1}\!\mleft\{#1\mright\}} % indicator function
+\newcommand{\indic}[1]{\mathbbm{1}\mleft\{#1\mright\}} % indicator function
 \newcommand{\iid}{i.i.d.}
 
 \newcommand{\sumi}[2]{\sum_{#1=1}^{#2}}
@@ -151,12 +151,14 @@
 \newcommand{\rhat}{\hat{r}}
 
 \newcommand{\Xnbar}{\overline{X}_n}
+\newcommand{\Xsqbar}{\overline{X_n^2}}
 \newcommand{\Rnbar}{\overline{R}_n}
 \newcommand{\Qnbar}{\overline{Q}_n}
 
 % Vectors/Matrices
 \newcommand{\Xm}{\vect{X}}
 \newcommand{\Yv}{\vect{Y}}
+\newcommand{\Xv}{\vect{X}}
 \newcommand{\Bv}{\beta}
 \newcommand{\Bvh}{\hat{\beta}}
 \newcommand{\ve}{\varepsilon}
@@ -327,7 +329,7 @@ Consider the estimator
   \[ \Bvh = \Bv + B\ve. \]
 
   \begin{theorem} \label{thm:Bx}
-    If $X \sim \N{0}{\Sigma}$, then $a + BX \sim \N{a}{B \Sigma B^\T}$,
+    If $X \sim \N{\mu}{\Sigma}$, then $a + BX \sim \N{a + B\mu}{B \Sigma B^\T}$,
     for any constant vector $a$, matrix $B$ and invertible covariance matrix
     $\Sigma$.
   \end{theorem}
@@ -621,7 +623,7 @@ $\Bvh$ is the maximum likelihood estimator regardless of the value of
 $\sigma^2$. The only requirement on the errors $\ve_i$ is that they be \iid, such
 that $\sigma^2$ is finite and constant.
 
-\subsection{The Distribution of the MLE}
+\subsection{The Distribution of the MLE} \label{sec:dist_mle}
 \begin{prop}
   Given $\Xm$, the MLE of the regression coefficients is normally distributed,
   centered about the true parameter, with variance proportional to the error
@@ -641,7 +643,7 @@ that $\sigma^2$ is finite and constant.
   \end{align*}
   By \Cref{thm:Bx} and the assumption of normality of errors,
   \begin{align*}
-    \ve &\sim \N{0}{\sigma^2 \vect{I}_n} \\
+    \ve &\sim \N{\mu}{\sigma^2 \vect{I}_n} \\
     \implies B\ve &\sim \N{0}{\sigma^2 B B^\T}.
   \end{align*}
   Thus,
@@ -761,13 +763,275 @@ Although the MLE of $\sigma^2$ is \emph{consistent} ($\mathrm{Bias} \to 0$ as $n
   \begin{align*}
     \hat{\sigma}^2 &= \frac{n}{n-p} \hat{\sigma}^2_\mathrm{MLE} \\
     &= \E{\hat{\sigma}^2_\mathrm{MLE}}\E{\hat{\sigma}^2_\mathrm{MLE}}\frac{n}{n-p} \frac{1}{n}(\Yv - \Xm\Bvh)^\T(\Yv - \Xm\Bvh) \\
-  \implies \hat{\sigma}^2  &\coloneqq \frac{1}{n-p} (\Yv - \Xm\Bvh)^\T(\Yv - \Xm\Bvh).
+  \implies \hat{\sigma}^2  &\coloneqq \frac{1}{n-p} (\Yv - \Xm\Bvh)^\T(\Yv - \Xm\Bvh). \qedhere
   \end{align*}
 \end{proof}
 
 Given $\Xm$, the conditional distribution of the unbiased estimator is
 \[ \frac{(n-p)\hat{\sigma}^2}{\sigma^2} \Big| \Xm \sim \chi^2_{n-p} \]
 by Cochran's theorem, under the assumption that the errors are \iid\ Gaussian.
+
+\subsection{The 2-D Case}
+Assume $p = 2$ such that 
+\begin{equation} \label{eq:Xm}
+   \Xm = \begin{bmatrix} 1 & X_1 \\ \vdots & \vdots \\ 1 & X_n \end{bmatrix}.
+\end{equation}
+We no longer assume that $\Xm$ has a density. % WHY??
+Let $\Bv = (a, b)^\T$ so the regression is
+\[ Y_i = a + bX_i + \ve_i, \quad i = 1, \dots, n. \]
+
+\subsubsection{The Least Squares Estimators}
+The least squares estimators (LSEs) for $(a, b) = (\hat{a}, \hat{b})$ are defined as 
+\[ (\hat{a}, \hat{b})_\mathrm{LSE} = \argmin_{a, b \in \R} \avg{i}{n}{(Y_i - (a + bX_i))^2}. \]
+The estimators can be shown to be
+\begin{align*}
+  \hat{b} &= \ddfrac{\avg{i}{n}{X_iY_i} - \left(\avg{i}{n}{X_i}\right)\left(\avg{i}{n}{Y_i}\right)}
+                    {\avg{i}{n}{X_i^2} - \avg{i}{n}{Y_i^2}} \\
+  \hat{a} &= \avg{i}{n}{Y_i} - \hat{b}\avg{i}{n}{X_i}.
+\end{align*}
+
+\subsubsection{Consistency of the LSE}
+\begin{prop}
+  The least squares estimators $(\hat{a}, \hat{b})$ are consistent:
+  \[  \Prob{\left|(\hat{a}, \hat{b}) - (a, b)\right| > \epsilon} \Plim 0. \]
+\end{prop}
+
+\begin{proof}
+  To show that the estimators are consistent, we first need expressions for the
+  true parameters. The definition of the true LSE parameters is
+  \[ (a, b)_\mathrm{LSE} = \argmin_{a, b \in \R} \E{(Y - (a + bX))^2}. \]
+  To find the minima, we differentiate with respect to each parameter, and set
+  each expression equal to 0.
+  \begin{align*}
+    \nabla_a &= \E{-2(Y - (a + bX))} = 0, \text{ and} \\
+    \nabla_b &= \E{-2X(Y - (a + bX))} = 0 \\
+    \iff \E{Y} &= a + b\E{X}, \text{ and} \numberthis \label{eq:EA} \\
+    \iff \E{XY} &= a\E{X} + b\E{X^2}. \numberthis \label{eq:EB}
+  \end{align*}
+  By subtracting $\E{X} \times \text{\Cref{eq:EA}}$ from \Cref{eq:EB}, we get
+  \[ \E{XY} - \E{X}\E{Y} = b(\E{X^2} - \E{X}^2) \]
+  \begin{align*}
+    \implies b &= \frac{\E{XY} - \E{X}\E{Y}}{\E{X^2} - \E{X}^2} \\
+               &= \frac{\Cov{X, Y}}{\Var{X}}.
+  \end{align*}
+  Substituting this expression for $b$ into \Cref{eq:EA} gives
+  \[ a = \E{Y} - b\E{X}. \]
+
+  We can reduce the expressions for $(\hat{a}, \hat{b})$ as follows
+  \begin{alignat*}{3}
+    \avg{i}{n}{X_i} \Plim \E{X} \by{LLN} \\
+    \avg{i}{n}{X_i^2} \Plim \E{X^2} \by{CMT} \\
+    \avg{i}{n}{X_iY_i} \Plim \E{XY} \by{LLN}
+  \end{alignat*}
+  and likewise for $Y_i$ and $Y_i^2$. Thus, by the continuous mapping theorem,
+  the LSEs converge in probability to
+  \begin{align*}
+    \hat{b} &\Plim \frac{\E{XY} - \E{X}\E{Y}}{\E{X^2} - \E{Y^2}} = b \\
+    \hat{a} &\Plim \E{Y} - b\E{X} = a. \qedhere
+  \end{align*}
+\end{proof}
+
+\subsubsection{Asymptotic Normality of the Estimators}
+Assume the design is independent of the error, $X_1 \indep \ve_1$, and the error
+is normally distributed $\ve_1 \sim \N{0}{\sigma^2}$.
+
+\begin{prop}
+  The least squares estimator is asymptotically normal
+  \[ ((\hat{a}, \hat{b}) - (a, b)) \Dlim \N{0}{\sigma^2 (\Xm^\T\Xm)^{-1}}. \]
+\end{prop}
+
+\begin{proof}
+  By the Central Limit Theorem,
+  \[ ((\hat{a}, \hat{b}) - (a, b)) \Dlim \N{0}{\Var{(\hat{a}, \hat{b})}}. \]
+  In \Cref{sec:dist_mle}, we showed that, given the design,
+  \[ \Var{\Bvh} = \sigma^2 (\Xm^\T\Xm)^{-1}. \qedhere \]
+\end{proof}
+
+To give the asymptotic variance in terms of the moments of $X$, we compute the
+matrix product $\Xm^\T\Xm$, and invert it. The matrix $\Xm$ is defined in
+\Cref{eq:Xm}.
+{\everymath{\displaystyle}
+\begin{align*}
+  \Xm^\T \Xm &=
+  \begin{bmatrix} 
+    1   & \cdots & 1   \\
+    X_1 & \cdots & X_n
+  \end{bmatrix}^\T
+  \begin{bmatrix} 
+    1      & X_1    \\
+    \vdots & \vdots \\
+    1      & X_n
+  \end{bmatrix} \\
+  &=
+  \begin{bmatrix}
+    n               & \sumi{i}{n} X_i   \\
+    \sumi{i}{n} X_i & \sumi{i}{n} X_i^2
+  \end{bmatrix}
+  =
+  n
+  \begin{bmatrix}
+    1              & \avg{i}{n} X_i   \\
+    \avg{i}{n} X_i & \avg{i}{n} X_i^2
+  \end{bmatrix}
+  =
+  n
+  \begin{bmatrix}
+    1      & \Xnbar   \\
+    \Xnbar & \Xsqbar
+  \end{bmatrix}.
+\end{align*}
+}
+The inverse of a $2 \times 2$ matrix multiplied by a constant is
+\[ (a A)^{-1} = \frac{1}{a} A^{-1} = \frac{1}{a \det A} 
+  \begin{bmatrix}
+     A_{2,2} & -A_{1,2} \\
+    -A_{2,1} &  A_{1,1}
+  \end{bmatrix} 
+\]
+where $\det A = A_{1,1}A_{2,2} - A_{1,2}A_{2,1}$.
+The determinant is
+\begin{align*}
+  \det \Xm^\T \Xm &= 1 \times \Xsqbar - \Xnbar \times \Xnbar \\
+  &= \Xsqbar - \Xnbar^2 \eqqcolon S_n^2.
+\end{align*}
+where $S_n^2$ is the \emph{design sample variance}.
+The entire inverse is
+\[ (\Xm^\T \Xm)^{-1} = \frac{1}{n S_n^2}
+  \begin{bmatrix}
+    \Xsqbar & -\Xnbar \\
+    -\Xnbar & 1
+  \end{bmatrix}
+\]
+so the variance of the estimator is
+{\everymath{\displaystyle}
+\[ \Var{\Bvh} = \frac{\sigma^2}{n S_n^2}
+  \begin{bmatrix}
+    \phantom{-}\avg{i}{n} X_i^2 & -\avg{i}{n}X_i \\
+    -\avg{i}{n}X_i   & 1
+  \end{bmatrix},
+\] which is asymptotically
+\[ \Var{\Bvh} = \frac{\sigma^2}{n \Var{X}}
+  \begin{bmatrix}
+    \phantom{-}\E{X^2}  & -\E{X} \\
+    -\E{X}              & 1
+  \end{bmatrix}.
+\]
+}
+
+\subsubsection{A Hypothesis Test}
+Consider the hypotheses
+\begin{align*}
+  H_0 &\colon b > 0, \\
+  H_1 &\colon b \le 0.
+\end{align*}
+The moments of $X$ and the error variance $\sigma^2$ are \emph{not} known.
+
+\begin{prop}
+  Let $\alpha \in (0, 1)$. A hypothesis test with asymptotic level $\alpha$ is
+  given by
+  \[ \delta_\alpha = \indic{T_n > q_\alpha} \]
+  where
+  \[ T_n = \sqrt{n}\ddfrac{\hat{b}}{\sqrt{\frac{\hat{\sigma}^2}{\Var{X}}}} \sim t_{n-2}, \]
+  and $q_\alpha$ is the $(1-\alpha)$-quantile of Student's $t$-distribution
+  with $n-2$ degrees of freedom.
+\end{prop}
+
+\begin{proof}
+  By the Central Limit Theorem,
+  \[ (\Bvh - \Bv) \Dlim \N{0}{\sigma^2 (\Xm^\T\Xm)^{-1}}. \]
+  Since we are only concerned with testing the slope $b$, we would like to
+  transform both the estimator, $\Bvh$, and the asymptotic covariance matrix,
+  $\Var{\hat{b}}$, to isolate the parameter $b$.
+  We will show the general case, and then evaluate it for our particular test.
+  Let $G \in \R^{k \times p}$ be a matrix such that $\rank G = k \le p$,
+  and $\lambda \in \R^k$ be a vector, so the hypotheses become
+  \begin{align*}
+    H_0 &\colon G\Bv = \lambda, \\
+    H_1 &\colon G\Bv \ne \lambda.
+  \end{align*}
+  Since $\Bvh$ is normally distributed,
+  \begin{alignat*}{3}
+    \Bvh - \Bv &\sim \N{0}{\sigma^2 (\Xm^\T \Xm)^{-1}}, \\
+    G(\Bvh - \Bv) &\sim \N{0}{\sigma^2 G (\Xm^\T \Xm)^{-1} G^\T}. \by{\Cref{thm:Bx}}
+  \end{alignat*}
+  Under the null hypothesis,
+  \[ \frac{G\Bvh - \lambda}{\sqrt{\sigma^2}} \sim \N{0}{G (\Xm^\T \Xm)^{-1} G^\T}. \]
+
+  \begin{lemma} \label{lem:norm2chi}
+    If $X \in \R^k \sim \N{0}{\Sigma}$, then $X^\T \Sigma^{-1} X \sim \chi^2_k$.
+  \end{lemma}
+
+  By \Cref{lem:norm2chi},
+  \[ \frac{(G\Bvh - \lambda)^\T (G (\Xm^\T \Xm)^{-1} G^\T)^{-1} (G\Bvh - \lambda)}{\sigma^2} 
+    \sim \chi^2_k. \]
+  To replace the unknown variance $\sigma^2$, multiply the expression by 
+  $\sigma^2/\hat{\sigma}^2$ to get
+  \[ \frac{(G\Bvh - \lambda)^\T (G (\Xm^\T \Xm)^{-1} G^\T)^{-1} (G\Bvh - \lambda)}{\hat{\sigma}^2} 
+    \sim \ddfrac{\chi^2_k}{\left(\frac{\hat{\sigma}^2}{\sigma^2}\right)}. \]
+  By Cochran's theorem, under the assumption that the errors are \iid\ Gaussian,
+  \[ \frac{\hat{\sigma}^2}{\sigma^2} \sim \chi^2_{n-p}. \]
+  If we divide each side again by $k$, our expression becomes
+  \[ \frac{(G\Bvh - \lambda)^\T (G (\Xm^\T \Xm)^{-1} G^\T)^{-1} (G\Bvh - \lambda)}{k \hat{\sigma}^2} 
+    \sim \ddfrac{\frac{\chi^2_k}{k}}{\frac{\chi^2_{n-p}}{n-p}}. \]
+  Under the assumption that $\chi^2_\kappa \indep \chi^2_\nu$,
+  \[ \ddfrac{\frac{\chi^2_\kappa}{\kappa}}{\frac{\chi^2_\nu}{\nu}} \eqqcolon F_{\kappa, \nu}, \]
+  where $F$ is Fisher's $F$-distribution with parameters $\kappa$, and $\nu$. 
+  Define the test statistic
+  \[ T_n \coloneqq \frac{(G\Bvh - \lambda)^\T (G (\Xm^\T \Xm)^{-1} G^\T)^{-1} (G\Bvh - \lambda)}
+    {k \hat{\sigma}^2} \]
+  such that
+  \[ T_n \sim F_{k, n-p}. \]
+  Given $\Xm$, this distribution is \emph{pivotal}, so it does not rely on the
+  unknown error variance.
+
+  In our particular case, let
+  \[ G = \begin{bmatrix} 0 & 1 \end{bmatrix} \quad (k = 1) \]
+  such that
+  \[ G\Bv = \begin{bmatrix} 0 & 1 \end{bmatrix} \begin{bmatrix} a \\ b \end{bmatrix} = b, \]
+  and let $\lambda = 0$.
+  Then, 
+  \[ G\Bvh - \lambda = \hat{b} \]
+  and
+  \begin{align*}
+    (G (\Xm^\T \Xm)^{-1} G^\T)^{-1} &=
+    \left(
+    \begin{bmatrix} 0 & 1 \end{bmatrix}
+    \left(
+    \frac{1}{n \Var{X}}
+    \begin{bmatrix}
+      \phantom{-}\E{X^2}  & -\E{X} \\
+      -\E{X}              & 1
+    \end{bmatrix}
+    \right)
+    \begin{bmatrix} 0 \\ 1 \end{bmatrix}
+    \right)^{-1} \\
+    &=
+    n \Var{X}
+    \left(
+    \begin{bmatrix} 0 & 1 \end{bmatrix}
+    \begin{bmatrix}
+      \phantom{-}\E{X^2}  & -\E{X} \\
+      -\E{X}              & 1
+    \end{bmatrix}
+    \begin{bmatrix} 0 \\ 1 \end{bmatrix}
+    \right)^{-1} \\
+    &= n \Var{X}.
+  \end{align*}
+  The test statistic is then
+  \[ T_n = \frac{n \Var{X} \hat{b}^2}{\hat{\sigma}^2} \sim F_{1, n-2}. \]
+  Since we would like to differentiate between positive and negative parameter
+  values, we would prefer to take the positive square root and define
+  \[ T_n \coloneqq \sqrt{n} \ddfrac{\hat{b}}{\sqrt{\frac{\hat{\sigma}^2}{\Var{X}}}}. \]
+  It can be shown that $F_{1, n} = t_n^2$, so
+  \[ T_n = \sqrt{n} \ddfrac{\hat{b}}{\sqrt{\frac{\hat{\sigma}^2}{\Var{X}}}} \sim t_{n-2}. \qedhere \]
+\end{proof}
+
+% Appendix: general hypothesis testing under normality assumption?
+% Appendix: proof of F_{1, n} = t_n^2
+% \begin{lemma}
+%   Let $G \in \R^{k \times p}$ be a matrix with $\rank G = k \le p$.
+%   \[ G\Bvh - G\Bv \sim \N{0}{\sigma^2 G^\T (\Xm^\T \Xm)^{-1} G}. \]
+% \end{lemma}
 
 
 \end{document}
