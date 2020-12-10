@@ -35,6 +35,7 @@
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{prop}{Proposition}[section]
+\newtheorem{definition}{Definition}[section]
 
 \renewcommand{\qedsymbol}{\ensuremath{\blacksquare}}
 
@@ -851,7 +852,7 @@ is normally distributed $\ve_1 \sim \N{0}{\sigma^2}$.
 \end{prop}
 
 \begin{proof}
-  By the Central Limit Theorem,
+  By the Central Limit Theorem and the consistency of our estimators,
   \[ ((\hat{a}, \hat{b}) - (a, b)) \Dlim \N{0}{\Var{(\hat{a}, \hat{b})}}. \]
   In \Cref{sec:dist_mle}, we showed that, given the design,
   \[ \Var{\Bvh|\Xm} = \sigma^2 (\Xm^\T\Xm)^{-1}. \qedhere \]
@@ -859,17 +860,17 @@ is normally distributed $\ve_1 \sim \N{0}{\sigma^2}$.
 
 \begin{tcolorbox}
   \emph{Note.}
-  The unconditional variance is given by the law of total variance
+  The unconditional variance is given by the \emph{law of total variance}
   \begin{align*}
     \Var{\Bvh} &= \Var{\E{\Bvh|\Xm}} + \E{\Var{\Bvh|\Xm}} \\
               &= \Var{\Bv} + \E{\sigma^2 (\Xm^\T\Xm)^{-1}} \\
               &= \E{\sigma^2 (\Xm^\T\Xm)^{-1}} \\
     \implies \Var{\Bvh} &= \sigma^2 \E{(\Xm^\T\Xm)^{-1}}.
   \end{align*}
-  This result shows that the variance of the estimator for random design is the
-  expectation of the variance of the estimator for fixed design, \ie\ the
-  variance of the fixed design estimator is an unbiased estimate of the variance
-  in the random design estimator.
+  This variance is identical to that of the $\Bvh$ derived assuming \emph{fixed}
+  design. Thus, we have shown that the variance of the \emph{fixed} design
+  estimator is a consistent, unbiased estimate of the variance of the
+  \emph{random} design estimator.
 \end{tcolorbox}
 
 To give the asymptotic variance in terms of the moments of $X$, we compute the
@@ -917,25 +918,26 @@ where $\det A = A_{1,1}A_{2,2} - A_{1,2}A_{2,1}$.
 The determinant is
 \begin{align*}
   \det \Xm^\T \Xm &= 1 \times \Xsqbar - \Xnbar \times \Xnbar \\
-  &= \Xsqbar - \Xnbar^2 \eqqcolon S_n^2.
+  &= \Xsqbar - \Xnbar^2 \eqqcolon S_x^2.
 \end{align*}
-where $S_n^2$ is the \emph{sample variance of the design}.
+where $S_x^2$ is the \emph{sample variance} of the design.
 The entire inverse is
-\[ (\Xm^\T \Xm)^{-1} = \frac{1}{n S_n^2}
+\[ (\Xm^\T \Xm)^{-1} = \frac{1}{n S_x^2}
   \begin{bmatrix}
     \Xsqbar & -\Xnbar \\
     -\Xnbar & 1
   \end{bmatrix}
 \]
-so the variance of the estimator is
+so the conditional variance of the estimator is
 {\everymath{\displaystyle}
-\[ \Var{\Bvh|\Xm} = \frac{\sigma^2}{n S_n^2}
+\[ \Var{\Bvh|\Xm} = \frac{\sigma^2}{n S_x^2}
   \begin{bmatrix}
     \phantom{-}\avg{i}{n} X_i^2 & -\avg{i}{n}X_i \\
     -\avg{i}{n}X_i   & 1
   \end{bmatrix},
-\] which is asymptotically (by the law of large numbers)
-\[ \Var{\Bvh|\Xm} = \frac{\sigma^2}{n \Var{X}}
+\] which is asymptotically (by the Law of Large Numbers and Continous Mapping
+Theorem)
+\[ \Var{\Bvh|\Xm} \Plim \frac{\sigma^2}{n \Var{X}}
   \begin{bmatrix}
     \phantom{-}\E{X^2}  & -\E{X} \\
     -\E{X}              & 1
@@ -954,22 +956,87 @@ The moments of $X$ and the error variance $\sigma^2$ are \emph{not} known.
 \begin{prop}
   Let $\alpha \in (0, 1)$. A hypothesis test with asymptotic level $\alpha$ is
   given by
-  \[ \delta_\alpha = \indic{T_n > q_\alpha} \]
+  \[ \delta_\alpha = \indic{T_n > q_\alpha}, \]
   where
-  \[ T_n = \sqrt{n}\ddfrac{\hat{b}}{\sqrt{\frac{\hat{\sigma}^2}{\Var{X}}}} \sim t_{n-2}, \]
+  \[ T_n = \sqrt{n}\ddfrac{\hat{b}}{\sqrt{\frac{\hat{\sigma}^2}{S_x^2}}} \sim t_{n-2}, \]
   and $q_\alpha$ is the $(1-\alpha)$-quantile of Student's $t$-distribution
   with $n-2$ degrees of freedom.
 \end{prop}
 
 \begin{proof}
-  By the Central Limit Theorem,
+  By the Central Limit Theorem, the conditional distribution
   \[ (\Bvh - \Bv) \Dlim \N{0}{\sigma^2 (\Xm^\T\Xm)^{-1}}. \]
   Since we are only concerned with testing the slope $b$, we would like to
   transform both the estimator, $\Bvh$, and the asymptotic covariance matrix,
-  $\Var{\hat{b}}$, to isolate the parameter $b$.
-  We will show the general case, and then evaluate it for our particular test.
+  $\Var{\Bvh|\Xm}$, to isolate the parameter $b$.
+  \begin{lemma} \label{lem:F_test}
+    Given the hypotheses
+    \begin{align*}
+      H_0 &\colon G\Bv = \lambda, \\
+      H_1 &\colon G\Bv \ne \lambda,
+    \end{align*}
+    where $G \in \R^{k \times p}$ is a matrix with $\rank G = k \le p$, and
+    $\lambda \in \R^k$, the test statistic
+    \[ S_n = \frac{(G\Bvh - \lambda)^\T (G (\Xm^\T \Xm)^{-1} G^\T)^{-1} (G\Bvh - \lambda)}
+      {k \hat{\sigma}^2} \sim F_{k, n-p},\]
+    under $H_0$. A proof is given in the \nameref{app:F_test}.
+  \end{lemma}
+
+  In our particular case, let
+  \[ G = \begin{bmatrix} 0 & 1 \end{bmatrix} \quad (k = 1, p = 2) \]
+  such that
+  \[ G\Bv = \begin{bmatrix} 0 & 1 \end{bmatrix} \begin{bmatrix} a \\ b \end{bmatrix} = b, \]
+  and let $\lambda = 0$.
+  Then, 
+  \[ G\Bvh - \lambda = \hat{b}, \]
+  and
+  \begin{align*}
+    (G (\Xm^\T \Xm)^{-1} G^\T)^{-1} &=
+    \left(
+    \begin{bmatrix} 0 & 1 \end{bmatrix}
+    \left(
+    \frac{1}{n S_x^2}
+    \begin{bmatrix}
+      \phantom{-}\Xsqbar  & -\Xnbar \\
+      -\Xnbar              & 1
+    \end{bmatrix}
+    \right)
+    \begin{bmatrix} 0 \\ 1 \end{bmatrix}
+    \right)^{-1} \\
+    &=
+    n S_x^2
+    \left(
+    \begin{bmatrix} 0 & 1 \end{bmatrix}
+    \begin{bmatrix}
+      \phantom{-}\Xsqbar  & -\Xnbar \\
+      -\Xnbar              & 1
+    \end{bmatrix}
+    \begin{bmatrix} 0 \\ 1 \end{bmatrix}
+    \right)^{-1} \\
+    &= n S_x^2.
+  \end{align*}
+  The test statistic is then
+  \[ S_n = \frac{n S_x^2 \hat{b}^2}{\hat{\sigma}^2} \sim F_{1, n-2}. \]
+  Since we would like to differentiate between positive and negative parameter
+  values, we take the positive square root and define
+  \[ T_n \coloneqq \sqrt{S_n} = \sqrt{n} \ddfrac{\hat{b}}{\sqrt{\frac{\hat{\sigma}^2}{S_x^2}}}. \]
+  Since $F_{1, n-2} = t_{n-2}^2$, the test statistic, conditioned on $\Xm$, is
+  distributed as
+  \[ T_n | \Xm = \sqrt{n} \ddfrac{\hat{b}}{\sqrt{\frac{\hat{\sigma}^2}{S_x^2}}} 
+    \sim t_{n-2}. \]
+
+  Our test is then
+  \[ \delta_\alpha = \indic{T_n > q_\alpha} \]
+  where $q_\alpha$ is the $(1-\alpha)$-quantile of Student's $t$-distribution
+  with $n-2$ degrees of freedom.
+\end{proof}
+
+% Appendix: move general hypothesis testing under normality assumption here?
+\subsection*{Appendix to Problem \thesection} \label{app:F_test}
+
+\begin{proof}[Proof of \Cref{lem:F_test}]
   Let $G \in \R^{k \times p}$ be a matrix such that $\rank G = k \le p$,
-  and $\lambda \in \R^k$ be a vector, so the hypotheses become
+  and $\lambda \in \R^k$ be a vector. Consider the hypotheses
   \begin{align*}
     H_0 &\colon G\Bv = \lambda, \\
     H_1 &\colon G\Bv \ne \lambda.
@@ -998,66 +1065,37 @@ The moments of $X$ and the error variance $\sigma^2$ are \emph{not} known.
   If we divide each side again by $k$, our expression becomes
   \[ \frac{(G\Bvh - \lambda)^\T (G (\Xm^\T \Xm)^{-1} G^\T)^{-1} (G\Bvh - \lambda)}{k \hat{\sigma}^2} 
     \sim \ddfrac{\frac{\chi^2_k}{k}}{\frac{\chi^2_{n-p}}{n-p}}. \]
-  Under the assumption that $\chi^2_\kappa \indep \chi^2_\nu$,
-  \[ \ddfrac{\frac{\chi^2_\kappa}{\kappa}}{\frac{\chi^2_\nu}{\nu}} \eqqcolon F_{\kappa, \nu}, \]
-  where $F$ is Fisher's $F$-distribution with parameters $\kappa$, and $\nu$. 
+  \begin{definition} 
+    Under the assumption $\chi^2_p \indep \chi^2_q$, Fisher's $F$-distribution
+    with parameters $p, q \in \mathbb{N}$ is defined as
+    \[ F_{p, q} \coloneqq \ddfrac{\frac{\chi^2_p}{p}}{\frac{\chi^2_q}{q}} \]
+  \end{definition}
   Define the test statistic
-  \[ T_n \coloneqq \frac{(G\Bvh - \lambda)^\T (G (\Xm^\T \Xm)^{-1} G^\T)^{-1} (G\Bvh - \lambda)}
+  \[ S_n \coloneqq \frac{(G\Bvh - \lambda)^\T (G (\Xm^\T \Xm)^{-1} G^\T)^{-1} (G\Bvh - \lambda)}
     {k \hat{\sigma}^2} \]
   such that
-  \[ T_n \sim F_{k, n-p}. \]
+  \[ S_n \sim F_{k, n-p}. \]
   Given $\Xm$, this distribution is \emph{pivotal}, so it does not rely on the
-  unknown error variance.
-
-  In our particular case, let
-  \[ G = \begin{bmatrix} 0 & 1 \end{bmatrix} \quad (k = 1) \]
-  such that
-  \[ G\Bv = \begin{bmatrix} 0 & 1 \end{bmatrix} \begin{bmatrix} a \\ b \end{bmatrix} = b, \]
-  and let $\lambda = 0$.
-  Then, 
-  \[ G\Bvh - \lambda = \hat{b} \]
-  and
-  \begin{align*}
-    (G (\Xm^\T \Xm)^{-1} G^\T)^{-1} &=
-    \left(
-    \begin{bmatrix} 0 & 1 \end{bmatrix}
-    \left(
-    \frac{1}{n \Var{X}}
-    \begin{bmatrix}
-      \phantom{-}\E{X^2}  & -\E{X} \\
-      -\E{X}              & 1
-    \end{bmatrix}
-    \right)
-    \begin{bmatrix} 0 \\ 1 \end{bmatrix}
-    \right)^{-1} \\
-    &=
-    n \Var{X}
-    \left(
-    \begin{bmatrix} 0 & 1 \end{bmatrix}
-    \begin{bmatrix}
-      \phantom{-}\E{X^2}  & -\E{X} \\
-      -\E{X}              & 1
-    \end{bmatrix}
-    \begin{bmatrix} 0 \\ 1 \end{bmatrix}
-    \right)^{-1} \\
-    &= n \Var{X}.
-  \end{align*}
-  The test statistic is then
-  \[ T_n = \frac{n \Var{X} \hat{b}^2}{\hat{\sigma}^2} \sim F_{1, n-2}. \]
-  Since we would like to differentiate between positive and negative parameter
-  values, we would prefer to take the positive square root and define
-  \[ T_n \coloneqq \sqrt{n} \ddfrac{\hat{b}}{\sqrt{\frac{\hat{\sigma}^2}{\Var{X}}}}. \]
-  It can be shown that $F_{1, n} = t_n^2$, so
-  \[ T_n = \sqrt{n} \ddfrac{\hat{b}}{\sqrt{\frac{\hat{\sigma}^2}{\Var{X}}}} \sim t_{n-2}. \qedhere \]
+  unknown error variance, $\sigma^2$.
 \end{proof}
 
-% Appendix: general hypothesis testing under normality assumption?
-% Appendix: proof of F_{1, n} = t_n^2
-% \begin{lemma}
-%   Let $G \in \R^{k \times p}$ be a matrix with $\rank G = k \le p$.
-%   \[ G\Bvh - G\Bv \sim \N{0}{\sigma^2 G^\T (\Xm^\T \Xm)^{-1} G}. \]
-% \end{lemma}
+\begin{theorem}
+  If $T \sim t_n$ is a random variable drawn from a Student's
+  $t$-distribution with $n$ degrees of freedom, then $T$ is related to
+  Fisher's $F$-distribution by $T^2 = F_{1, n}$.
+\end{theorem}
 
+\begin{proof}
+  Using the definition of a $\chi^2_k$ random variable as the sum of $k$
+  standard normal random variables, we see that
+  \begin{align*}
+    t_n \coloneqq \ddfrac{\N{0}{1}}{\sqrt{\frac{\chi^2_n}{n}}} 
+    = \ddfrac{\sqrt{\frac{\chi^2_1}{1}}}{\sqrt{\frac{\chi^2_n}{n}}} 
+    &= \sqrt{\ddfrac{\frac{\chi^2_1}{1}}{\frac{\chi^2_n}{n}}} \\
+    \implies t_n &= \sqrt{F_{1, n}} \\
+    \implies t_n^2 &= F_{1, n}. \qedhere
+  \end{align*}
+\end{proof}
 
 \end{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
