@@ -2,6 +2,7 @@
 \usepackage[english]{babel}
 \usepackage[T1]{fontenc}
 \usepackage[comma, compress, numbers, square]{natbib}
+\usepackage[sectionbib]{chapterbib}
 \usepackage{graphicx}
 \usepackage{verbatim}
 \usepackage{amsmath}
@@ -122,6 +123,7 @@
 % Derivatives
 \newcommand{\dd}{\mathrm{d}}
 \newcommand{\ddx}[2]{\frac{\dd #1}{\dd #2}}
+\newcommand{\ppx}[2]{\frac{\partial #1}{\partial #2}}
 \newcommand{\dx}[1]{\,\dd #1} % for inside integration
 
 % Probability helpers
@@ -498,6 +500,12 @@ Consider the estimator
   \[ \tr M = \dim\mathscr{N}(\Xm^\T) = n - p, \]
   \[ \implies \norm*{\Yv - \Xm\Bvh}_2^2 = \sigma^2 (n - p). \qedhere \]
 \end{proof}
+Further discussion of the geometry of these subspaces can be found in
+\cite{davidson2004econometric}.
+
+% References:
+\bibliographystyle{apalike}
+\bibliography{scholar}
 
 \clearpage
 \section{Linear Regression with Random Design}
@@ -1096,6 +1104,127 @@ The moments of $X$ and the error variance $\sigma^2$ are \emph{not} known.
     \implies t_n^2 &= F_{1, n}. \qedhere
   \end{align*}
 \end{proof}
+
+\clearpage
+\section{Logistic Regression}
+Consider \iid\ pairs $(\Xv_1, Y_1), \dots, (\Xv_n, Y_n)$, such that
+\begin{itemize}
+  \item $Y_i \in \{0, 1\}$ is a Bernoulli random variable,
+  \item $\Xv_i \in \R^p$, and
+  \item $\log \mleft(\ddfrac{\Prob{Y_i = 1 | \Xv_i}}{\Prob{Y_i = 0 | \Xv_i}} \mright) 
+        = \Xv_i^\T \Bv$ for some $\Bv \in \R^p$.
+\end{itemize}
+Assume $\Xv_1$ has an unknown density, $f_X(x) = \Prob{\Xv_1 = x}$.
+
+\subsection{The Parameter of the Output Variable}
+\begin{prop}
+  The probability that $Y_i = 1$, given $\Xv_i$, is the logistic function,
+  \[ \Prob{Y_i = 1 | \Xv_i} = \frac{1}{1 + e^{-\Xv_i^\T \Bv}}. \]
+\end{prop}
+
+\begin{proof}
+  Let $\Prob{Y_i = 1 | \Xv_i} = p_i$. Then, $\Prob{Y_i = 0 | \Xv_i} = 1 - p_i$,
+  so our requirement on their ratio is
+  \begin{align*}
+    &\log \mleft(\ddfrac{\Prob{Y_i = 1 | \Xv_i}}{\Prob{Y_i = 0 | \Xv_i}} \mright) = \Xv_i^\T \Bv \\
+    &\log \mleft(\frac{p_i}{1 - p_i}\mright) = \Xv_i^\T \Bv \\
+    \implies& \frac{p_i}{1 - p_i} = e^{\Xv_i^\T \Bv} \\
+    \implies& p_i = e^{\Xv_i^\T \Bv} - p_i e^{\Xv_i^\T \Bv} \\
+    \implies& p_i (1 + e^{\Xv_i^\T \Bv}) = e^{\Xv_i^\T \Bv} \\
+    \implies& p_i = \frac{e^{\Xv_i^\T \Bv}}{1 + e^{\Xv_i^\T \Bv}} \\
+    \implies& p_i = \frac{e^{-\Xv_i^\T \Bv}}{e^{-\Xv_i^\T \Bv}} \times \frac{e^{\Xv_i^\T \Bv}}{1 + e^{\Xv_i^\T \Bv}} \\
+    \implies& p_i = \Prob{Y_i = 1 | \Xv_i} = \frac{1}{1 + e^{-\Xv_i^\T \Bv}}. \qedhere
+  \end{align*}
+\end{proof}
+
+\subsection{The Likelihood of the Model}
+\begin{prop}
+  The likelihood of the model is given by
+  \[ \Li{\Xv, Y; \Bv} = \prod_{i=1}^n p_i(\Bv)^{Y_i} (1 - p_i(\Bv))^{1 - Y_i} f_X(\Xv_i). \]
+\end{prop}
+
+\begin{proof}
+  The likelihood is defined as
+  \begin{align*}
+    \Li{\Xv, Y; \Bv} &\coloneqq \prod_{i=1}^n f_Y(Y_i) \\
+                     &= \prod_{i=1}^n f_{Y|X}(Y_i | \Xv_i) f_X(\Xv_i) \\
+    \implies \Li{\Xv, Y; \Bv} &= \prod_{i=1}^n p_i(\Bv)^{Y_i} (1 - p_i(\Bv))^{1 - Y_i} f_X(\Xv_i). \qedhere
+  \end{align*}
+\end{proof}
+
+\subsection{The Maximum Likelihood Estimator}
+\begin{prop}
+  The MLE does not depend on the density of the design, $f_X$.
+\end{prop}
+
+\begin{proof}
+  The maximum likelihood estimator of the parameter is
+  \begin{align*}
+    \Bvh_\mathrm{MLE} \coloneqq& \argmax_{\Bv \in \R^p} \Li{\Bv} \\
+    \iff &\argmax_\Bv \prod_{i=1}^n p_i(\Bv)^{Y_i} (1 - p_i(\Bv))^{1 - Y_i} f_X(\Xv_i) \\
+    \iff &\argmax_\Bv \prod_{i=1}^n p_i(\Bv)^{Y_i} (1 - p_i(\Bv))^{1 - Y_i} \times \prod_{i=1}^n f_X(\Xv_i) \\
+    \intertext{Since the second term is not a function of $\Bv$,}
+    \implies \Bvh_\mathrm{MLE} =& \argmax_\Bv \prod_{i=1}^n p_i(\Bv)^{Y_i} (1 - p_i(\Bv))^{1 - Y_i}
+  \end{align*}
+  is not a function of the density of $f_X$.
+\end{proof}
+
+We can further explore the likelihood expression and solve for the actual MLE.
+Since
+\[ \Bvh_\mathrm{MLE} \coloneqq \argmax_\Bv \Li{\Bv} 
+                          \iff \argmax_\Bv \log \Li{\Bv} \]
+we can work with the log-likelihood
+\[ \Bvh_\mathrm{MLE} = \argmax_\Bv \sumi{i}{n} Y_i \log p_i(\Bv) + (1 - Y_i) \log (1 - p_i(\Bv)). \]
+To maximize the log-likelihood, we take the gradient with respect to $\Bv_j$,
+\begin{align*}
+  \nabla_{\Bv_j} &= \sumi{i}{n} \left( \frac{Y_i}{p_i} - \frac{1 - Y_i}{1 - p_i} \right) \ppx{p_i}{\Bv_j} \\
+  &= \sumi{i}{n} \left( \frac{Y_i(1 - p_i) - p_i(1 - Y_i)}{p_i(1 - p_i)} \right) \ppx{p_i}{\Bv_j} \\
+  &= \sumi{i}{n} \left( \frac{Y_i - Y_i p_i - p_i + Y_i p_i}{p_i(1 - p_i)} \right) \ppx{p_i}{\Bv_j} \\
+  &= \sumi{i}{n} \left( \frac{Y_i - p_i}{p_i(1 - p_i)} \right) \ppx{p_i}{\Bv_j}.
+\end{align*}
+
+\begin{prop}
+  The derivative of the logistic function $p$ with respect to its argument is
+  equal to $p(1 - p)$; \ie\ if
+  \[ p(x) = \frac{1}{1 + e^{-x}}, \]
+  then
+  \[ \ddx{p}{x} = p(1 - p). \]
+\end{prop}
+
+\begin{proof}
+  Let
+  \[ p(x) = \frac{1}{1 + e^{-x}}, \quad x \in \R. \]
+  Then, by the chain rule,
+  \begin{align*}
+    \ddx{p}{x} &= \frac{-1}{(1 + e^{-x})^2} \cdot -e^{-x} \\
+    \implies \ddx{p}{x} &= \frac{e^{-x}}{(1 + e^{-x})^2}.
+  \end{align*}
+  The expession $1 - p$ is given by
+  \begin{align*}
+    1-p &= 1 - \frac{1}{1 + e^{-x}} \\
+    &= \frac{1 + e^{-x}}{1 + e^{-x}} - \frac{1}{1 + e^{-x}} \\
+    &= \frac{1 + e^{-x} - 1}{1 + e^{-x}} \\
+    \implies 1 - p &= \frac{e^{-x}}{1 + e^{-x}},
+  \end{align*}
+  so the product $p(1-p)$ is
+  \begin{align*}
+    p(1-p) &= \frac{1}{1+e^{-x}} \cdot \frac{e^{-x}}{1 + e^{-x}} \\
+    \implies p(1-p) &= \ddx{p}{x} = \frac{e^{-x}}{(1 + e^{-x})^2}. \qedhere
+  \end{align*}
+\end{proof}
+Using this fact, the derivative of $p_i(\Xv^\T\Bv)$ is
+\begin{align*}
+  \ppx{p_i}{\Bv_j} &= p_i(1 - p_i) \ppx{\Xv_i^\T\Bv}{\Bv_j} \\
+  \implies \ppx{p_i}{\Bv_j} &= p_i(1 - p_i) X_{ij}.
+\end{align*}
+Then, our expression for the gradient of the log-likelihood is 
+\begin{align*}
+  \nabla_{\Bv_j} &= \sumi{i}{n} \left( \frac{Y_i - p_i}{p_i(1 - p_i)} \right) p_i(1 - p_i) X_{ij} \\
+  \implies \nabla_{\Bv_j} &= \sumi{i}{n} \left( Y_i - p(\Xv_i; \Bv) \right) X_{ij}.
+\end{align*}
+Since $p$ is a transcendental function of $\Xv$, we cannot find the zeros of
+this equation exactly. In practice, its zeros are estimated by numerical means,
+such as Newton's Method.
 
 \end{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
