@@ -709,6 +709,8 @@ Given $X_1 = x_1$, $\ve_1 = y_1 - x_1^\T\Bv$, so
 \[ f_x = \frac{1}{\sqrt{2\pi\sigma^2}} \exp \mleft[\frac{-(y_1 - x_1^\T\Bv)^2}{2\sigma^2}\mright]. \]
 
 \subsubsection{The Least Square Estimator}
+In this section, we will use the following theorem without proof.
+\begin{theorem}
 Since $X_1, \dots, X_n \in \R^p$ are \iid, the rank of
 \[ \Xm = \begin{bmatrix} 
             \text{---} X_1^\T \text{---} \\
@@ -717,6 +719,7 @@ Since $X_1, \dots, X_n \in \R^p$ are \iid, the rank of
           \end{bmatrix} 
 \]
 is almost surely $p$.
+\end{theorem}
 
 \begin{theorem}
   Under the assumption of normal error, $\ve_1 \sim \N{0}{\sigma^2}$, the maximum
