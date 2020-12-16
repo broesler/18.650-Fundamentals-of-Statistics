@@ -26,21 +26,30 @@ rng = np.random.default_rng(seed=seed)
 sns.set_style('whitegrid')
 
 # -----------------------------------------------------------------------------
-#         Define true parameters
+#         Define parameters
 # -----------------------------------------------------------------------------
-# beta = np.array([[1.0, 0.5]]).T  # (p, 1) => Y = a + b*X
-beta = np.array([[1.0, 0.5, 0.0]]).T  # (p, 1) => Y = X @ beta
+xranges = [(0, 10)]  # ranges over which X's take values
+# xranges = [(0, 10), (35, 50)]  # ranges over which X's take values
 
-n = 100        # number of observations
-p = beta.size  # number of parameters
+# True parameter
+beta = np.array([[1.0, 0.5]]).T  # (p, 1) => Y = a + b*X
+# beta = np.array([[1.0, 0.5, 0.2]]).T  # (p, 1) => Y = X @ beta
+
+n   = 100        # number of observations
+p   = beta.size  # number of parameters
+n_s = 25         # number of "predictions" to make
 
 # Create synthetic "true" data points
-# x = stats.uniform(0, 10).rvs(size=(n, p-1), random_state=seed)  # (n, p-1)
-# x = stats.norm(5, 2).rvs(size=(n, p-1), random_state=seed)  # (n, p-1)
+xv, xs  = list(), list()
+for i, r in enumerate(xranges[:p-1]):
+    # "true" data points
+    xv.append(stats.uniform(r[0], r[1] - r[0]).rvs(n, random_state=seed+i))
+    # xv.append(stats.norm((r[0] + r[1])/2, (r[1] - r[0])/5).rvs(n, random_state=seed+i+1))
+    # sampled data points
+    xs.append(np.linspace(r[0], r[1], n_s))
 
-# TODO generalize ranges
-x = np.c_[stats.uniform(0, 10).rvs(size=(n, 1), random_state=seed), \
-          stats.uniform(35, 10).rvs(size=(n, 1), random_state=seed+1)]
+x = np.c_[xv].T    # [n, p-1]
+x_s = np.c_[xs].T  # [n_s, p-1]
 
 # TODO create heteroscedastic example, simplify to `sigma_sq * np.eye(n)`
 sigma_sq = 1.0  # variance of the error
@@ -52,18 +61,8 @@ X = np.c_[np.ones(x.shape[0]), x]  # (n, p) assume deterministic
 Y = X @ beta + eps                 # (n, 1) noisy observations
 
 # Sampled values from "true", non-noisy distribution
-n_s = 25  # number of "predictions" to make
-# xs = np.linspace(-1, 11, n_s)
-# x_s = np.tile(xs, (p-1, 1)).T  # (n, p-1)
-x_s = np.c_[np.linspace(-1, 11, n_s), np.linspace(34, 46, n_s)]
 X_s = np.c_[np.ones(x_s.shape[0]), x_s]            # (n, p)
-# Get values on each design plane for demonstation
 Y_s = X_s @ beta
-# Y_s = np.zeros((n_s, p-1))
-# for i in range(p-1):
-#     Xs = np.c_[np.ones_like(xs), np.zeros((n_s, p-1))]
-#     Xs[:, i+1] = xs
-#     Y_s[:, [i]] = Xs @ beta  # no noise
 
 # Estimate the parameters
 XTXi = linalg.inv(X.T @ X)  # only invert once
@@ -105,7 +104,10 @@ for i in range(p-1):
     r_p[i], _ = stats.pearsonr(x[:, i], Y.squeeze())
 
 # Correlations between covariates
-Rxx = linalg.inv(np.corrcoef(x.T))  # (p-1, p-1)
+if p > 2:
+    Rxx = linalg.inv(np.corrcoef(x.T))  # (p-1, p-1)
+else:
+    Rxx = np.eye(r_p.shape[0])
 
 # np.testing.assert_allclose(Rsq, r.T @ r, atol=1e-3)
 np.testing.assert_allclose(Rsq, r_p.T @ Rxx @ r_p)
@@ -214,7 +216,7 @@ np.testing.assert_allclose(llf_hat,            res.llf,        atol=1e-1)
 #         Plots
 # -----------------------------------------------------------------------------
 fig = plt.figure(1, clear=True)
-fig.set_size_inches(10, 6, forward=True)
+fig.set_size_inches(6*(p-1), 6, forward=True)
 gs = GridSpec(1, p-1)
 for i in range(p-1):
     ax = fig.add_subplot(gs[i])
@@ -233,7 +235,7 @@ for i in range(p-1):
     ax.set(xlabel=rf'$x_{i+1}$',
            ylabel=r'$y$')
 
-ax.legend(loc='lower right', fontsize=8)
+ax.legend(loc='lower right')
 gs.tight_layout(fig)
 
 # Plot the 3D planar surface if p > 2
