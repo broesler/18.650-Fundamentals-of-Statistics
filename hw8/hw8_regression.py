@@ -11,13 +11,13 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-# import pandas as pd
+import pandas as pd
 import seaborn as sns
-
 import statsmodels.api as sm
 
+from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
 from matplotlib.gridspec import GridSpec
-from scipy import stats
+from scipy import stats, linalg
 
 # Set seed for reproducability
 seed = 565656
@@ -28,32 +28,45 @@ sns.set_style('whitegrid')
 # -----------------------------------------------------------------------------
 #         Define true parameters
 # -----------------------------------------------------------------------------
-beta = np.array([[1.0, 0.5]]).T  # (p, 1)
-# TODO rewrite for p > 2
-# beta = np.array([[1.0, 0.5, 0.25]]).T  # (p, 1)
+# beta = np.array([[1.0, 0.5]]).T  # (p, 1) => Y = a + b*X
+beta = np.array([[1.0, 0.5, 0.0]]).T  # (p, 1) => Y = X @ beta
 
 n = 100        # number of observations
 p = beta.size  # number of parameters
 
 # Create synthetic "true" data points
-x = stats.uniform(0, 10).rvs(size=(n, p-1), random_state=seed)  # (n,)
+# x = stats.uniform(0, 10).rvs(size=(n, p-1), random_state=seed)  # (n, p-1)
+# x = stats.norm(5, 2).rvs(size=(n, p-1), random_state=seed)  # (n, p-1)
+
+# TODO generalize ranges
+x = np.c_[stats.uniform(0, 10).rvs(size=(n, 1), random_state=seed), \
+          stats.uniform(35, 10).rvs(size=(n, 1), random_state=seed+1)]
 
 # TODO create heteroscedastic example, simplify to `sigma_sq * np.eye(n)`
 sigma_sq = 1.0  # variance of the error
 err_dist = stats.norm(0, sigma_sq)
-eps = err_dist.rvs(size=(n, 1), random_state=seed)
+eps = err_dist.rvs((n, 1), random_state=seed)
 
+# Add column of ones to design
 X = np.c_[np.ones(x.shape[0]), x]  # (n, p) assume deterministic
-Y = X @ beta + eps             # (n, 1) noisy observations
+Y = X @ beta + eps                 # (n, 1) noisy observations
 
-# "true" line
-n_s = 100  # number of "predictions" to make
-x_s = np.linspace(-1, 11, n_s)
-X_s = np.c_[np.ones(x_s.shape[0]), x_s]
-Y_s = X_s @ beta  # no noise
+# Sampled values from "true", non-noisy distribution
+n_s = 25  # number of "predictions" to make
+# xs = np.linspace(-1, 11, n_s)
+# x_s = np.tile(xs, (p-1, 1)).T  # (n, p-1)
+x_s = np.c_[np.linspace(-1, 11, n_s), np.linspace(34, 46, n_s)]
+X_s = np.c_[np.ones(x_s.shape[0]), x_s]            # (n, p)
+# Get values on each design plane for demonstation
+Y_s = X_s @ beta
+# Y_s = np.zeros((n_s, p-1))
+# for i in range(p-1):
+#     Xs = np.c_[np.ones_like(xs), np.zeros((n_s, p-1))]
+#     Xs[:, i+1] = xs
+#     Y_s[:, [i]] = Xs @ beta  # no noise
 
 # Estimate the parameters
-XTXi = np.linalg.inv(X.T @ X)  # only invert once
+XTXi = linalg.inv(X.T @ X)  # only invert once
 beta_hat = XTXi @ X.T @ Y      # == np.linalg.pinv(X) @ Y
 
 # Make predictions
@@ -61,15 +74,15 @@ Y_hat   = X @ beta_hat    # estimate of original data
 Y_s_hat = X_s @ beta_hat  # prediction along the line
 eps_hat = Y - Y_hat       # residuals (estimate of the actual epsilon)
 
-# NOTE `plt.figure(); plt.scatter(x, eps - eps_hat)` shows that difference is
+# `plt.figure(); plt.scatter(x, eps - eps_hat)` shows that difference is
 # *linear* in x, decreasing with increasing x. Appears to be independent of
 # slope sign or magnitude.
 
 # Define the projection matrices
-P = X @ XTXi @ X.T
-Pp = np.eye(P.shape[0]) - P
-np.testing.assert_allclose(P @ X, X)
-np.testing.assert_allclose(Pp @ X, np.zeros_like(X), atol=1e-12)
+H = X @ XTXi @ X.T
+M = np.eye(H.shape[0]) - H
+np.testing.assert_allclose(H @ X, X)
+np.testing.assert_allclose(M @ X, np.zeros_like(X), atol=1e-8)
 
 # -----------------------------------------------------------------------------
 #         Compute Statistics on the Fit
@@ -83,13 +96,19 @@ TSS = float(yc.T @ yc)            # == np.sum((Y - Y.mean())**2)  # total sum of
 ESS = TSS - RSS
 Rsq = 1 - RSS/TSS                 # == ESS / TSS  # explained variance
 
-# TODO rewrite for x \in R^(n,p-1)
-# covariance in the data: Cov(X, Y)
-r = float(xc.T @ yc / np.sqrt(xc.T @ xc * yc.T @ yc))  # manually compute
-r_p, pval = stats.pearsonr(x.squeeze(), Y.squeeze())   # compute using scipy
+# manually compute r**2 = Cov(X, Y) / sqrt(Var(X) * Var(Y))
+# r = linalg.inv(linalg.sqrtm((xc.T @ xc) * (yc.T @ yc))) @ (xc.T @ yc)  
 
-np.testing.assert_allclose(Rsq, r**2)
-np.testing.assert_allclose(Rsq, r_p**2)
+# compute using scipy
+r_p = np.zeros(p-1)
+for i in range(p-1):
+    r_p[i], _ = stats.pearsonr(x[:, i], Y.squeeze())
+
+# Correlations between covariates
+Rxx = linalg.inv(np.corrcoef(x.T))  # (p-1, p-1)
+
+# np.testing.assert_allclose(Rsq, r.T @ r, atol=1e-3)
+np.testing.assert_allclose(Rsq, r_p.T @ Rxx @ r_p)
 
 # Compute confidence intervals on beta_hat
 alpha = 0.05                     # 95% interval
@@ -117,7 +136,7 @@ k = np.linalg.matrix_rank(G)
 
 # Most general form: pinv takes only invertible part of X
 gb = G @ beta_hat - lam
-Sn = float((gb.T @ np.linalg.pinv(G @ XTXi @ G.T) @ gb) / (k*sigma_hat_sq))
+Sn = float((gb.T @ linalg.pinv(G @ XTXi @ G.T) @ gb) / (k*sigma_hat_sq))
 f_pvalue = 1 - stats.f(k, n - p).cdf(Sn)  # one-tailed since Sn ~ chi-sq
 
 # ISLR, eqn (3.23)
@@ -131,9 +150,10 @@ pvalues = 2*(1 - beta_dist.cdf(np.abs(Tn)))
 # FIXME this code fails if n != n_s (needs for loop)
 # Prediction interval (*see* Wasserman, Theorem 13.11, Exercise 13.10)
 za = stats.norm(0, 1).ppf(1 - alpha/2)
-xd_s = x - x_s
-xi_hat2 = sigma_hat_sq * (1 + 1/n * np.sum((x - x_s)**2, axis=0) / np.sum(xc**2))  # (n_s, 1)
-Yh_bands = np.c_[Y_s_hat.squeeze() - za * np.sqrt(xi_hat2), Y_s_hat.squeeze() + za * np.sqrt(xi_hat2)]
+Yh_bands = np.zeros((n_s, 2))  # n_s samples, 2 CI bounds
+for i in range(n_s):
+    xi_hat2 = linalg.norm(sigma_hat_sq * (1 + 1/n * np.sum((x - x_s[i, :])**2, axis=0) / np.sum(xc**2)))  # (n_s, 1)
+    Yh_bands[i, :] = np.dstack((Y_s_hat[i, :] - za * np.sqrt(xi_hat2), Y_s_hat[i, :] + za * np.sqrt(xi_hat2)))
 
 
 # Bootstrap a confidence interval for the *function* fit
@@ -146,16 +166,16 @@ def bootstrap(X, Y, n_boot=10000):
         resampler = rng.integers(0, n, size=n, dtype=np.intp)  # intp is index dtype
         Ys = Y[resampler, :]
         Xs = X[resampler, :]
-        beta_hat = np.linalg.pinv(Xs) @ Ys
+        beta_hat = linalg.pinv(Xs) @ Ys
         boot_dist[:, [i]] = beta_hat
         eps_hat = Ys - Xs @ beta_hat
         sh2_dist[i] = float(eps_hat.T @ eps_hat) / (n - p)
     return boot_dist, sh2_dist
 
 
-beta_boots, sh2_boots = bootstrap(X, Y)    # (p,   n_boot)
+beta_boots, sh2_boots = bootstrap(X, Y)    # (p, n_boot)
 Y_hat_boots = X_s @ beta_boots  # (n_s, n_boot)
-err_bands = np.quantile(Y_hat_boots, (alpha/2, 1 - alpha/2), axis=1).T  # (n_s, p)
+err_bands = np.quantile(Y_hat_boots, (alpha/2, 1 - alpha/2), axis=1).T  # (n_s, 2)
 
 # TODO
 #   * AIC
@@ -170,7 +190,7 @@ llf_hat = float(-n/2 * np.log(2*np.pi*sigma_hat_sq) - 1/(2*sigma_hat_sq) * (eps_
 #         Compare vs statsmodels function
 # -----------------------------------------------------------------------------
 res = sm.OLS(Y, X).fit()
-# print(res.summary())
+print(res.summary())
 
 np.testing.assert_allclose(Y_hat.squeeze(),    res.fittedvalues)
 np.testing.assert_allclose(eps_hat.squeeze(),  res.resid)
@@ -187,44 +207,66 @@ np.testing.assert_allclose(f_pvalue,           res.f_pvalue,   atol=1e-7)
 np.testing.assert_allclose(llf_hat,            res.llf,        atol=1e-1)
 
 # Create pandas dataframe for other plots
-# df = pd.DataFrame(np.c_[x, Y], columns=['x', 'y'])
-# sns.jointplot(x='x', y='y', data=df, kind='reg')
+# df = pd.DataFrame(np.c_[x, Y], columns=[f'x{i}' for i in range(1, p)]+ ['y'])
+# sns.jointplot(x='x1', y='y', data=df, kind='reg')
 
 # -----------------------------------------------------------------------------
 #         Plots
 # -----------------------------------------------------------------------------
 fig = plt.figure(1, clear=True)
 fig.set_size_inches(10, 6, forward=True)
-gs = GridSpec(1, 2)
-ax = fig.add_subplot(gs[0])
-ax.scatter(x, Y, alpha=0.5, label='data')
+gs = GridSpec(1, p-1)
+for i in range(p-1):
+    ax = fig.add_subplot(gs[i])
+    ax.scatter(x[:, i], Y, alpha=0.5, label='data')
 
-ax.plot(x_s, Y_s,                 label=fr'$y = {beta[0,0]:.4f} + {beta[1,0]:.4f}x$')
-ax.plot(x_s, Y_s_hat, color='C3', label=fr'$\hat{{y}} = {beta_hat[0,0]:.4f} + {beta_hat[1,0]:.4f}x$')
+    label_true = rf'$y = {beta[0, 0]:.4f} + ' \
+                 + ' + '.join([rf'{beta[j, 0]:.4f}x_{j}' for j in range(1, p)]) + '$'
+    label_hat  = rf'$\hat{{y}} = {beta_hat[0, 0]:.4f} + ' \
+                 + ' + '.join([rf'{beta_hat[j, 0]:.4f}x_{j}' for j in range(1, p)]) + '$'
+    ax.plot(x_s[:, i], Y_s,     label=label_true)
+    ax.plot(x_s[:, i], Y_s_hat, label=label_hat, color='C3')
 
-ax.fill_between(x_s,  Yh_bands[:, 0],  Yh_bands[:, 1], color='C3', alpha=0.1)  # prediction CI
-ax.fill_between(x_s, err_bands[:, 0], err_bands[:, 1], color='C3', alpha=0.3)  # curve fit CI
+    ax.fill_between(x_s[:, i],  Yh_bands[:, 0],  Yh_bands[:, 1], color='C3', alpha=0.1)  # prediction CI
+    ax.fill_between(x_s[:, i], err_bands[:, 0], err_bands[:, 1], color='C3', alpha=0.3)  # curve fit CI
 
-ax.legend(loc='lower right', fontsize=10)
-ax.set(title='Regression',
-       xlabel='$x$',
-       ylabel='$y$',
-       xlim=(-0.5, 10.5),
-       aspect=1)
+    ax.set(xlabel=rf'$x_{i+1}$',
+           ylabel=r'$y$')
+
+ax.legend(loc='lower right', fontsize=8)
+gs.tight_layout(fig)
+
+# Plot the 3D planar surface if p > 2
+if p > 2:
+    xg1, xg2 = np.meshgrid(x_s[:, 0], x_s[:, 1])
+    xg = np.dstack((np.ones_like(xg1), xg1, xg2))
+    yg = (xg @ beta_hat).squeeze()
+
+    fig = plt.figure(2, clear=True)
+    ax = fig.add_subplot(projection='3d')
+    ax.plot_surface(xg1, xg2, yg,
+                    cmap='Reds', edgecolor='none', zorder=0, alpha=0.3)
+    ax.scatter(x[:, 0], x[:, 1], Y_hat, c='C3', label=r'$\hat{y}$')
+    ax.scatter(x[:, 0], x[:, 1], Y, label='data')
+    ax.plot(x_s[:, 0], x_s[:, 1], Y_s.squeeze(), color='C3', label='sampled line')
+    ax.legend(loc='upper left')
+    ax.set(xlabel=r'$x_1$',
+           ylabel=r'$x_2$',
+           zlabel=r'$y$')
+    ax.view_init(elev=12, azim=-115)
 
 # Plot residuals
-ax = fig.add_subplot(gs[1])
-ax.scatter(x, eps,     alpha=0.5,             label=r'$\varepsilon$')
-ax.scatter(x, eps_hat, alpha=0.5, color='C3', label=r'$\hat{\varepsilon}$')
-ax.axhline(0, color='k', ls='--')
-ax.set(title='Residuals',
-       xlabel='$x$',
-       ylabel=r'$Y - X\beta$',
-       xlim=(-0.5, 10.5),
-       aspect=1)
-ax.legend(fontsize=10)
+# ax = fig.add_subplot(gs[1])
+# ax.scatter(x[:, 0], eps,     alpha=0.5,             label=r'$\varepsilon$')
+# ax.scatter(x[:, 0], eps_hat, alpha=0.5, color='C3', label=r'$\hat{\varepsilon}$')
+# ax.axhline(0, color='k', ls='--')
+# ax.set(title='Residuals',
+#        xlabel='$x$',
+#        ylabel=r'$Y - X\beta$',
+#        xlim=(-0.5, 10.5),
+#        aspect=1)
+# ax.legend(fontsize=10)
 
-gs.tight_layout(fig)
 
 # TODO figure out mismatch
 # >>> stats.chi2.fit(sh2_norm)

@@ -204,7 +204,7 @@ ax.set(xlabel=r'Theoretical Quantiles $\mathcal{N}(0, 1)$',
        )
 
 gs.tight_layout(fig)
-fig.savefig('./hw7_latex/figures/indep_dist.pdf')
+# fig.savefig('./hw7_latex/figures/indep_dist.pdf')
 
 plt.show()
 # =============================================================================
