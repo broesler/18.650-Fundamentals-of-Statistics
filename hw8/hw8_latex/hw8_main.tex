@@ -23,7 +23,6 @@
 \usepackage[font=small, hypcap=true, list=true]{subcaption}   % use for subfigures instead of {subfigure}
 
 \usepackage{hyperref}
-% \usepackage{nameref}  % refer to unnumbered sections
 \hypersetup{
     linktoc=all,    % link table of contents to sections
     colorlinks,
@@ -167,6 +166,14 @@
 \newcommand{\Bvh}{\hat{\beta}}
 \newcommand{\ve}{\varepsilon}
 \newcommand{\Ebh}{\mathbb{E}[\Bvh]}
+
+\newcommand{\thh}{\hat{\theta}}
+\newcommand{\xs}{x_\star}
+\newcommand{\Xs}{\Xv_\star}
+\newcommand{\Ys}{Y_\star}
+\newcommand{\Yhs}{\hat{Y}_\star}
+\newcommand{\Vth}{\mathbb{V}[\hat{\theta}]}
+\newcommand{\za}{z_\alpha}
 
 \DeclareMathOperator*{\argmin}{argmin}
 \DeclareMathOperator*{\argmax}{argmax}
@@ -429,7 +436,7 @@ Consider the estimator
   Q: What is the prediction error of the estimator?
 \end{quote}
 
-\begin{prop}
+\begin{prop} \label{prop:pred_err}
   The prediction error, defined as the expected value of the sum of squared
   residuals, is
   \[ \E{\norm*{\Yv - \Xm\Bvh}_2^2} = \tr M \Sigma M, \]
@@ -492,7 +499,7 @@ Consider the estimator
   The trace of $M$ is then equal to the number of its non-zero eigenvalues.
   Since $M$ is a projection onto the null space of $\Xm^\T$, it has non-zero
   eigenvalues equal to the dimension of that null space.
-  For $\Xm \in \R^{n \times p}$,
+  For $\Xm \in \R^{n \times p}$, $n \ge p$,
   \[ \dim\mathscr{N}(\Xm^\T) = n - \dim \mathscr{C}(\Xm). \]
   The dimension of the column space is the rank
   \[ \dim \mathscr{C}(\Xm) = \rank \Xm = p, \]
@@ -503,9 +510,136 @@ Consider the estimator
 Further discussion of the geometry of these subspaces can be found in
 \cite{davidson2004econometric}.
 
+\subsection{Out of Sample Prediction}
+The derivation of prediction error given in the proof of \Cref{prop:pred_err}
+applies only to predictions made from inputs \emph{in the fixed design}
+variables. What if we observe $\Xm = \Xs$,
+where $\Xs \notin \{\Xv_1, \dots, \Xv_n \}$,
+and would like to make a prediction?
+What is the confidence interval on our prediction? The following example is
+based on Exercise 13.10 in \cite{wasserman2013all}.
+
+Let our desired prediction matrix be $\Xs \in \R^{m \times p}$, $\rank \Xs = p$, 
+such that our prediction $\Yhs \in \R^m$ is
+\[ \Yhs = \Xs \Bvh. \]
+The variance of this prediction is
+\begin{align*}
+   \Var{\Yhs} &= \Var{\Xs \Bvh}  \\
+   &= \Xs \Var{\Bvh} \Xs^\T \\
+   &= \Xs (\Xm^\T \Sigma^{-1} \Xm)^{-1} \Xs^\T.
+\end{align*}
+% TODO fully work this out in multiple dimensions, and/or with heteroscedasticity.
+For the following arguments, we let $m = 1$, so that our prediction $\Yhs$ is
+a singleton, and assume that the error is homoscedastic, so that 
+$\Sigma = \sigma^2 \vect{I}_n$.
+
+\begin{theorem}
+  The probability that the out-of-sample prediction $\Yhs$ lies in the interval
+  \[ \Yhs \pm \za \sqrt{\Var{\Yhs}} \]
+  where $\za = \Phi\mleft(1 - \frac{\alpha}{2}\mright)$, is \emph{not} equal to $1 - \frac{\alpha}{2}$, \ie
+  \[ \Prob{ \Yhs - \za \sqrt{\Var{\Yhs}} 
+           < \Ys 
+           < \Yhs + \za \sqrt{\Var{\Yhs}}} 
+      < 1 - \frac{\alpha}{2} \]
+\end{theorem}
+
+\begin{proof}
+  Define the variables
+  \begin{alignat*}{3}
+    \theta &= \Xs \beta &&\implies \Ys = \theta + \ve, \\
+    \thh &= \Xs \Bvh &&\implies \Yhs = \thh,
+  \end{alignat*}
+  where $\thh \sim \N{\theta}{s^2}$ and $s^2 = \Vth = \Var{\Yhs}$.
+  Then, the probability that $\Yhs$ is in the interval is given by
+  \begin{align*}
+    &\Prob{\Yhs - \za s < \Ys < \Yhs + \za s}  \\
+    \iff &\Prob{\thh - \za s < \theta + \ve < \thh + \za s} \\
+    \iff &\Prob{\frac{\thh - \za s - \E{\thh}}{\sqrt{\Vth}}
+              < \frac{\theta + \ve - \E{\thh}}{\sqrt{\Vth}}
+              < \frac{\thh - \za s - \E{\thh}}{\sqrt{\Vth}}} \\
+    \iff &\Prob{\frac{\thh - \za s - \theta}{s}
+              < \frac{\theta + \ve - \theta}{s}
+              < \frac{\thh - \za s - \theta}{s}} \\
+    \iff &\Prob{\frac{\thh - \theta}{s} - \za
+              < \frac{\ve}{s}
+              < \frac{\thh - \theta}{s} + \za} \\
+    \iff &\Prob{-\za < \frac{\ve - (\thh - \theta)}{s} < \za}.
+  \end{align*}
+  To evaluate the middle expression, recall the definitions
+  \begin{align*}
+    \ve \sim \N{0}{\sigma^2}, \\
+    \thh - \theta \sim \N{0}{s^2}.
+  \end{align*}
+  Assuming $\Xv \indep \ve$, $\Cov{\Xv, \ve} = 0$, so
+  \[ \Var{\ve - (\thh - \theta)} = \Var{\ve} + \Var{\thh - \theta}. \]
+  Their joint distribution is then
+  \begin{align*}
+     \frac{1}{s}(\ve - (\thh - \theta)) &\sim \frac{1}{s}\N{0}{s^2 + \sigma^2} \\
+     &\sim \N{0}{\frac{s^2 + \sigma^2}{s^2}} \\
+     &\sim \N{0}{1 + \frac{\sigma^2}{s^2}}.
+  \end{align*}
+  The probability expression then becomes
+  \begin{align*}
+    &\Prob{\za < \frac{\ve - (\thh - \theta)}{s} < \za} \\
+    \iff &\Prob{-\za < \N{0}{1 + \frac{\sigma^2}{s^2}} < \za}
+    < 1 - \frac{\alpha}{2}.
+  \end{align*}
+  because the normal distribution has a larger variance than a standard normal.
+\end{proof}
+
+The question remains: what \emph{is} a proper confidence interval for an
+out-of-sample prediction? 
+\begin{prop}
+  The interval defined by $\Yhs \pm \za \xi_n^2$,
+  where $\xi_n^2 = s^2 + \sigma^2$, ensures that
+  \[ \Prob{ \Yhs - \za \xi_n^2 < \Ys < \Yhs + \za \xi_n^2}
+    = \Prob{-\za < \N{0}{1} < \za} = 1 - \frac{\alpha}{2}, \]
+  giving a proper confidence interval.
+\end{prop}
+
+\begin{proof}
+  We would like to find a parameter $\lambda \in \R$
+  ($\lambda \ne s$) such that 
+  \[ \Prob{\Yhs - \za\lambda < \Ys < \Yhs + \za\lambda} 
+      = \Prob{ -\za < \N{0}{1} < \za} = 1 - \frac{\alpha}{2}. \]
+  Following the proof above, this probability statement becomes
+  \begin{align*}
+    &\Prob{\Yhs - \za\lambda < \Ys < \Yhs + \za\lambda}  \\
+    \iff &\Prob{\thh - \za\lambda < \theta + \ve < \thh + \za\lambda}  \\
+    \iff &\Prob{\frac{\thh - \theta}{s} - \za\frac{\lambda}{s} 
+              < \frac{\ve}{s}
+              < \frac{\thh - \theta}{s} + \za\frac{\lambda}{s}} \\
+    \iff &\Prob{- \za < \frac{s}{\lambda} \cdot \frac{\ve - (\thh - \theta)}{s} < \za} \\
+    \iff &\Prob{- \za < \frac{1}{\lambda} (\ve - (\thh - \theta)) < \za},
+    \intertext{which, given our normality assumptions,}
+    \iff &\Prob{- \za < \frac{1}{\lambda} \N{0}{s^2 + \sigma^2} < \za} \\
+    \iff &\Prob{- \za < \N{0}{\frac{s^2 + \sigma^2}{\lambda^2}} < \za}.
+  \end{align*}
+  This expression implores us to define
+  \[ \xi_n^2 = \lambda^2 \coloneqq s^2 + \sigma^2, \]
+  so that
+  \begin{align*}
+    &\Prob{- \za < \N{0}{\frac{s^2 + \sigma^2}{s^2 + \sigma^2}} < \za} \\
+    \iff &\Prob{-\za < \N{0}{1} < \za} = 1 - \frac{\alpha}{2}. \qedhere
+  \end{align*}
+\end{proof}
+In practice, we do not know the value of $\sigma^2$, so we use the unbiased
+estimator $\hat{\sigma}^2$, and let
+\[ \hat{\xi}_n^2 = \hat{\sigma}^2 + s^2. \]
+When $p = 2$, this expression evaluates to
+\[ \hat{\xi}_n^2 = \hat{\sigma}^2 + \frac{\hat{\sigma}^2}{n}
+  \mleft( \frac{\sumi{i}{n} (X_i - \Xs)^2}{\sumi{i}{n}{(X_i - \Xnbar)^2}} \mright). \]
+\emph{See} \Cref{sec:2dnormal} for a full derivation of the 2-D covariance
+matrix $\Var{\Bvh}$. We can see from this expression that if our desired
+out-of-sample input $\Xs$ is close to $\Xnbar$, the additional term is
+minimized. We can also observe that if $\Xs$ is far from $\Xnbar$, even if $n$
+is large, we will have large uncertainty in our prediction.
+
+
 % References:
 \bibliographystyle{apalike}
-\bibliography{scholar}
+\bibliography{hw8_main}
+
 
 \clearpage
 \section{Linear Regression with Random Design}
@@ -621,10 +755,10 @@ is almost surely $p$.
 
 The maximum likelihood estimator occurs at the location where the partial
 derivative of the log-likelihood with respect to $\Bv$ is zero.%
-\footnote{The classification of
-  the critical point as a ``maximum'' is confirmed by inspecting the second
-  derivative, $\nabla_\Bv^2 = 2\Xm^\T \Xm$. The matrix $\Xm^\T \Xm$ is
-  positive definite, so the cricital point is indeed a maximum.}
+\footnote{The classification of the critical point as a ``maximum'' is confirmed
+  by inspecting the second derivative, $\nabla_\Bv^2 = 2\Xm^\T \Xm$. Since
+  $\rank \Xm = p$, the matrix $\Xm^\T \Xm$ is positive definite, so the critical
+  point is indeed a maximum.}
 \begin{alignat*}{3}
   \nabla_\Bv &= -2\Xm^\T(\Yv - \Xm\Bvh) = 0 \\
   &= \Xm^\T\Yv - \Xm^\T\Xm\Bvh = 0 \\
@@ -729,16 +863,16 @@ that $\sigma^2$ is finite and constant.
     \mathrm{Bias}_{\sigma^2}(\hat{\sigma}_\mathrm{MLE}^2) &= \E{\hat{\sigma}_\mathrm{MLE}^2 - \sigma^2} \\
     &= \E{\hat{\sigma}_\mathrm{MLE}^2} - \E{\sigma^2} \by{linearity of expectation} \\
     &= \E{\hat{\sigma}_\mathrm{MLE}^2} - \sigma^2 \by{$\sigma^2$ is constant} \\
-    &= \E{\E{\tfrac{1}{n}(\Yv - \Xm\Bvh)^\T(\Yv - \Xm\Bvh) | \Xm}} - \sigma^2. \by{law of total expectation}
+    &= \E{\E{\left. \tfrac{1}{n}(\Yv - \Xm\Bvh)^\T(\Yv - \Xm\Bvh) \right| \Xm}} - \sigma^2. \by{law of total expectation}
   \end{alignat*}
   We have already shown in the~\nameref{app:prediction_error} that the norm of
   the residuals, under the assumption of normality, is 
   \[ (\Yv - \Xm\Bvh)^\T(\Yv - \Xm\Bvh) = \sigma^2 (n - p) \]
   where $\rank \Xm = p$. Thus,
   \begin{align*}
-    \mathrm{Bias}_{\sigma^2}(\hat{\sigma}_\mathrm{MLE}^2) &= \E{\E{\tfrac{1}{n}
-        \sigma^2 (n - p) | \Xm}} - \sigma^2 \\
-    &= \frac{n-p}{n} \E{\E{\sigma^2 | \Xm}} - \sigma^2 \\
+    \mathrm{Bias}_{\sigma^2}(\hat{\sigma}_\mathrm{MLE}^2) &= \E{\E{\left .\tfrac{1}{n}
+        \sigma^2 (n - p) \right| \Xm}} - \sigma^2 \\
+    &= \frac{n-p}{n} \E{\E{\left. \sigma^2 \right| \Xm}} - \sigma^2 \\
     &= \frac{n-p}{n} \E{\sigma^2} - \sigma^2 \\
     &= \frac{n-p}{n} \sigma^2 - \sigma^2 \numberthis \label{eq:Es2} \\
     &= \frac{(n-p)\sigma^2 - n\sigma^2}{n} \\
@@ -770,16 +904,16 @@ Although the MLE of $\sigma^2$ is \emph{consistent} ($\mathrm{Bias} \to 0$ as $n
   \end{align*}
   The parameter $\lambda$ is found by computing the expectation
   \begin{align*}
-    \E{\hat{\sigma}^2} &= \E{\E{\hat{\sigma}^2 | \Xm}} \\
-    &= \E{\E{\lambda \hat{\sigma}^2_\mathrm{MLE} | \Xm}} \\
-    &= \lambda \E{\E{\hat{\sigma}^2_\mathrm{MLE} | \Xm}} \\
+    \E{\hat{\sigma}^2} &= \E{\E{\left. \hat{\sigma}^2 \right| \Xm}} \\
+    &= \E{\E{\left. \lambda \hat{\sigma}^2_\mathrm{MLE} \right| \Xm}} \\
+    &= \lambda \E{\E{\left. \hat{\sigma}^2_\mathrm{MLE} \right| \Xm}} \\
     &= \lambda \frac{n-p}{n} \sigma^2 = \sigma^2 \\
     \implies \lambda &= \frac{n}{n-p}.
   \end{align*}
-  Thus,
+  Thus, our unbiased estimator is
   \begin{align*}
     \hat{\sigma}^2 &= \frac{n}{n-p} \hat{\sigma}^2_\mathrm{MLE} \\
-    &= \frac{n}{n-p} \frac{1}{n}(\Yv - \Xm\Bvh)^\T(\Yv - \Xm\Bvh) \\
+    &= \frac{n}{n-p} \cdot \frac{1}{n}(\Yv - \Xm\Bvh)^\T(\Yv - \Xm\Bvh) \\
   \implies \hat{\sigma}^2  &\coloneqq \frac{1}{n-p} (\Yv - \Xm\Bvh)^\T(\Yv - \Xm\Bvh). \qedhere
   \end{align*}
 \end{proof}
@@ -850,7 +984,7 @@ The estimators can be shown to be % show in Appendix?
   \end{align*}
 \end{proof}
 
-\subsubsection{Asymptotic Normality of the Estimators}
+\subsubsection{Asymptotic Normality of the Estimators} \label{sec:2dnormal}
 Assume the design is independent of the error, $X_1 \indep \ve_1$, and the error
 is normally distributed $\ve_1 \sim \N{0}{\sigma^2}$.
 
@@ -1199,7 +1333,7 @@ To maximize the log-likelihood, we take the gradient with respect to $\Bv_j$,
     \ddx{p}{x} &= \frac{-1}{(1 + e^{-x})^2} \cdot -e^{-x} \\
     \implies \ddx{p}{x} &= \frac{e^{-x}}{(1 + e^{-x})^2}.
   \end{align*}
-  The expession $1 - p$ is given by
+  The expression $1 - p$ is given by
   \begin{align*}
     1-p &= 1 - \frac{1}{1 + e^{-x}} \\
     &= \frac{1 + e^{-x}}{1 + e^{-x}} - \frac{1}{1 + e^{-x}} \\
@@ -1220,9 +1354,11 @@ Using this fact, the derivative of $p_i(\Xv^\T\Bv)$ is
 Then, our expression for the gradient of the log-likelihood is 
 \begin{align*}
   \nabla_{\Bv_j} &= \sumi{i}{n} \left( \frac{Y_i - p_i}{p_i(1 - p_i)} \right) p_i(1 - p_i) X_{ij} \\
-  \implies \nabla_{\Bv_j} &= \sumi{i}{n} \left( Y_i - p(\Xv_i; \Bv) \right) X_{ij}.
+  \implies \nabla_{\Bv_j} &= \sumi{i}{n} \left( Y_i - p(\Xv_i; \Bv) \right) X_{ij} \\
+  \implies \nabla_{\Bv_j} &= \left( \Yv - p(\Xv; \Bv) \right)^\T \Xv_j,
 \end{align*}
-Since $p$ is a transcendental function of $\Xv$, we cannot find the zeros of
+where $\Yv, p(\Xm; \Bv), \Xv_j \in \R^n$.
+Since $p$ is a transcendental function of $\Xv^\T\Bv$, we cannot find the zeros of
 this equation exactly. In practice, its zeros are estimated by numerical means,
 such as Newton's Method.
 
