@@ -29,11 +29,16 @@ shows the samples labeled with the appropriate distribution.
 Consider two independent samples $X_1, \dots, X_n$, and
 $Y_1, \dots, Y_m$ of independent, real-valued, continuous random
 variables, and assume that the $X_i$’s are i.i.d. with some cdf $F$ and
-that the $Y_i$’s are i.i.d. with some cdf $G$. Note that the two samples
-may have different sizes (if $n \ne m$). We want to test whether
-$F = G$. Consider the following hypotheses: $$\begin{aligned}
+that the $Y_i$’s are i.i.d. with some cdf $G$. [^1] We want to test
+whether $F = G$. Consider the following hypotheses:
+
+$$
+\begin{aligned}
   H_0 \colon ``F = G" \\
-  H_1 \colon ``F \ne G"\end{aligned}$$ For simplicity, we will assume
+  H_1 \colon ``F \ne G"\end{aligned}
+$$
+
+For simplicity, we will assume
 that $F$ and $G$ are continuous and increasing.
 
 ## Example Experiment
@@ -45,9 +50,13 @@ have the same distribution for our analysis.
 
 ## CDF Distributions
 
-Let $$\begin{aligned}
+Let
+
+$$
+\begin{aligned}
   U_i &= F(X_i), \quad \forall i = 1, \dots, n, \\
-  V_j &= G(Y_j), \quad \forall j = 1, \dots, n.\end{aligned}$$
+  V_j &= G(Y_j), \quad \forall j = 1, \dots, n.\end{aligned}
+$$
 
 <div class="prop">
 
@@ -62,7 +71,10 @@ variable is uniform on $[0,
 *Proof.* The distributions of $U_i$ and $V_j$ can be determined by
 finding their cdfs. The cdf of $U_i$ is defined by
 $F_U(t) \coloneqq \mathbb{P}\left[U_i \le t\right]$. Assuming that
-$F(X)$ and $G(Y)$ are invertible, it follows that $$\begin{aligned}
+$F(X)$ and $G(Y)$ are invertible, it follows that
+
+$$
+\begin{aligned}
 {3}
   \mathbb{P}\left[U_i \le t\right] &= \mathbb{P}\left[F(X_i) \le t\right] &\quad&\text{(definition of $U_i$)} \\
                    &= \mathbb{P}\left[X_i \le F^{-1}(t)\right] \\
@@ -82,7 +94,11 @@ empirical cdf of $\{Y_1, \dots, Y_m\}$.
 
 ### The Test Statistic
 
-Let $$T_{n,m} = \sup_{t \in \mathbb{R}} \left| F_n(t) - G_m(t) \right|$$
+Let
+
+$$
+T_{n,m} = \sup_{t \in \mathbb{R}} \left| F_n(t) - G_m(t) \right|
+$$
 
 <div class="prop">
 
@@ -93,7 +109,10 @@ maximum value of a finite set of numbers.*
 
 <div class="proof">
 
-*Proof.* By definition, the cdf $$\begin{aligned}
+*Proof.* By definition, the cdf
+
+$$
+\begin{aligned}
 {3}
     F(t) &= \mathbb{P}\left[X \le t\right] \quad \forall t \in \mathbb{R}\\
          &= \mathbb{E}\left[\mathbbm{1}\!\left\{X \le t\right\}\right]. \\
@@ -102,26 +121,49 @@ maximum value of a finite set of numbers.*
     F_n(t) &= \frac{1}{n}\sum_{i=1}^{n} \mathbbm{1}\!\left\{X_i \le t\right\} \addtocounter{equation}{1}\tag{\theequation}\label{eq:F_n}
     \intertext{Likewise,}
     G_m(t) &= \frac{1}{m}\sum_{j=1}^{m} \mathbbm{1}\!\left\{Y_j \le t\right\}. \addtocounter{equation}{1}\tag{\theequation}\label{eq:G_m}
-  \end{aligned}$$
-$$\therefore T_{n,m} = \sup_{t \in \mathbb{R}} \left| \frac{1}{n}\sum_{i=1}^{n} \mathbbm{1}\!\left\{X_i \le t\right\} - \frac{1}{m}\sum_{j=1}^{m} \mathbbm{1}\!\left\{Y_j \le t\right\} \right|.$$
+  \end{aligned}
+$$
+
+$$
+\therefore T_{n,m} = \sup_{t \in \mathbb{R}} \left| \frac{1}{n}\sum_{i=1}^{n} \mathbbm{1}\!\left\{X_i \le t\right\} - \frac{1}{m}\sum_{j=1}^{m} \mathbbm{1}\!\left\{Y_j \le t\right\} \right|.
+$$
+
 The empirical
 cdfs <a href="#eq:F_n" data-reference-type="eqref" data-reference="eq:F_n">[eq:F_n]</a> and <a href="#eq:G_m" data-reference-type="eqref" data-reference="eq:G_m">[eq:G_m]</a>
-can also be written $$\begin{aligned}
+can also be written
+
+$$
+\begin{aligned}
 {3}
     F_n(t) &= \#\{i=1, \dots, n \colon X_i \le t\} \cdot \frac{1}{n} \\
     G_m(t) &= \#\{i=1, \dots, m \colon Y_j \le t\} \cdot \frac{1}{m},
-  \end{aligned}$$ so the only values that the empirical cdfs can take
-are the discrete sets $$\begin{aligned}
+  \end{aligned}
+$$
+
+so the only values that the empirical cdfs can take
+are the discrete sets
+
+$$
+\begin{aligned}
     F_n(i) &= \frac{i}{n} \quad \forall i = 1, \dots, n \\
     G_m(j) &= \frac{j}{m} \quad \forall j = 1, \dots, m.
-  \end{aligned}$$ Therefore, the test statistic can be rewritten as the
-maximum value of a finite set of numbers: $$\begin{split}
+  \end{aligned}
+$$
+
+Therefore, the test statistic can be rewritten as the
+maximum value of a finite set of numbers:
+
+$$
+\begin{split}
       T_{n,m} = \max_{i=0,\dots,n} \Bigg[
       &\max_{j=0,\dots,m} \left| \frac{i}{n} - \frac{j}{m} \right| 
         \mathbbm{1}\!\left\{Y^{(j)} \le X^{(i)} < Y^{(j+1)}\right\}, \\ 
       &\max_{k=j+1, \dots, m} \left| \frac{i}{n} - \frac{k}{m} \right| 
         \mathbbm{1}\!\left\{Y^{(k)} \le X^{(i+1)}\right\} \Bigg]
-    \end{split}$$ where $X^{(i)}$ is the $i^\text{th}$ value in the
+    \end{split}
+$$
+
+where $X^{(i)}$ is the $i^\text{th}$ value in the
 ordered set of data $X^{(1)} \le \cdots \le X^{(n)}$. The values
 $X^{(0)}, Y^{(0)} \coloneqq -\infty$ are prepended to the otherwise
 finite realizations to simplify the computation. ◻
@@ -190,7 +232,6 @@ def _ks_2samp(X, Y):
 
     return Tv, js
 
-
 def _rank(A, k):
     """Return the number of keys in `A` strictly less than `k`."""
     assert all(A == sorted(A))
@@ -211,7 +252,7 @@ An example two-sample KS-test is shown in
 Figure <a href="#fig:ks_test" data-reference-type="ref" data-reference="fig:ks_test">2</a>.
 
 <figure>
-<embed src="ks_test.pdf" id="fig:ks_test" style="width:90.0%" /><figcaption aria-hidden="true">The empirical cdfs of two independent random samples from <span class="math inline">𝒩(0,1)</span> and <span class="math inline">𝒩(0,2)</span>. The test statistic <span class="math inline"><em>T</em><sub><em>n</em>, <em>m</em></sub></span> is shown by the double arrow.</figcaption>
+<embed src="ks_test.pdf" id="fig:ks_test" style="width:90.0%" /><figcaption aria-hidden="true">The empirical cdfs of two independent random samples from <span class="math inline">\(\mathcal{N}\left( 0, 1 \right)\)</span> and <span class="math inline">\(\mathcal{N}\left( 0, 2 \right)\)</span>. The test statistic <span class="math inline">\(T_{n,m}\)</span> is shown by the double arrow.</figcaption>
 </figure>
 
 ### The Null Hypothesis
@@ -219,7 +260,9 @@ Figure <a href="#fig:ks_test" data-reference-type="ref" data-reference="fig:ks_
 <div class="prop">
 
 **Proposition 3**. *If $H_0$ is true, then
-$$T_{n,m} = \sup_{0 \le x \le 1} \left| \frac{1}{n}\sum_{i=1}^{n} \mathbbm{1}\!\left\{U_i \le x\right\}
+
+$$
+T_{n,m} = \sup_{0 \le x \le 1} \left| \frac{1}{n}\sum_{i=1}^{n} \mathbbm{1}\!\left\{U_i \le x\right\}
 - \frac{1}{m}\sum_{j=1}^{m} \mathbbm{1}\!\left\{V_j \le x\right\} \right|.$$*
 
 </div>
@@ -228,20 +271,47 @@ $$T_{n,m} = \sup_{0 \le x \le 1} \left| \frac{1}{n}\sum_{i=1}^{n} \mathbbm{1}\!\
 
 *Proof.*
 By <a href="#eq:F_n" data-reference-type="eqref" data-reference="eq:F_n">[eq:F_n]</a> and <a href="#eq:G_m" data-reference-type="eqref" data-reference="eq:G_m">[eq:G_m]</a>,
-$$\label{eq:Tnm_supt}
-    T_{n,m} = \sup_{t \in \mathbb{R}} \left| \frac{1}{n}\sum_{i=1}^{n} \mathbbm{1}\!\left\{X_i \le t\right\} - \frac{1}{m}\sum_{j=1}^{m} \mathbbm{1}\!\left\{Y_j \le t\right\} \right|.$$
+
+$$
+\label{eq:Tnm_supt}
+    T_{n,m} = \sup_{t \in \mathbb{R}} \left| \frac{1}{n}\sum_{i=1}^{n} \mathbbm{1}\!\left\{X_i \le t\right\} - \frac{1}{m}\sum_{j=1}^{m} \mathbbm{1}\!\left\{Y_j \le t\right\} \right|.
+$$
+
 To show the proposition is true, we make a change of variable. Let
-$$x = F(t).$$ Then, $$t \in \mathbb{R}\implies x \in [0, 1].$$ Since $F$
-and $G$ are continuous and monotonically increasing, $$\begin{aligned}
+
+$$
+x = F(t).
+$$
+
+Then,
+
+$$
+t \in \mathbb{R}\implies x \in [0, 1].
+$$
+
+Since $F$
+and $G$ are continuous and monotonically increasing,
+
+$$
+\begin{aligned}
 {3}
     X_i \le t &\iff F(X_i) \le F(t) \\
               &\iff U_i \le x &\quad&\text{(definition)}.
-  \end{aligned}$$ Similarly, $$\begin{aligned}
+  \end{aligned}
+$$
+
+Similarly,
+
+$$
+\begin{aligned}
 {3}
     Y_i \le t &\iff G(Y_i) \le G(t) \\
               &\iff G(Y_i) \le F(t) &\quad&\text{(under $H_0$)} \\
               &\iff V_i \le x &\quad&\text{(definition)}.
-  \end{aligned}$$ Substitution of these expressions
+  \end{aligned}
+$$
+
+Substitution of these expressions
 into <a href="#eq:Tnm_supt" data-reference-type="eqref" data-reference="eq:Tnm_supt">[eq:Tnm_supt]</a>
 completes the proof. ◻
 
@@ -259,7 +329,10 @@ on $[0, 1]$.*
 
 <div class="proof">
 
-*Proof.* $$\begin{aligned}
+*Proof.*
+
+$$
+\begin{aligned}
 {3}
     \mathbb{P}\left[U_i \le t\right] &= \mathbb{P}\left[F(X_i) \le t\right] \\
                      &= \mathbb{P}\left[F(X_1) \le t\right] &\quad&\text{(i.i.d.)} \\
@@ -291,12 +364,17 @@ distributions of the samples.
 
 Let $\alpha \in (0, 1)$ and $q_\alpha$ be the $(1 - \alpha)$-quantile of
 the distribution of $T_{n,m}$ under $H_0$. The quantile $q_\alpha$ is
-given by $$\begin{aligned}
+given by
+
+$$
+\begin{aligned}
   q_\alpha &= F^{-1}(1-\alpha) \\
            &= \inf\{x \colon F(x) \ge 1 - \alpha\} \\
            &\approx \min\{x \colon F_n(x) \ge 1 - \alpha\}, \quad n < \infty \\
            \implies q_\alpha \approx \hat{q}_\alpha &= \min_i \left\{
-               T_{n,m}^{(i)} \colon \tfrac{i}{M} \ge 1 - \alpha \right\}\end{aligned}$$
+               T_{n,m}^{(i)} \colon \tfrac{i}{M} \ge 1 - \alpha \right\}\end{aligned}
+$$
+
 where $M \in \mathbb{N}$ is large, and $T_{n,m}^{(i)}$ is the
 $i^\text{th}$ value in a sorted sample of $M$ test statistics. Thus,
 $q_\alpha$ can be approximated by choosing $i = \ceil{M(1 - \alpha)}$.
@@ -310,7 +388,11 @@ $\mathcal{N}\left( 0, 1 \right)$. $T_v^{(i)} \gets$ $T_{vs} \gets$
 $j \gets \ceil*{M(1 - \alpha)}$ $T_{vs}^{(j)}$
 
 A plot of the distribution of
-$$\frac{T_{n,m}^M - \overline{T}_{n,m}^M}{\sqrt{\operatorname{Var}\left(T_{n,m}^M\right)}}$$
+
+$$
+\frac{T_{n,m}^M - \overline{T}_{n,m}^M}{\sqrt{\operatorname{Var}\left(T_{n,m}^M\right)}}
+$$
+
 is shown in
 Figure <a href="#fig:Tnm" data-reference-type="ref" data-reference="fig:Tnm">3</a>
 in comparison to a standard normal. The test statistic distribution is
@@ -321,7 +403,7 @@ Algorithm <a href="#alg:ks_q" data-reference-type="ref" data-reference="alg:ks_
 to estimate the quantiles.
 
 <figure>
-<embed src="ks_dist.pdf" id="fig:Tnm" style="width:95.0%" /><figcaption aria-hidden="true">Empirical distribution of samples of the test statistic <span class="math inline"><em>T</em><sub><em>n</em>, <em>m</em></sub></span>.</figcaption>
+<embed src="ks_dist.pdf" id="fig:Tnm" style="width:95.0%" /><figcaption aria-hidden="true">Empirical distribution of samples of the test statistic <span class="math inline">\(T_{n,m}\)</span>.</figcaption>
 </figure>
 
 ### The Hypothesis Test
@@ -329,12 +411,21 @@ to estimate the quantiles.
 Given the aproximation for $\hat{q}_\alpha$ for $q_\alpha$ from
 Algorithm <a href="#alg:ks_q" data-reference-type="ref" data-reference="alg:ks_q">[alg:ks_q]</a>,
 we define a test with non-asymptotic level $\alpha$ for $H_0$ vs. $H_1$:
-$$\delta_\alpha = \mathbbm{1}\!\left\{T_{n,m} > \hat{q}_\alpha^{(n, M)}\right\}$$
+
+$$
+\delta_\alpha = \mathbbm{1}\!\left\{T_{n,m} > \hat{q}_\alpha^{(n, M)}\right\}
+$$
+
 where $T_{n,m}$ is found by
 Algorithm <a href="#alg:ks_stat" data-reference-type="ref" data-reference="alg:ks_stat">[alg:ks_stat]</a>.
-The p-value for this test is $$\begin{aligned}
+The p-value for this test is
+
+$$
+\begin{aligned}
   \text{p-value} &\coloneqq \mathbb{P}\left[Z \ge T_{n,m}\right] \\
-  &\approx \frac{\#\{j = 1, \dots, M \colon T_{n,m}^{(j)} \ge T_{n,m}\}}{M}\end{aligned}$$
+  &\approx \frac{\#\{j = 1, \dots, M \colon T_{n,m}^{(j)} \ge T_{n,m}\}}{M}\end{aligned}
+$$
+
 where $Z$ is a random variable distributed as $T_{n,m}$.
 
 # Aside: Homework 6, Problem 3 – Test of Independence for Bernoulli Random Variables
@@ -355,10 +446,17 @@ $r = \mathbb{P}\left[X=1, Y=1\right]$.
 <div class="proof">
 
 *Proof.* Two random variables are independent iff
-$$\mathbb{P}\left[X \cap Y\right] = \mathbb{P}\left[X\right]\mathbb{P}\left[Y\right] \label{eq:indep}
-    % \iff \Prob{X} = \frac{\Prob{X,Y}}{\Prob{Y}} = \Prob{X | Y}$$ By
+
+$$
+\mathbb{P}\left[X \cap Y\right] = \mathbb{P}\left[X\right]\mathbb{P}\left[Y\right] \label{eq:indep}
+    % \iff \Prob{X} = \frac{\Prob{X,Y}}{\Prob{Y}} = \Prob{X | Y}
+$$
+
+By
 the given definition of the Bernoulli random variables,
-$$\begin{aligned}
+
+$$
+\begin{aligned}
     \mathbb{P}\left[X \cap Y\right] &= \mathbb{P}\left[X, Y\right] = \mathbb{P}\left[X=1, Y=1\right] = r \\
     \mathbb{P}\left[X\right] &= \mathbb{P}\left[X=1\right] = p \\
     \mathbb{P}\left[Y\right] &= \mathbb{P}\left[Y=1\right] = q \\
@@ -377,10 +475,14 @@ whether $X \perp \!\!\! \perp Y$, *i.e. *whether $r = pq$.
 
 ### Estimators of $p, q, r$
 
-Define the estimators: $$\begin{aligned}
+Define the estimators:
+
+$$
+\begin{aligned}
   \hat{p}&= \frac{1}{n}\sum_{i=1}^{n} X_i, \\
   \hat{q}&= \frac{1}{n}\sum_{i=1}^{n} Y_i, \\
-  \hat{r}&= \frac{1}{n}\sum_{i=1}^{n} X_i Y_i.\end{aligned}$$
+  \hat{r}&= \frac{1}{n}\sum_{i=1}^{n} X_i Y_i.\end{aligned}
+$$
 
 <div class="prop">
 
@@ -401,34 +503,52 @@ $p$.
 
 **Theorem 1** (Weak Law of Large Numbers). *If the sequence of random
 variables $X_1, \dots, X_n$ are i.i.d., then
-$$\frac{1}{n}\sum_{i=1}^{n} X_i \xrightarrow[n \to \infty]{\mathbb{P}}\mathbb{E}\left[X\right].$$*
+
+$$
+\frac{1}{n}\sum_{i=1}^{n} X_i \xrightarrow[n \to \infty]{\mathbb{P}}\mathbb{E}\left[X\right].$$*
 
 </div>
 
-The expectation of $X$ is given by $$\begin{aligned}
+The expectation of $X$ is given by
+
+$$
+\begin{aligned}
 {3}
     \mathbb{E}\left[X\right] &= \mathbb{E}\left[\mathop{\mathrm{Ber}}(p)\right] &\quad&\text{(given)} \\
           &= p &\quad&\text{(definition of Bernoulli r.v.)} \\
     \therefore \frac{1}{n}\sum_{i=1}^{n} X_i &\xrightarrow[n \to \infty]{\mathbb{P}}p &\quad&\text{(LLN)} \\
     \implies \hat{p}&\xrightarrow[n \to \infty]{\mathbb{P}}p.
-  \end{aligned}$$ Likewise
+  \end{aligned}
+$$
+
+Likewise
 $\hat{q}\xrightarrow[n \to \infty]{\mathbb{P}}q$.
 
 To show that $\hat{r}$ converges to $r$, let $R \coloneqq X Y$ be a
 Bernoulli random variable with parameter
 $r = \mathbb{P}\left[X=1, Y=1\right]$, so that the estimator
-$$\label{eq:rhat}
-    \hat{r}= \frac{1}{n}\sum_{i=1}^{n} X_i Y_i = \frac{1}{n}\sum_{i=1}^{n} R_i.$$
+
+$$
+\label{eq:rhat}
+    \hat{r}= \frac{1}{n}\sum_{i=1}^{n} X_i Y_i = \frac{1}{n}\sum_{i=1}^{n} R_i.
+$$
+
 Note that the values of $R_i$ *are* i.i.d. since each pair $(X_i, Y_i)$
 are i.i.d., even though $X_i$ and $Y_j$ may not be independent for
 $i \ne j$. As before, we apply the Law of Large Numbers to the average
-of $R_i$’s. The expectation of $R$ is $$\begin{aligned}
+of $R_i$’s. The expectation of $R$ is
+
+$$
+\begin{aligned}
 {3}
     \mathbb{E}\left[R\right] &= \mathbb{E}\left[\mathop{\mathrm{Ber}}(r)\right] &\quad&\text{(definition)} \\
           &= r &\quad&\text{(definition of Bernoulli r.v.)} \\
     \therefore \frac{1}{n}\sum_{i=1}^{n} R_i &\xrightarrow[n \to \infty]{\mathbb{P}}r &\quad&\text{(LLN)} \\
     \implies \hat{r}&\xrightarrow[n \to \infty]{\mathbb{P}}r.
-  \end{aligned}$$ Thus, each estimator $(\hat{p}, \hat{q}, \hat{r})$
+  \end{aligned}
+$$
+
+Thus, each estimator $(\hat{p}, \hat{q}, \hat{r})$
 converges to its respective parameter $(p, q, r)$. ◻
 
 </div>
@@ -439,7 +559,9 @@ converges to its respective parameter $(p, q, r)$. ◻
 
 **Proposition 7**. *The vector of estimators
 $(\hat{p}, \hat{q}, \hat{r})$ is asymptotically normal, *i.e. *
-$$\sqrt{n} ((\hat{p}, \hat{q}, \hat{r}) - (p, q, r)) 
+
+$$
+\sqrt{n} ((\hat{p}, \hat{q}, \hat{r}) - (p, q, r)) 
         \xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, \operatorname{Cov}\left((\hat{p}, \hat{q}, \hat{r})\right) \right).$$*
 
 </div>
@@ -452,21 +574,33 @@ normal, we employ the Central Limit Theorem (CLT).
 **Theorem 2** (Central Limit Theorem). *Let $X_1, \dots, X_n$ be a
 sequence of i.i.d. random vectors $X_i \in \mathbb{R}^k$, and
 $\overline{X}_n= \frac{1}{n}\sum_{i=1}^{n} X_i$. Then,
-$$\sqrt{n}(\overline{X}_n- \mathbb{E}\left[X\right]) \xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, \Sigma \right).$$
+
+$$
+\sqrt{n}(\overline{X}_n- \mathbb{E}\left[X\right]) \xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, \Sigma \right).
+$$
+
 where $\Sigma$ is the $k$-by-$k$ matrix
 $\operatorname{Cov}\left(X\right)$.*
 
 </div>
 
-By the CLT, $$\label{eq:CLT}
-  \sqrt{n} ((\hat{p}, \hat{q}, \hat{r}) - \mathbb{E}\left[(\hat{p}, \hat{q}, \hat{r})\right]) \xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, \Sigma \right)$$
+By the CLT,
+
+$$
+\label{eq:CLT}
+  \sqrt{n} ((\hat{p}, \hat{q}, \hat{r}) - \mathbb{E}\left[(\hat{p}, \hat{q}, \hat{r})\right]) \xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, \Sigma \right)
+$$
+
 where $\Sigma$ is the 3-by-3 symmetric covariance matrix, defined as
-$$\Sigma \coloneqq 
+
+$$
+\Sigma \coloneqq 
   \begin{bmatrix}
     \operatorname{Var}\left(\hat{p}\right) & \operatorname{Cov}\left(\hat{p}, \hat{q}\right) & \operatorname{Cov}\left(\hat{p}, \hat{r}\right) \\
     \cdot & \operatorname{Var}\left(\hat{q}\right) & \operatorname{Cov}\left(\hat{q}, \hat{r}\right) \\
     \cdot & \cdot & \operatorname{Var}\left(\hat{r}\right)
-  \end{bmatrix}.$$
+  \end{bmatrix}.
+$$
 
 We first need to determine the expectations of the estimators.
 
@@ -479,7 +613,10 @@ $\mathbb{E}\left[\hat{p}\right] = p$.*
 
 <div class="proof">
 
-*Proof.* $$\begin{aligned}
+*Proof.*
+
+$$
+\begin{aligned}
 {3}
     \mathbb{E}\left[\hat{p}\right] &= \mathbb{E}\left[\frac{1}{n}\sum_{i=1}^{n} X_i\right] &\quad&\text{(definition)} \\
               &= \frac{1}{n} \sum_{i=1}^{n} \mathbb{E}\left[X_i\right] &\quad&\text{(linearity of expectation)} \\
@@ -507,14 +644,20 @@ $\operatorname{Var}\left(\hat{p}\right) = \frac{1}{n} p(1 - p)$.*
 
 <div class="proof">
 
-*Proof.* Using the definition of $\hat{p}$, $$\begin{aligned}
+*Proof.* Using the definition of $\hat{p}$,
+
+$$
+\begin{aligned}
 {3}
     \operatorname{Var}\left(\hat{p}\right) &= \operatorname{Var}\left(\frac{1}{n}\sum_{i=1}^{n} X_i\right) &\quad&\text{(definition)} \\
                 &= \frac{1}{n^2}\operatorname{Var}\left(\sum_{i=1}^{n} X_i\right) &\quad&\text{(variance rule)} \\
                 &= \frac{1}{n^2}\sum_{i=1}^{n}\operatorname{Var}\left(X_i\right) &\quad&\text{(i.i.d.)} \\
                 &= \frac{1}{n^2}n\operatorname{Var}\left(X\right) &\quad&\text{(i.i.d.)} \\
    \therefore \operatorname{Var}\left(\hat{p}\right) &= \frac{1}{n} p(1-p) &\quad&\text{(variance of $\mathop{\mathrm{Ber}}(p)$)}
-  \end{aligned}$$ Likewise,
+  \end{aligned}
+$$
+
+Likewise,
 $\operatorname{Var}\left(\hat{q}\right) = \frac{1}{n} q(1 - q)$, and
 $\operatorname{Var}\left(\hat{r}\right) = \frac{1}{n} r(1 - r)$. ◻
 
@@ -529,7 +672,10 @@ by $\operatorname{Cov}\left(\hat{p}, \hat{q}\right) = r - pq$.*
 
 <div class="proof">
 
-*Proof.* $$\begin{aligned}
+*Proof.*
+
+$$
+\begin{aligned}
 {3}
     \operatorname{Cov}\left(\hat{p}, \hat{q}\right) &= \operatorname{Cov}\left(\frac{1}{n}\sum_{i=1}^{n} X_i, \frac{1}{n}\sum_{i=1}^{n} Y_i\right) \\
     &= \frac{1}{n^2} \operatorname{Cov}\left(\sum_{i=1}^{n} X_i, \sum_{i=1}^{n} Y_i\right) &\quad&\text{(covariance property)} \\
@@ -552,7 +698,10 @@ by $\operatorname{Cov}\left(\hat{p}, \hat{r}\right) = r(1 - p)$.*
 
 <div class="proof">
 
-*Proof.* $$\begin{aligned}
+*Proof.*
+
+$$
+\begin{aligned}
 {3}
     \operatorname{Cov}\left(\hat{p}, \hat{r}\right) &= \operatorname{Cov}\left(\frac{1}{n}\sum_{i=1}^{n} X_i, \frac{1}{n}\sum_{i=1}^{n} R_i\right) \\
     &= \frac{1}{n^2} \operatorname{Cov}\left(\sum_{i=1}^{n} X_i, \sum_{i=1}^{n} R_i\right) &\quad&\text{(covariance property)} \\
@@ -572,13 +721,17 @@ by $\operatorname{Cov}\left(\hat{p}, \hat{r}\right) = r(1 - p)$.*
 
 Similarly, $\operatorname{Cov}\left(\hat{q}, \hat{r}\right) = r(1 - q)$.
 
-The entire asymptotic covariance matrix is then $$\label{eq:sigma}
+The entire asymptotic covariance matrix is then
+
+$$
+\label{eq:sigma}
   \Sigma =
   \begin{bmatrix}
     p(1-p) & r - pq & r(1-p) \\
     \cdot & q(1-q) & r(1-q) \\
     \cdot & \cdot & r(1-r)
-  \end{bmatrix}.$$
+  \end{bmatrix}.
+$$
 
 Since we have determined the expectation
 $\mathbb{E}\left[(\hat{p}, \hat{q}, \hat{r})\right] = (p, q,
@@ -593,7 +746,9 @@ asymptotically normal. 0◻
 <div id="prop:delta" class="prop">
 
 **Proposition 12**.
-*$$\sqrt{n}\left((\hat{r}- \hat{p}\hat{q}) - (r - pq)\right) \xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, V \right)$$
+*$$\sqrt{n}\left((\hat{r}- \hat{p}\hat{q}) - (r - pq)\right) \xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, V \right)
+$$
+
 where $V$ depends only on $p$, $q$, and $r$.*
 
 </div>
@@ -601,28 +756,58 @@ where $V$ depends only on $p$, $q$, and $r$.*
 <div class="proof">
 
 *Proof.* Let $\hat{\theta}$ and $\theta$ be vectors in $\mathbb{R}^3$
-$$\hat{\theta} = \begin{bmatrix} \hat{p}\\ \hat{q}\\ \hat{r}\end{bmatrix} \text{, and } 
-    \theta = \begin{bmatrix} p \\ q \\ r \end{bmatrix}.$$ From our proof
+
+$$
+\hat{\theta} = \begin{bmatrix} \hat{p}\\ \hat{q}\\ \hat{r}\end{bmatrix} \text{, and } 
+    \theta = \begin{bmatrix} p \\ q \\ r \end{bmatrix}.
+$$
+
+From our proof
 of
 Proposition <a href="#prop:normality_pqr" data-reference-type="ref" data-reference="prop:normality_pqr">Proposition 7</a>,
-we have $$\begin{aligned}
+we have
+
+$$
+\begin{aligned}
 {3}
     \sqrt{n}(\hat{\theta} - \theta) &\xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, \Sigma \right) &\quad&\text{(CLT)} \\
     \implies \sqrt{n}(g(\hat{\theta}) - g(\theta)) &\xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, \nabla g(\theta)^\top\Sigma
       \nabla g(\theta) \right) &\quad&\text{(Delta method)}
-  \end{aligned}$$ for any differentiable function
+  \end{aligned}
+$$
+
+for any differentiable function
 $g \colon \mathbb{R}^k \to \mathbb{R}$, and $\Sigma$ given by
 Equation <a href="#eq:sigma" data-reference-type="eqref" data-reference="eq:sigma">[eq:sigma]</a>.
-Define the function $$\label{eq:g}
-    g(u, v, w) = w - uv$$ such that $$\begin{aligned}
+Define the function
+
+$$
+\label{eq:g}
+    g(u, v, w) = w - uv
+$$
+
+such that
+
+$$
+\begin{aligned}
     g(\hat{\theta}) &= \hat{r}- \hat{p}\hat{q}, \\
     g(\theta) &= r - pq.
-  \end{aligned}$$ The gradient of $g(\theta)$ is then
-$$\nabla g(u,v,w) = \begin{bmatrix} -v \\ -u \\ 1 \end{bmatrix} 
-    \implies \nabla g(\theta) = \begin{bmatrix} -q \\ -p \\ 1 \end{bmatrix}$$
+  \end{aligned}
+$$
+
+The gradient of $g(\theta)$ is then
+
+$$
+\nabla g(u,v,w) = \begin{bmatrix} -v \\ -u \\ 1 \end{bmatrix} 
+    \implies \nabla g(\theta) = \begin{bmatrix} -q \\ -p \\ 1 \end{bmatrix}
+$$
+
 The asymptotic variance
 $V = \nabla g(\theta)^\top\Sigma \nabla g(\theta)$, which we will now
-show is a function only of the parameters $(p, q, r)$. $$\begin{aligned}
+show is a function only of the parameters $(p, q, r)$.
+
+$$
+\begin{aligned}
 {3}
     V &= \begin{bmatrix} -q & -p & 1 \end{bmatrix} 
     \begin{bmatrix}
@@ -649,15 +834,22 @@ show is a function only of the parameters $(p, q, r)$. $$\begin{aligned}
     \end{split} \\
     \therefore V &= (r - pq)[-q(1 - 2p) - p(1 - 2q) - r] + r(1-p)(1-q) 
     \addtocounter{equation}{1}\tag{\theequation}\label{eq:V}
-  \end{aligned}$$ which is a function only of $(p, q, r)$. ◻
+  \end{aligned}
+$$
+
+which is a function only of $(p, q, r)$. ◻
 
 </div>
 
 ### The Null Hypothesis
 
-Consider the hypotheses $$\begin{aligned}
+Consider the hypotheses
+
+$$
+\begin{aligned}
   H_0 \colon X \perp \!\!\! \perp Y \\
-  H_1 \colon X \centernot\perp \!\!\! \perp Y\end{aligned}$$
+  H_1 \colon X \centernot\perp \!\!\! \perp Y\end{aligned}
+$$
 
 <div id="prop:V_H0" class="prop">
 
@@ -670,15 +862,32 @@ Consider the hypotheses $$\begin{aligned}
 *Proof.* Under $H_0$, $r = pq$. Using the previous expression for $V$,
 Equation <a href="#eq:V" data-reference-type="eqref" data-reference="eq:V">[eq:V]</a>,
 replace $r$ by $pq$ to find
-$$V = (pq - pq)[-q(1 - 2p) - p(1 - 2q) - pq] + pq(1-p)(1-q).$$ The first
-term is identically 0, so $$V = pq(1-p)(1-q). \qedhere$$ ◻
+
+$$
+V = (pq - pq)[-q(1 - 2p) - p(1 - 2q) - pq] + pq(1-p)(1-q).
+$$
+
+The first
+term is identically 0, so
+
+$$
+V = pq(1-p)(1-q). \qedhere$$ ◻
 
 </div>
 
 <div id="prop:Vhat" class="prop">
 
-**Proposition 14**. *Given $$V = pq(1-p)(1-q),$$ a consistent estimator
-is given by $$\hat{V} = \hat{p}\hat{q}(1 - \hat{p})(1 - \hat{q}).$$*
+**Proposition 14**. *Given
+
+$$
+V = pq(1-p)(1-q),
+$$
+
+a consistent estimator
+is given by
+
+$$
+\hat{V} = \hat{p}\hat{q}(1 - \hat{p})(1 - \hat{q}).$$*
 
 </div>
 
@@ -709,7 +918,11 @@ $\hat{V}(\hat{p}, \hat{q}) \xrightarrow[n \to \infty]{\mathbb{P}}V(p, q)$. ◻
 
 **Proposition 15**. *Given $\alpha \in (0, 1)$, we propose the test
 statistic
-$$T_n \coloneqq \frac{\sqrt{n}(\hat{r}- \hat{p}\hat{q})}{\sqrt{\hat{V}}} \xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, 1 \right)$$
+
+$$
+T_n \coloneqq \frac{\sqrt{n}(\hat{r}- \hat{p}\hat{q})}{\sqrt{\hat{V}}} \xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, 1 \right)
+$$
+
 where $\hat{V}$ is given by
 Proposition <a href="#prop:Vhat" data-reference-type="ref" data-reference="prop:Vhat">Proposition 14</a>,
 and $t_{n-1}$ is Student’s $t$-distribution with $n-1$ degrees of
@@ -724,17 +937,27 @@ Proposition <a href="#prop:delta" data-reference-type="ref" data-reference="pro
 gives the distribution of $g(\theta)$ (given by
 Equation <a href="#eq:g" data-reference-type="eqref" data-reference="eq:g">[eq:g]</a>)
 under $H_0$. Assume that $p, q \in (0, 1)$ s.t. $V > 0$.
-$$\begin{aligned}
+
+$$
+\begin{aligned}
 {3}
   \sqrt{n}\left((\hat{r}- \hat{p}\hat{q}) - (r - pq)\right) &\xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, V \right)
   &\quad&\text{(Proposition~\ref{prop:delta})} \\
   \sqrt{n}(\hat{r}- \hat{p}\hat{q}) &\xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, V \right) &\quad&\text{($r = pq$ under $H_0$)} \\
   \sqrt{n}\frac{(\hat{r}- \hat{p}\hat{q})}{\sqrt{V}} &\xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, 1 \right) \addtocounter{equation}{1}\tag{\theequation}
-  \label{eq:Tn_norm}\end{aligned}$$ The asymptotic variance $V$,
+  \label{eq:Tn_norm}\end{aligned}
+$$
+
+The asymptotic variance $V$,
 however, is unknown, so we divide the estimator by
 $\sqrt{\frac{\hat{V}}{V}}$ to get an expression that will evaluate to
-our desired test statistic $$\label{eq:t1}
-  T_n = \frac{\displaystyle \sqrt{n}\frac{(\hat{r}- \hat{p}\hat{q})}{\sqrt{V}}}{\displaystyle \sqrt{\frac{\hat{V}}{V}}}$$
+our desired test statistic
+
+$$
+\label{eq:t1}
+  T_n = \frac{\displaystyle \sqrt{n}\frac{(\hat{r}- \hat{p}\hat{q})}{\sqrt{V}}}{\displaystyle \sqrt{\frac{\hat{V}}{V}}}
+$$
+
 Given this expression, we can determine the distribution of $T_n$.
 Equation <a href="#eq:Tn_norm" data-reference-type="eqref" data-reference="eq:Tn_norm">[eq:Tn_norm]</a>
 shows that the numerator is a standard normal random variable.
@@ -748,23 +971,38 @@ distribution of the denominator.
 i.i.d. random variables drawn from the distribution
 $\mathcal{N}\left( \mu, \sigma^2 \right)$, and
 $S_n^2 \coloneqq \sum_{i=1}^{n} (X_i - \overline{X}_n)^2$, then
-$$\overline{X}_n\perp \!\!\! \perp S_n,$$ and
-$$\frac{n S_n^2}{\sigma^2} \sim \chi^2_{n-1}.$$*
+
+$$
+\overline{X}_n\perp \!\!\! \perp S_n,
+$$
+
+and
+
+$$
+\frac{n S_n^2}{\sigma^2} \sim \chi^2_{n-1}.$$*
 
 </div>
 
 Since $\hat{V}$ and $V$ describe the sample variance and variance of a
 (asymptotically) normal distribution, $T_n$ is asymptotically
 characterized by
-$$T_n \xrightarrow[n \to \infty]{(d)}\frac{\displaystyle \mathcal{N}\left( 0, 1 \right)}{\displaystyle \sqrt{\frac{\chi^2_{n-1}}{n}}}$$
+
+$$
+T_n \xrightarrow[n \to \infty]{(d)}\frac{\displaystyle \mathcal{N}\left( 0, 1 \right)}{\displaystyle \sqrt{\frac{\chi^2_{n-1}}{n}}}
+$$
+
 which is the definition of a random variable drawn from *Student’s
 T-distribution* with $n-1$ degrees of freedom. In this case, however,
 the normality of the underlying random variables is asymptotic, so the
 $t_{n-1}$ distribution approaches a standard normal distribution
-$$\begin{aligned}
+
+$$
+\begin{aligned}
   T_n &\xrightarrow[n \to \infty]{(d)}t_{n-1} \\
   t_{n-1} &\xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, 1 \right) \addtocounter{equation}{1}\tag{\theequation}\label{eq:t_to_N} \\
-  \implies T_n &\xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, 1 \right) \qedhere\end{aligned}$$
+  \implies T_n &\xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, 1 \right) \qedhere\end{aligned}
+$$
+
 A proof of
 Equation <a href="#eq:t_to_N" data-reference-type="eqref" data-reference="eq:t_to_N">[eq:t_to_N]</a>
 is given in . ◻
@@ -772,8 +1010,18 @@ is given in . ◻
 </div>
 
 Given the test statistic $T_n$, define the rejection region
-$$R_\psi = \left\{ \hat{\theta} \colon |T_n| > q_{\alpha/2} \right\}$$
-where $$q_{\alpha/2} = \Phi^{-1}\left(1 - \frac{\alpha}{2}\right)$$ is
+
+$$
+R_\psi = \left\{ \hat{\theta} \colon |T_n| > q_{\alpha/2} \right\}
+$$
+
+where
+
+$$
+q_{\alpha/2} = \Phi^{-1}\left(1 - \frac{\alpha}{2}\right)
+$$
+
+is
 the $\left(1-\frac{\alpha}{2}\right)$-quantile of the standard normal
 $\mathcal{N}\left( 0, 1 \right)$ distribution.
 
@@ -795,25 +1043,50 @@ Table <a href="#tab:tab1" data-reference-type="ref" data-reference="tab:tab1">1
 
 </div>
 
-The values of our estimators are as follows: $$\begin{aligned}
+The values of our estimators are as follows:
+
+$$
+\begin{aligned}
   \hat{p}&= \frac{\text{\# Happy}}{N} = \frac{384}{1000} = 0.384 \\
   \hat{q}&= \frac{\text{\# In a Relationship}}{N} = \frac{506}{1000} = 0.506 \\
-  \hat{r}&= \frac{\text{\# Happy} \cap \text{\# In a Relationship}}{N} = \frac{205}{1000} = 0.205.\end{aligned}$$
+  \hat{r}&= \frac{\text{\# Happy} \cap \text{\# In a Relationship}}{N} = \frac{205}{1000} = 0.205.\end{aligned}
+$$
+
 The estimate of the asymptotic variance of the test statistic is
-$$\hat{V} = \hat{p}\hat{q}(1-\hat{p})(1-\hat{q}) = (0.384)(0.506)(1 - 0.384)(1 - 0.506)
-  = 0.05913,$$ giving the test statistic
-$$T_n = \frac{\sqrt{n}(\hat{r}- \hat{p}\hat{q})}{\sqrt{\hat{V}}}
-  = \frac{\sqrt{1000}(0.205 - 0.384\cdot0.506)}{\sqrt{0.05913}} = 1.391.$$
+
+$$
+\hat{V} = \hat{p}\hat{q}(1-\hat{p})(1-\hat{q}) = (0.384)(0.506)(1 - 0.384)(1 - 0.506)
+  = 0.05913,
+$$
+
+giving the test statistic
+
+$$
+T_n = \frac{\sqrt{n}(\hat{r}- \hat{p}\hat{q})}{\sqrt{\hat{V}}}
+  = \frac{\sqrt{1000}(0.205 - 0.384\cdot0.506)}{\sqrt{0.05913}} = 1.391.
+$$
+
 The standard normal quantile at $\alpha = 0.05$ is $q_{\alpha/2}
 = \Phi^{-1}\left(1
 - \frac{\alpha}{2}\right) = 1.96$, so the test result is
-$$|T_n| = 1.391 < q_{\alpha/2} = 1.96$$ so we *fail to reject $H_0$ at
-the 5% level*. The $p$-value of the test is $$\begin{aligned}
+
+$$
+|T_n| = 1.391 < q_{\alpha/2} = 1.96
+$$
+
+so we *fail to reject $H_0$ at
+the 5% level*. The $p$-value of the test is
+
+$$
+\begin{aligned}
   \text{$p$-value} &\coloneqq \mathbb{P}\left[Z > |T_n|\right] &\quad&\text{($Z \sim \mathcal{N}\left( 0, 1 \right)$)}  \\
                    &= \mathbb{P}\left[Z \le |T_n|\right] &\quad&\text{(symmetry)} \\
                    &= \mathbb{P}\left[Z \le -T_n\right] + \mathbb{P}\left[Z > T_n\right] \\
                    &= 2\Phi(-|T_n|) \\
-  \implies \text{$p$-value} &= 0.1642.\end{aligned}$$ In other words,
+  \implies \text{$p$-value} &= 0.1642.\end{aligned}
+$$
+
+In other words,
 the lowest level at which we could reject the null hypothesis is at
 $\alpha = \text{$p$-value} = 0.1642 = 16.42\%$.
 
@@ -823,40 +1096,66 @@ $\alpha = \text{$p$-value} = 0.1642 = 16.42\%$.
 
 **Proposition 16**. *A $t$-distribution with $n$ degrees of freedrom
 approaches a standard normal distribution as $n$ approaches infinity:
-$$t_n \xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, 1 \right).$$*
+
+$$
+t_n \xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, 1 \right).$$*
 
 </div>
 
 *Proof.* Student’s $t$-distribution with $\nu$ degrees of freedom is
 defined as the distribution of the random variable $T$ such that
-$$t_{\nu} \sim T = \frac{\displaystyle Z}{\displaystyle \sqrt{\frac{V}{\nu}}}$$
+
+$$
+t_{\nu} \sim T = \frac{\displaystyle Z}{\displaystyle \sqrt{\frac{V}{\nu}}}
+$$
+
 where $Z \sim \mathcal{N}\left( 0, 1 \right)$, $V \sim \chi^2_{\nu}$,
 and $Z \perp \!\!\! \perp V$.
 
 Let $X_1, \dots, X_n \sim \mathcal{N}\left( \mu, \sigma^2 \right)$ be a
 sequence of i.i.d. random variables. Define the sample mean and sample
-variance $$\begin{aligned}
+variance
+
+$$
+\begin{aligned}
   \overline{X}_n&\coloneqq \frac{1}{n}\sum_{i=1}^{n} X_i \\
-  S_n^2 &\coloneqq \frac{1}{n}\sum_{i=1}^{n} (X_i - \overline{X}_n)^2.\end{aligned}$$
-Let the random variables $$\begin{aligned}
+  S_n^2 &\coloneqq \frac{1}{n}\sum_{i=1}^{n} (X_i - \overline{X}_n)^2.\end{aligned}
+$$
+
+Let the random variables
+
+$$
+\begin{aligned}
   Z &= \frac{\sqrt{n}(\overline{X}_n- \mu)}{\sigma} \\
-  V &= \frac{n S_n^2}{\sigma^2}.\end{aligned}$$ such that
+  V &= \frac{n S_n^2}{\sigma^2}.\end{aligned}
+$$
+
+such that
 $Z \sim \mathcal{N}\left( 0, 1 \right)$ by the Central Limit Theorem,
 and $V \sim
 \chi^2_{n-1}$ by Cochran’s Theorem (which also shows that
 $Z \perp \!\!\! \perp V$). Then, the $t$-distribution is *pivotal*
-$$t_{n-1} = \frac{\displaystyle Z}{\displaystyle \sqrt{\frac{V}{n-1}}}.$$
+
+$$
+t_{n-1} = \frac{\displaystyle Z}{\displaystyle \sqrt{\frac{V}{n-1}}}.
+$$
 
 <div class="lemma">
 
 **Lemma 5**. *The sample variance converges in probability to the
-variance, $$S_n^2 \xrightarrow[n \to \infty]{\mathbb{P}}\sigma^2.$$*
+variance,
+
+$$
+S_n^2 \xrightarrow[n \to \infty]{\mathbb{P}}\sigma^2.$$*
 
 </div>
 
 <div class="proof">
 
-*Proof.* $$\begin{aligned}
+*Proof.*
+
+$$
+\begin{aligned}
 {3}
     S_n^2 &\coloneqq \frac{1}{n}\sum_{i=1}^{n}(X_i - \overline{X}_n)^2 \\
           &= \frac{1}{n}\sum_{i=1}^{n}(X_i^2 - 2 \overline{X}_nX_i + \overline{X}_n^2) \\
@@ -864,15 +1163,27 @@ variance, $$S_n^2 \xrightarrow[n \to \infty]{\mathbb{P}}\sigma^2.$$*
           &= \frac{1}{n}\sum_{i=1}^{n} X_i^2 - 2 \overline{X}_n\frac{1}{n}\sum_{i=1}^{n} X_i + \overline{X}_n^2  \\
           &= \frac{1}{n}\sum_{i=1}^{n} X_i^2 - 2 \overline{X}_n^2  + \overline{X}_n^2  \\
           &= \frac{1}{n}\sum_{i=1}^{n} X_i^2 - \overline{X}_n^2.
-  \end{aligned}$$ The second term in the expression for $S_n^2$ is
-determined by $$\begin{aligned}
+  \end{aligned}
+$$
+
+The second term in the expression for $S_n^2$ is
+determined by
+
+$$
+\begin{aligned}
 {3}
     \overline{X}_n&\xrightarrow[n \to \infty]{\mathbb{P}}\mathbb{E}\left[X\right] &\quad&\text{(LLN)} \\
     \mathbb{E}\left[X\right] &= \mu &\quad&\text{(given)}. \\
     g(\overline{X}_n) &\xrightarrow[n \to \infty]{\mathbb{P}}g(\mu) &\quad&\text{(CMT)} \\
     \implies \overline{X}_n^2 &\xrightarrow[n \to \infty]{\mathbb{P}}\mu^2.
-  \end{aligned}$$ The first term in the expression for $S_n^2$ is then
-determined by $$\begin{aligned}
+  \end{aligned}
+$$
+
+The first term in the expression for $S_n^2$ is then
+determined by
+
+$$
+\begin{aligned}
 {3}
     \frac{1}{n}\sum_{i=1}^{n} X_i^2 &\xrightarrow[n \to \infty]{\mathbb{P}}\mathbb{E}\left[X^2\right] &\quad&\text{(LLN)} \\
     \operatorname{Var}\left(X\right) &= \mathbb{E}\left[X^2\right] - \mathbb{E}\left[X\right]^2 &\quad&\text{(definition)} \\
@@ -893,7 +1204,9 @@ a constant.
 **Theorem 6** (Slutsky’s Theorem). *If the sequences of random variables
 $X_n~\xrightarrow[n \to \infty]{(d)}~X$, and
 $Y_n~\xrightarrow[n \to \infty]{(d)}~c$, a constant, then
-$$\begin{aligned}
+
+$$
+\begin{aligned}
 {3}
     X_n + Y_n &\xrightarrow[n \to \infty]{(d)}X + c \text{, and} \\
     X_n Y_n &\xrightarrow[n \to \infty]{(d)}cX.
@@ -904,10 +1217,14 @@ $$\begin{aligned}
 Since convergence in probability implies convergence in distribution,
 and $Z
 \xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, 1 \right)$,
-Slutsky’s theorem implies that $$\begin{aligned}
+Slutsky’s theorem implies that
+
+$$
+\begin{aligned}
   t_{n-1} = \frac{\displaystyle Z}{\displaystyle \sqrt{\frac{V}{n-1}}} 
         &\xrightarrow[n \to \infty]{(d)}\frac{\displaystyle \mathcal{N}\left( 0, 1 \right)}{\displaystyle \sqrt{\frac{n}{n-1}}} \\
-        \implies t_{n-1} &\xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, 1 \right).  \qed\end{aligned}$$
+        \implies t_{n-1} &\xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, 1 \right).  \qed\end{aligned}
+$$
 
 # Test of Independence for Samples with Continuous CDF
 
@@ -917,12 +1234,22 @@ each pair is independent, $X_i \perp \!\!\! \perp
 X_j$ for $i \ne j$, we would like to test if
 $X_i \perp \!\!\! \perp Y_i$ for all $i$.
 
-Define the hypotheses $$\begin{aligned}
+Define the hypotheses
+
+$$
+\begin{aligned}
   H_0 &\colon X_1 \perp \!\!\! \perp Y_1 \\
-  H_1 &\colon X_1 \centernot\perp \!\!\! \perp Y_1.\end{aligned}$$ For
+  H_1 &\colon X_1 \centernot\perp \!\!\! \perp Y_1.\end{aligned}
+$$
+
+For
 $i = 1, \dots, n$, let $R_i$ be the *rank* of $X_i$ in the sample $X_1,
 \dots, X_n$. The rank function is defined as
-$$R_i = \operatorname{rank}(X_i) \coloneqq \#\{j \colon X_j \le X_i\}$$
+
+$$
+R_i = \operatorname{rank}(X_i) \coloneqq \#\{j \colon X_j \le X_i\}
+$$
+
 *i.e. *if $X_i = \min_j X_j$, then $R_i = 1$, and if $X_i = \max_j
 X_j$, then $R_j = n$. Similarly, let $Q_i$ be the rank of $Y_i$ in
 $Y_1, \dots, Y_n$.
@@ -955,24 +1282,55 @@ distribution of $(Q_1,
 <div class="proof">
 
 *Proof.* Given the definition of $R_i$
-$$R_i = \operatorname{rank}(X_i) \coloneqq \#\{j \colon X_j \le X_i$$ we
+
+$$
+R_i = \operatorname{rank}(X_i) \coloneqq \#\{j \colon X_j \le X_i
+$$
+
+we
 can determine its distribution. Let
-$$F_n(t) = \frac{1}{n}\sum_{i=1}^{n} \mathbbm{1}\!\left\{X_i \le t\right\}$$
+
+$$
+F_n(t) = \frac{1}{n}\sum_{i=1}^{n} \mathbbm{1}\!\left\{X_i \le t\right\}
+$$
+
 for some $t \in \mathbb{R}$ be the empirical cdf of the sample $X_i$’s.
 We can then rewrite the definition of the rank as
-$$R_i = \sum_{j=1}^{n} \mathbbm{1}\!\left\{X_j \le X_i\right\} = n F_n(X_i).$$
-The cdf of $R_i$, $F_R(t)$ is then $$\begin{aligned}
+
+$$
+R_i = \sum_{j=1}^{n} \mathbbm{1}\!\left\{X_j \le X_i\right\} = n F_n(X_i).
+$$
+
+The cdf of $R_i$, $F_R(t)$ is then
+
+$$
+\begin{aligned}
     \mathbb{P}\left[R_i \le t\right] &= \mathbb{P}\left[n F_n(X_i) \le t\right] \\
                      &= \mathbb{P}\left[X_i \le F_n^{-1}\left(\tfrac{t}{n}\right)\right] \\
                      &= F_n\left(F_n^{-1}\left(\tfrac{t}{n}\right)\right)
-  \end{aligned}$$ Since $F_n$ is a piecewise-constant function,
+  \end{aligned}
+$$
+
+Since $F_n$ is a piecewise-constant function,
 $F_n^{-1}$ does not exist. To avoid ambiguity, define
-$$F_n^{-1}(p) = \inf\{x \colon F_n(x) \ge p\}$$ where $p \in (0, 1)$.
+
+$$
+F_n^{-1}(p) = \inf\{x \colon F_n(x) \ge p\}
+$$
+
+where $p \in (0, 1)$.
 Given the definition of the empirical cdf, its inverse can only take the
 discrete values $X_1, \dots, X_n$, so
-$$F_n\left(F_n^{-1}\left(\tfrac{t}{n}\right)\right) 
-      = \frac{\floor{t}}{n} \quad t \in [0, n]$$ Therefore,
-$$\begin{aligned}
+
+$$
+F_n\left(F_n^{-1}\left(\tfrac{t}{n}\right)\right) 
+      = \frac{\floor{t}}{n} \quad t \in [0, n]
+$$
+
+Therefore,
+
+$$
+\begin{aligned}
     \mathbb{P}\left[R_i \le t\right] &= \frac{\floor{t}}{n} \quad t \in [0, n] \\
                     &= \left\{0, \tfrac{1}{n}, \tfrac{2}{n}, \dots, 1\right\} \\
     \implies F_R(t) &= \left\{0, \tfrac{1}{n}, \tfrac{2}{n}, \dots, 1\right\} \\
@@ -998,16 +1356,29 @@ $(R_1, \dots, R_n) \perp \!\!\! \perp(Q_1, \dots, Q_n)$.*
 <div class="proof">
 
 *Proof.* Under $H_0$, $X_i \perp \!\!\! \perp Y_i$, so
-$$\mathbb{P}\left[X = x \land Y = y\right] = \mathbb{P}\left[X=x\right]\mathbb{P}\left[Y=y\right]$$
+
+$$
+\mathbb{P}\left[X = x \land Y = y\right] = \mathbb{P}\left[X=x\right]\mathbb{P}\left[Y=y\right]
+$$
+
 Since the empirical cdfs $F_n$ and $G_n$ of $X_i$ and $Y_j$,
 respectively, are monotonically increasing, we can apply them to every
-value to get the expression $$\begin{split}
+value to get the expression
+
+$$
+\begin{split}
       &\mathbb{P}\left[nF_n(X) = nF_n(x) \land nG_n(Y) = nG_n(y)\right] \\
       &\quad = \mathbb{P}\left[nF_n(X)=nF_n(x)\right]\mathbb{P}\left[nG_n(Y)=nG_n(y)\right].
-      \end{split}$$ The rank $R_i = n F_n(X_i)$, and, similarly,
+      \end{split}
+$$
+
+The rank $R_i = n F_n(X_i)$, and, similarly,
 $Q_j = n G_n(Y_j)$. The non-random values $nF_n(x)$ and $nG_n(y)$ are
 arbitrary integers in $(0, \dots, n)$, which we denote by $k$ and
-$\ell$. Therefore, $$\begin{aligned}
+$\ell$. Therefore,
+
+$$
+\begin{aligned}
     \mathbb{P}\left[R_i = k \land Q_j = \ell\right] &= \mathbb{P}\left[R_i = k\right]\mathbb{P}\left[Q_j = \ell\right] \\
     \implies R &\perp \!\!\! \perp Q. \qedhere
   \end{aligned}$$ ◻
@@ -1025,7 +1396,11 @@ $Y$’s.
 ## The Test Statistic
 
 Consider the test statistic
-$$T_n \coloneqq \frac{\displaystyle \sum_{i=1}^{n}(R_i - \overline{R}_n)(Q_i - \overline{Q}_n)}{\displaystyle \sqrt{\sum_{i=1}^{n} (R_i - \overline{R}_n)^2 \sum_{i=1}^{n} (Q_i - \overline{Q}_n)^2}}.$$
+
+$$
+T_n \coloneqq \frac{\displaystyle \sum_{i=1}^{n}(R_i - \overline{R}_n)(Q_i - \overline{Q}_n)}{\displaystyle \sqrt{\sum_{i=1}^{n} (R_i - \overline{R}_n)^2 \sum_{i=1}^{n} (Q_i - \overline{Q}_n)^2}}.
+$$
+
 This test statistic is the empirical correlation between the two
 samples. If $H_0$ is true, then $T_n \to 0$. We will now show that $T_n$
 has a much simpler expression.
@@ -1042,14 +1417,21 @@ has a much simpler expression.
 
 *Proof.* Because $R \perp \!\!\! \perp Q$ and $R, Q$ are each
 permutations of $(1, \dots, n)$, the first equality is true.
-$$\begin{aligned}
+
+$$
+\begin{aligned}
 {3}
     \overline{R}_n&\coloneqq \frac{1}{n}\sum_{i=1}^{n} R_i \\
            &= \frac{1}{n}\sum_{i=1}^{n} i &\quad&\text{(permutation of $(1, \dots, n)$)} \\
            &= \frac{1}{n}\sum_{i=1}^{n} Q_i &\quad&\text{($R \perp \!\!\! \perp Q$)} \\
     \implies \overline{R}_n&= \overline{Q}_n.
-  \end{aligned}$$ Recognize the average as a geometric series
-$$\begin{aligned}
+  \end{aligned}
+$$
+
+Recognize the average as a geometric series
+
+$$
+\begin{aligned}
 {3}
     \overline{R}_n&= \frac{1}{n}\sum_{i=1}^{n} \\
            &= \frac{1}{n} \frac{n(n+1)}{2} &\quad&\text{(geometric series)} \\
@@ -1068,7 +1450,10 @@ $$\begin{aligned}
 <div class="proof">
 
 *Proof.* The first equality is true because $R, Q$ are each permutations
-of $(1, \dots, n)$. The sum evaluates to $$\begin{aligned}
+of $(1, \dots, n)$. The sum evaluates to
+
+$$
+\begin{aligned}
 {3}
     \sum_{i=1}^{n} (R_i - \overline{R}_n)^2 &= \sum_{i=1}^{n} (R_i^2 - 2\overline{R}_nR_i + \overline{R}_n^2) \\
     &= \sum_{i=1}^{n} \left(i^2 - 2 i \frac{n+1}{2} + \left(\frac{n+1}{2}\right)^2 \right) \\
@@ -1089,7 +1474,9 @@ of $(1, \dots, n)$. The sum evaluates to $$\begin{aligned}
 <div class="prop">
 
 **Proposition 21**. *The test statistic can be written as
-$$T_n = \frac{12}{n(n^2 - 1)} \sum_{i=1}^{n}R_iQ_i - \frac{3(n+1)}{n-1}.$$*
+
+$$
+T_n = \frac{12}{n(n^2 - 1)} \sum_{i=1}^{n}R_iQ_i - \frac{3(n+1)}{n-1}.$$*
 
 </div>
 
@@ -1098,7 +1485,10 @@ $$T_n = \frac{12}{n(n^2 - 1)} \sum_{i=1}^{n}R_iQ_i - \frac{3(n+1)}{n-1}.$$*
 *Proof.* Plugging the expressions from
 Propositions <a href="#prop:rn1" data-reference-type="ref" data-reference="prop:rn1">Proposition 19</a>
 and <a href="#prop:rn2" data-reference-type="ref" data-reference="prop:rn2">Proposition 20</a>
-into the definition of $T_n$, $$\begin{aligned}
+into the definition of $T_n$,
+
+$$
+\begin{aligned}
     T_n &\coloneqq \frac{\displaystyle \sum_{i=1}^{n}(R_i - \overline{R}_n)(Q_i - \overline{Q}_n)}{\displaystyle \sqrt{\sum_{i=1}^{n} (R_i - \overline{R}_n)^2 \sum_{i=1}^{n} (Q_i - \overline{Q}_n)^2}} \\
     &= \frac{\displaystyle \sum_{i=1}^{n}\left(R_i - \frac{n+1}{2}\right)\left(Q_i - \frac{n+1}{2}\right)}{\displaystyle \sqrt{\frac{n(n^2 - 1)}{12} \frac{n(n^2 - 1)}{12}}} \\
     &= \frac{\displaystyle \sum_{i=1}^{n}\left(R_iQ_i 
@@ -1107,8 +1497,14 @@ into the definition of $T_n$, $$\begin{aligned}
     &= \frac{12}{n(n^2 - 1)} \left[ \sum_{i=1}^{n}R_iQ_i 
     + \left(\frac{n+1}{2}\right)^2  \sum_{i=1}^{n} 1
     - \frac{n+1}{2}\sum_{i=1}^{n}(R_i + Q_i) \right]
-  \end{aligned}$$ The first term matches the first term of the
-proposition. The remaining two terms simplify to $$\begin{aligned}
+  \end{aligned}
+$$
+
+The first term matches the first term of the
+proposition. The remaining two terms simplify to
+
+$$
+\begin{aligned}
     &\phantom{=} \frac{12}{n(n^2 - 1)} \left[ \left(\frac{n+1}{2}\right)^2  \sum_{i=1}^{n} 1
     - \frac{n+1}{2}\sum_{i=1}^{n}(R_i + Q_i) \right]  \\
     &= \frac{12}{n(n^2 - 1)} \left[ \frac{n(n+1)^2}{4} - \frac{n+1}{2}\sum_{i=1}^{n}2i \right] \\
@@ -1128,7 +1524,11 @@ proposition. The remaining two terms simplify to $$\begin{aligned}
 
 **Proposition 22**. *If $H_0 \colon X \perp \!\!\! \perp Y$ is true,
 then
-$$T_n \sim S_n = \frac{12}{n(n^2 - 1)} \sum_{i=1}^{n} R_i' Q_i' - \frac{3(n+1)}{n-1},$$
+
+$$
+T_n \sim S_n = \frac{12}{n(n^2 - 1)} \sum_{i=1}^{n} R_i' Q_i' - \frac{3(n+1)}{n-1},
+$$
+
 where $(R_1', \dots, R_n')$ and $(Q_1', \dots, Q_n')$ are ranks of two
 i.i.d. samples of $\mathcal{U}\left(\left[ 0, 1 \right]\right)$.*
 
@@ -1172,22 +1572,44 @@ $S_{vs} \gets$ $j \gets \ceil*{M(1 - \alpha)}$ $S_{vs}^{(j)}$
 
 ## A Non-Asymptotic Hypothesis Test
 
-Redefine the hypotheses in terms of the test statistic $$\begin{aligned}
+Redefine the hypotheses in terms of the test statistic
+
+$$
+\begin{aligned}
   H_0 &\colon T_n = 0 \\
-  H_1 &\colon T_n \ne 0\end{aligned}$$ with
-$$T_n = \frac{12}{n(n^2 - 1)} \sum_{i=1}^{n}R_iQ_i - \frac{3(n+1)}{n-1}.$$
+  H_1 &\colon T_n \ne 0\end{aligned}
+$$
+
+with
+
+$$
+T_n = \frac{12}{n(n^2 - 1)} \sum_{i=1}^{n}R_iQ_i - \frac{3(n+1)}{n-1}.
+$$
+
 Let $\alpha \in (0, 1)$. The hypothesis test is then
-$$\delta_\alpha = \mathbbm{1}\!\left\{|T_n| \ge \hat{q}_{\alpha/2}^{(n, M)}\right\}$$
+
+$$
+\delta_\alpha = \mathbbm{1}\!\left\{|T_n| \ge \hat{q}_{\alpha/2}^{(n, M)}\right\}
+$$
+
 where $\hat{q}_{\alpha/2}^{(n, M)}$ is the estimated
 $(1 - \alpha)$-quantile of $T_n$. The $p$-value for this test is
-$$\begin{aligned}
+
+$$
+\begin{aligned}
   \text{$p$-value} &\coloneqq \mathbb{P}\left[|Z| \ge |T_n|\right] \\
-  &\approx \frac{\#\{j=1,\dots,M \colon |S_v^{(j)}| \ge |T_n|\}}{M}\end{aligned}$$
+  &\approx \frac{\#\{j=1,\dots,M \colon |S_v^{(j)}| \ge |T_n|\}}{M}\end{aligned}
+$$
+
 where $S_v^{(j)}$ is the $j^{\text{th}}$ sample of $S_n$, as computed in
 Algorithm <a href="#alg:sn_q" data-reference-type="ref" data-reference="alg:sn_q">[alg:sn_q]</a>.
 
 A plot of the distribution of
-$$\frac{S_n^M - \overline{S}_n^M}{\sqrt{\operatorname{Var}\left(S_n^M\right)}}$$
+
+$$
+\frac{S_n^M - \overline{S}_n^M}{\sqrt{\operatorname{Var}\left(S_n^M\right)}}
+$$
+
 is shown in
 Figure <a href="#fig:Sn" data-reference-type="ref" data-reference="fig:Sn">4</a>
 in comparison to a standard normal. The underlying samples are each
@@ -1201,5 +1623,7 @@ Algorithm <a href="#alg:sn_q" data-reference-type="ref" data-reference="alg:sn_
 to estimate the quantiles.
 
 <figure>
-<embed src="indep_dist.pdf" id="fig:Sn" style="width:95.0%" /><figcaption aria-hidden="true">Plot of the distribution of the test statistic <span class="math inline"><em>S</em><sub><em>n</em></sub></span>, normalized to compare with a standard normal distribution.</figcaption>
+<embed src="indep_dist.pdf" id="fig:Sn" style="width:95.0%" /><figcaption aria-hidden="true">Plot of the distribution of the test statistic <span class="math inline">\(S_n\)</span>, normalized to compare with a standard normal distribution.</figcaption>
 </figure>
+
+[^1]: Note that the two samples may have different sizes (if $n \ne m$).
