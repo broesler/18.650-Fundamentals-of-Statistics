@@ -8,25 +8,24 @@
 #
 #===============================================================================
 
-# NOTE: 
-#   * use github-flavored-markedown for Jekyll
-#   * convert un-MathJax phrasing first, then pandoc it
-
+# TODO include argument parser to generalize script
 # if [ $# -eq 0 ]; then
 #     printf "Usage: ./convert_to_md.sh <filename.tex>\n" 1>&2
 #     exit 1
 # fi
 
+post_basename="ks2samp"
 texfile="hw7_main.tex"
 main_outfile="${texfile/.*/}.md"
-outfile="ks2samp.md"
+outfile="$post_basename.md"
 
-    # | pandoc --mathjax -f latex -t gfm+tex_math_dollars+footnotes "$@" \
-sed -E 's/\\m(left|right)/\\\1/g' "$texfile" \
-    | pandoc --mathjax --listings -f latex -t gfm+tex_math_dollars+footnotes "$@" \
-    | sed -E -e '/``` /,/# <<begin/{/``` /!d};/# <<end/,/```/{/```/!d}' \
-      -e 's/(^| )\$\$/\n\n$$\n/g' \
-      -e 's/([^ ])\$\$( |$)/\1\n$$\n\n/g' \
+white_square='\xE2\x97\xBB'  # hex code from `echo ◻ | hexdump -C`
+
+# TODO figure out how to use pandoc template directly?
+# Filter some LaTeX before using pandoc, then filter the markdown.
+sed -E -f before.sed "$texfile" \
+    | pandoc --mathjax -f latex -t gfm+tex_math_dollars+footnotes \
+    | sed -E -f after.sed \
     | cat -s \
     > "$main_outfile"
 
@@ -34,7 +33,7 @@ sed -E 's/\\m(left|right)/\\\1/g' "$texfile" \
 sed -E -n '/^# Kolmogorov/,/^# .*/{/^# [^K]/!p}' "$main_outfile" > "$outfile"
 
 # Update figure paths, use "img" instead of "embed"
-figure_path='/assets/images/ks2samp/'
+figure_path="/assets/images/$post_basename/"
 sed -E -i'' "s,<embed\s+src=\"([^\"]*)\",<img src=\"${figure_path}\1\",g" "$outfile"
 
 # Extract post title
@@ -43,22 +42,30 @@ sed -i'' '1d' "$outfile"   # remove header line
 
 # Prepend preamble
 # <https://stackoverflow.com/questions/55435352/bad-file-descriptor-when-reading-from-fd-3-pointing-to-a-temp-file>
-tmpfile=$(mktemp /tmp/ks2samp.XXXXX)
+tmpfile=$(mktemp /tmp/$post_basename.XXXXX)
 exec 3>"$tmpfile"  # file descriptor to write
 exec 4<"$tmpfile"  # file descriptor to read
 rm "$tmpfile"      # remove the file when the script exits
 
 cat "$outfile" >&3  # write the output file to a temp file
 
+the_date=$(date +%F)
+
 # Write the preamble to the outfile
 cat > "$outfile" << EOF
 ---
 layout: post
-title:  "${the_title}"
-date: 2021/01/26 21:46 -0500  # hard-code for now
+title:  "$the_title"
+date: $the_date
 categories: statistics
 tags: statistics hypothesis-testing python
 ---
+
+\\\[
+\newcommand{\coloneqq}{\mathrel{\vcenter{:}}=}
+\newcommand{\indicator}{\unicode[Garamond]{x1D7D9}}
+\\\]
+
 EOF
 
 # date:   "$(date +'%F %T %z')"
@@ -68,6 +75,7 @@ cat <&4 >> "$outfile"
 
 # Copy it to the final post name
 # cp -i "$outfile" "$HOME/src/web_dev/broesler.github.io/_drafts/$(date +'%F')-$outfile"
+# cp -i "$outfile" "$HOME/src/web_dev/broesler.github.io/_drafts/$the_date-$outfile"
 
 ##===============================================================================
 ##===============================================================================
