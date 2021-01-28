@@ -19,7 +19,7 @@ texfile="hw7_main.tex"
 main_outfile="${texfile/.*/}.md"
 outfile="$post_basename.md"
 
-white_square='\xE2\x97\xBB'  # hex code from `echo ◻ | hexdump -C`
+# white_square='\xE2\x97\xBB'  # hex code from `echo ◻ | hexdump -C`
 
 # TODO figure out how to use pandoc template directly?
 # Filter some LaTeX before using pandoc, then filter the markdown.
@@ -61,10 +61,12 @@ categories: statistics
 tags: statistics hypothesis-testing python
 ---
 
-\\\[
+\$\$
 \newcommand{\coloneqq}{\mathrel{\vcenter{:}}=}
-\newcommand{\indicator}{\unicode[Garamond]{x1D7D9}}
-\\\]
+\newcommand{\indic}[1]{\unicode[Garamond]{x1D7D9}\!\left\{ #1 \right\}}
+\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\$\$
 
 EOF
 
