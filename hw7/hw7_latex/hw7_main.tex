@@ -56,6 +56,7 @@
 % Algorithm
 % \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 % \renewcommand{\algorithmicensure}{\textbf{Output:}}
+\algnewcommand\Assert{\State \textbf{assert} }
 
 %-------------------------------------------------------------------------------
 %     {listings + color} package options
@@ -289,6 +290,7 @@ Let
 
 \clearpage
 The following algorithm calculates the KS test statistic for two given samples.
+
 \begin{algorithm}[H]
   \caption{Calculate the KS test statistic $T_{n,m}$ for two samples.}
   \label{alg:ks_stat}
@@ -312,7 +314,8 @@ The following algorithm calculates the KS test statistic for two given samples.
     \State\Return $\max_i T_v$
     \EndProcedure
     \Function{Rank}{$A, k$}
-      \State {\bfseries assert} $A$ is sorted in ascending order.
+      % \State {\bfseries assert} $A$ is sorted in ascending order.
+      \Assert $A$ is sorted in ascending order.
       \State\Return $\#\{i=1,\dots,\dim A \colon k < A_i\}$
     \EndFunction
   \end{algorithmic}
@@ -419,8 +422,7 @@ $q_\alpha$ given $\alpha$ is as follows.
 distribution of $T_{n,m}$ under $H_0$.}
   \label{alg:ks_q}
   \begin{algorithmic}
-    \Require $n = \dim X$. $m = \dim Y$. $M \in \mathbb{N}$. $\alpha
-    \in (0, 1)$.
+    \Require $n = \dim X$. $m = \dim Y$. $M \in \mathbb{N}$. $\alpha \in (0, 1)$.
     \Ensure $q_\alpha \in [0, 1]$.
     \Procedure{KSQuantile}{$n, m, M, \alpha$}
       \State $T_v \gets$ empty array of size $n$

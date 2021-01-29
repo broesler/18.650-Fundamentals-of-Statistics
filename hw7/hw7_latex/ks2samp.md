@@ -1,10 +1,18 @@
 ---
 layout: post
 title:  "Kolmogorov-Smirnov Test for Two Samples"
-date: 2021/01/26 21:46 -0500  # hard-code for now
+date: 2021-01-27
 categories: statistics
 tags: statistics hypothesis-testing python
 ---
+
+$$
+\newcommand{\coloneqq}{\mathrel{\vcenter{:}}=}
+\newcommand{\indic}[1]{\unicode[Garamond]{x1D7D9}\!\left\{ #1 \right\}}
+\newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
+\newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+$$
+
 
 Consider two independent samples $X_1, \dots, X_n$, and
 $Y_1, \dots, Y_m$ of independent, real-valued, continuous random
@@ -13,12 +21,13 @@ that the $Y_i$’s are i.i.d. with some cdf $G$. [^1] We want to test
 whether $F = G$. Consider the following hypotheses:
 
 $$
-\begin{aligned}
+\begin{align*}
   H_0 \colon ``F = G" \\
-  H_1 \colon ``F \ne G"\end{aligned}
+  H_1 \colon ``F \ne G"
+\end{align*}
 $$
 
-For simplicity, we will assume
+ For simplicity, we will assume
 that $F$ and $G$ are continuous and increasing.
 
 ## Example Experiment
@@ -33,12 +42,13 @@ have the same distribution for our analysis.
 Let
 
 $$
-\begin{aligned}
+\begin{align*}
   U_i &= F(X_i), \quad \forall i = 1, \dots, n, \\
-  V_j &= G(Y_j), \quad \forall j = 1, \dots, n.\end{aligned}
+  V_j &= G(Y_j), \quad \forall j = 1, \dots, n.
+\end{align*}
 $$
 
-<div class="prop">
+<div class="prop" markdown=1>
 
 **Proposition 1**. *The distribution of the cdf of a continuous random
 variable is uniform on $[0,
@@ -46,7 +56,7 @@ variable is uniform on $[0,
 
 </div>
 
-<div class="proof">
+<div class="proof" markdown=1>
 
 *Proof.* The distributions of $U_i$ and $V_j$ can be determined by
 finding their cdfs. The cdf of $U_i$ is defined by
@@ -54,14 +64,15 @@ $F_U(t) \coloneqq \mathbb{P}\left[U_i \le t\right]$. Assuming that
 $F(X)$ and $G(Y)$ are invertible, it follows that
 
 $$
-\begin{aligned}
-{3}
+\begin{align*}
   \mathbb{P}\left[U_i \le t\right] &= \mathbb{P}\left[F(X_i) \le t\right] &\quad&\text{(definition of $U_i$)} \\
                    &= \mathbb{P}\left[X_i \le F^{-1}(t)\right] \\
                    &= F(F^{-1}(t)) &\quad&\text{(definition of cdf)} \\
                    &= t \\
   \therefore F_U(t) &= t \\
-  \implies f_U(t) &= \mathcal{U}\left(\left[ 0, 1 \right]\right) \tag*{\qedhere}\end{aligned}$$ ◻
+  \implies f_U(t) &= \mathcal{U}\left(\left[ 0, 1 \right]\right) \tag*{◻}
+\end{align*}
+$$
 
 </div>
 
@@ -80,32 +91,37 @@ $$
 T_{n,m} = \sup_{t \in \mathbb{R}} \left| F_n(t) - G_m(t) \right|
 $$
 
-<div class="prop">
+<div class="prop" markdown=1>
 
 **Proposition 2**. *The test statistic $T_{n,m}$ can be written as the
 maximum value of a finite set of numbers.*
 
 </div>
 
-<div class="proof">
+<div class="proof" markdown=1>
 
 *Proof.* By definition, the cdf
 
 $$
-\begin{aligned}
-{3}
+\begin{align*}
     F(t) &= \mathbb{P}\left[X \le t\right] \quad \forall t \in \mathbb{R}\\
-         &= \mathbb{E}\left[\mathbbm{1}\!\left\{X \le t\right\}\right]. \\
+         &= \mathbb{E}\left[\indic{X \le t}\right]. \\
     \intertext{By the Law of Large Numbers, the expectation can be approximated
         by the sample average, so we can define the \emph{empirical cdf} as}
-    F_n(t) &= \frac{1}{n}\sum_{i=1}^{n} \mathbbm{1}\!\left\{X_i \le t\right\} \addtocounter{equation}{1}\tag{\theequation}\label{eq:F_n}
-    \intertext{Likewise,}
-    G_m(t) &= \frac{1}{m}\sum_{j=1}^{m} \mathbbm{1}\!\left\{Y_j \le t\right\}. \addtocounter{equation}{1}\tag{\theequation}\label{eq:G_m}
-  \end{aligned}
+    F_n(t) &= \frac{1}{n}\sum_{i=1}^{n} \indic{X_i \le t} \numberthis \label{eq:F_n}
+    \end{align*}
+$$
+
+ Likewise,
+
+$$
+\begin{align*}
+    G_m(t) &= \frac{1}{m}\sum_{j=1}^{m} \indic{Y_j \le t}. \numberthis \label{eq:G_m}
+  \end{align*}
 $$
 
 $$
-\therefore T_{n,m} = \sup_{t \in \mathbb{R}} \left| \frac{1}{n}\sum_{i=1}^{n} \mathbbm{1}\!\left\{X_i \le t\right\} - \frac{1}{m}\sum_{j=1}^{m} \mathbbm{1}\!\left\{Y_j \le t\right\} \right|.
+\therefore T_{n,m} = \sup_{t \in \mathbb{R}} \left| \frac{1}{n}\sum_{i=1}^{n} \indic{X_i \le t} - \frac{1}{m}\sum_{j=1}^{m} \indic{Y_j \le t} \right|.
 $$
 
 The empirical
@@ -113,54 +129,70 @@ cdfs <a href="#eq:F_n" data-reference-type="eqref" data-reference="eq:F_n">[eq:
 can also be written
 
 $$
-\begin{aligned}
-{3}
+\begin{align*}
     F_n(t) &= \#\{i=1, \dots, n \colon X_i \le t\} \cdot \frac{1}{n} \\
     G_m(t) &= \#\{i=1, \dots, m \colon Y_j \le t\} \cdot \frac{1}{m},
-  \end{aligned}
+  \end{align*}
 $$
 
-so the only values that the empirical cdfs can take
+ so the only values that the empirical cdfs can take
 are the discrete sets
 
 $$
-\begin{aligned}
+\begin{align*}
     F_n(i) &= \frac{i}{n} \quad \forall i = 1, \dots, n \\
     G_m(j) &= \frac{j}{m} \quad \forall j = 1, \dots, m.
-  \end{aligned}
+  \end{align*}
 $$
 
-Therefore, the test statistic can be rewritten as the
+ Therefore, the test statistic can be rewritten as the
 maximum value of a finite set of numbers:
 
 $$
 \begin{split}
       T_{n,m} = \max_{i=0,\dots,n} \Bigg[
       &\max_{j=0,\dots,m} \left| \frac{i}{n} - \frac{j}{m} \right| 
-        \mathbbm{1}\!\left\{Y^{(j)} \le X^{(i)} < Y^{(j+1)}\right\}, \\ 
+        \indic{Y^{(j)} \le X^{(i)} < Y^{(j+1)}}, \\ 
       &\max_{k=j+1, \dots, m} \left| \frac{i}{n} - \frac{k}{m} \right| 
-        \mathbbm{1}\!\left\{Y^{(k)} \le X^{(i+1)}\right\} \Bigg]
+        \indic{Y^{(k)} \le X^{(i+1)}} \Bigg]
     \end{split}
 $$
 
-where $X^{(i)}$ is the $i^\text{th}$ value in the
+ where $X^{(i)}$ is the $i^\text{th}$ value in the
 ordered set of data $X^{(1)} \le \cdots \le X^{(n)}$. The values
 $X^{(0)}, Y^{(0)} \coloneqq -\infty$ are prepended to the otherwise
-finite realizations to simplify the computation. ◻
+finite realizations to simplify the computation. <span class="qed_symbol">◻</span>
 
 </div>
 
 The following algorithm calculates the KS test statistic for two given
 samples.
 
-$X, Y$ are vectors of real numbers. $0 \le T_{n,m} \le 1$.
-$X_s \gets \{-\infty,$ $\}$ $Y_s \gets$ $n \gets \dim X_s$
-$m \gets \dim Y_s$ $T_v \gets$ empty array of size $n$ $j \gets j$ +
-$k \gets j$ + $\displaystyle{T_v^{(i)} \gets 
-        \max\left(\left|\frac{i}{n} - \frac{j}{m}\right|,
-              \left|\frac{i}{n} - \frac{k}{m}\right|\right)}$
-$\max_i T_v$ $A$ is sorted in ascending order.
-$\#\{i=1,\dots,\dim A \colon k < A_i\}$
+<div class="algorithm" markdown=1>
+  \caption{Calculate the KS test statistic $T_{n,m}$ for two samples.}
+  \label{alg:ks_stat}
+<p class="algorithmic">     <strong>Require:</strong> $X, Y$ are vectors of real numbers. </p>
+<p class="algorithmic">     <strong>Ensure:</strong> $0 \le T_{n,m} \le 1$. </p>
+<p class="algorithmic">     <strong>Procedure</strong> <span style="font-variant: small-caps">KS2Sample</span>($X, Y$) </p>
+<p class="algorithmic">      $X_s \gets \{-\infty,$ <span style="font-variant: small-caps">Sort</span>($X$)$\}$ </p>
+<p class="algorithmic">      $Y_s \gets$ <span style="font-variant: small-caps">Sort</span>($Y$) </p>
+<p class="algorithmic">      $n \gets \dim X_s$ </p>
+<p class="algorithmic">      $m \gets \dim Y_s$ </p>
+<p class="algorithmic">      $T_v \gets$ empty array of size $n$ </p>
+<p class="algorithmic">     <strong>for all</strong> $i \in \{0, \dots, n\}$ <strong>do</strong> </p>
+<p class="algorithmic">        $j \gets j$ + <span style="font-variant: small-caps">Rank</span>($\{Y_s^{(\ell)}\}_{\ell=j}^m, X_s^{(i)}$) </p>
+<p class="algorithmic">       <span style="float: right">&#x25B7; Only search remaining $j$ values</span> </p>
+<p class="algorithmic">        $k \gets j$ + <span style="font-variant: small-caps">Rank</span>($\{Y_s^{(\ell)}\}_{\ell=j}^m, X_s^{(\min(i+1, n))}$) </p>
+<p class="algorithmic">        $\displaystyle{T_v^{(i)} \gets         \max\left(\left|\frac{i}{n} - \frac{j}{m}\right|,              \left|\frac{i}{n} - \frac{k}{m}\right|\right)}$ </p>
+<p class="algorithmic">     <strong>end for</strong> </p>
+<p class="algorithmic">     <strong>Return</strong> $\max_i T_v$ </p>
+<p class="algorithmic">     <strong>end procedure</strong> </p>
+<p class="algorithmic">     <strong>Function</strong> <span style="font-variant: small-caps">Rank</span>($A, k$) </p>
+<p class="algorithmic">       </p>
+<p class="algorithmic">       <strong>Assert</strong> $A$ is sorted in ascending order. </p>
+<p class="algorithmic">       <strong>Return</strong> $\#\{i=1,\dots,\dim A \colon k < A_i\}$ </p>
+<p class="algorithmic">     <strong>end function</strong> </p>
+</div>
 
 The following subroutine is an implementation of
 Algorithm <a href="#alg:ks_stat" data-reference-type="ref" data-reference="alg:ks_stat">[alg:ks_stat]</a>.
@@ -237,24 +269,27 @@ Figure <a href="#fig:ks_test" data-reference-type="ref" data-reference="fig:ks_
 
 ### The Null Hypothesis
 
-<div class="prop">
+<div class="prop" markdown=1>
 
 **Proposition 3**. *If $H_0$ is true, then
 
 $$
-T_{n,m} = \sup_{0 \le x \le 1} \left| \frac{1}{n}\sum_{i=1}^{n} \mathbbm{1}\!\left\{U_i \le x\right\}
-- \frac{1}{m}\sum_{j=1}^{m} \mathbbm{1}\!\left\{V_j \le x\right\} \right|.$$*
+T_{n,m} = \sup_{0 \le x \le 1} \left| \frac{1}{n}\sum_{i=1}^{n} \indic{U_i \le x}
+- \frac{1}{m}\sum_{j=1}^{m} \indic{V_j \le x} \right|.
+$$
+
+*
 
 </div>
 
-<div class="proof">
+<div class="proof" markdown=1>
 
 *Proof.*
 By <a href="#eq:F_n" data-reference-type="eqref" data-reference="eq:F_n">[eq:F_n]</a> and <a href="#eq:G_m" data-reference-type="eqref" data-reference="eq:G_m">[eq:G_m]</a>,
 
 $$
 \label{eq:Tnm_supt}
-    T_{n,m} = \sup_{t \in \mathbb{R}} \left| \frac{1}{n}\sum_{i=1}^{n} \mathbbm{1}\!\left\{X_i \le t\right\} - \frac{1}{m}\sum_{j=1}^{m} \mathbbm{1}\!\left\{Y_j \le t\right\} \right|.
+    T_{n,m} = \sup_{t \in \mathbb{R}} \left| \frac{1}{n}\sum_{i=1}^{n} \indic{X_i \le t} - \frac{1}{m}\sum_{j=1}^{m} \indic{Y_j \le t} \right|.
 $$
 
 To show the proposition is true, we make a change of variable. Let
@@ -263,43 +298,41 @@ $$
 x = F(t).
 $$
 
-Then,
+ Then,
 
 $$
 t \in \mathbb{R}\implies x \in [0, 1].
 $$
 
-Since $F$
+ Since $F$
 and $G$ are continuous and monotonically increasing,
 
 $$
-\begin{aligned}
-{3}
+\begin{align*}
     X_i \le t &\iff F(X_i) \le F(t) \\
               &\iff U_i \le x &\quad&\text{(definition)}.
-  \end{aligned}
+  \end{align*}
 $$
 
-Similarly,
+ Similarly,
 
 $$
-\begin{aligned}
-{3}
+\begin{align*}
     Y_i \le t &\iff G(Y_i) \le G(t) \\
               &\iff G(Y_i) \le F(t) &\quad&\text{(under $H_0$)} \\
               &\iff V_i \le x &\quad&\text{(definition)}.
-  \end{aligned}
+  \end{align*}
 $$
 
-Substitution of these expressions
+ Substitution of these expressions
 into <a href="#eq:Tnm_supt" data-reference-type="eqref" data-reference="eq:Tnm_supt">[eq:Tnm_supt]</a>
-completes the proof. ◻
+completes the proof. <span class="qed_symbol">◻</span>
 
 </div>
 
 ### The Joint Distribution of the Samples
 
-<div id="prop:Tnm" class="prop">
+<div id="prop:Tnm" class="prop" markdown=1>
 
 **Proposition 4**. *If $H_0$ is true, the joint distribution of
 $U_1, \dots, U_n, V_1, \dots, V_m$ $(n+m)$ random variables is uniform
@@ -307,25 +340,31 @@ on $[0, 1]$.*
 
 </div>
 
-<div class="proof">
+<div class="proof" markdown=1>
 
 *Proof.*
 
 $$
-\begin{aligned}
-{3}
+\begin{align*}
     \mathbb{P}\left[U_i \le t\right] &= \mathbb{P}\left[F(X_i) \le t\right] \\
                      &= \mathbb{P}\left[F(X_1) \le t\right] &\quad&\text{(i.i.d.)} \\
                      &= \mathbb{P}\left[G(X_1) \le t\right] &\quad&\text{(under $H_0$)} \\
                      &= \mathbb{P}\left[G(Y_1) \le t\right] &\quad&\text{(i.i.d.)} \\
                      &= \mathbb{P}\left[V_1 \le t\right] &\quad&\text{(definition)} \\
-    \intertext{These probabilities can be rearranged to find the cdfs of $U$ and $V$}
+    \end{align*}
+$$
+
+ These probabilities can be rearranged to find the cdfs of $U$ and $V$
+
+$$
+\begin{align*}
                      &= \mathbb{P}\left[X_1 \le F^{-1}(t)\right] \\
                      &= F(F^{-1}(t)) &\quad&\text{(definition of cdf)} \\
                      &= t \\
     \therefore F_U(t) &= G_V(t) = t \\
-    \implies f_{U,V}(t) &= \mathcal{U}\left(\left[ 0, 1 \right]\right) \tag*{\qedhere}
-  \end{aligned}$$ ◻
+    \implies f_{U,V}(t) &= \mathcal{U}\left(\left[ 0, 1 \right]\right) \tag*{◻}
+  \end{align*}
+$$
 
 </div>
 
@@ -347,12 +386,13 @@ the distribution of $T_{n,m}$ under $H_0$. The quantile $q_\alpha$ is
 given by
 
 $$
-\begin{aligned}
+\begin{align*}
   q_\alpha &= F^{-1}(1-\alpha) \\
            &= \inf\{x \colon F(x) \ge 1 - \alpha\} \\
            &\approx \min\{x \colon F_n(x) \ge 1 - \alpha\}, \quad n < \infty \\
            \implies q_\alpha \approx \hat{q}_\alpha &= \min_i \left\{
-               T_{n,m}^{(i)} \colon \tfrac{i}{M} \ge 1 - \alpha \right\}\end{aligned}
+               T_{n,m}^{(i)} \colon \tfrac{i}{M} \ge 1 - \alpha \right\}
+\end{align*}
 $$
 
 where $M \in \mathbb{N}$ is large, and $T_{n,m}^{(i)}$ is the
@@ -360,12 +400,24 @@ $i^\text{th}$ value in a sorted sample of $M$ test statistics. Thus,
 $q_\alpha$ can be approximated by choosing $i = \ceil{M(1 - \alpha)}$.
 An algorithm to approximate $q_\alpha$ given $\alpha$ is as follows.
 
-$n = \dim X$. $m = \dim Y$. $M \in \mathbb{N}$. $\alpha
-    \in (0, 1)$. $q_\alpha \in [0, 1]$. $T_v \gets$ empty array of size
-$n$ $X_s \gets$ sample of size $n$ from
-$\mathcal{N}\left( 0, 1 \right)$. $Y_s \gets$ sample of size $m$ from
-$\mathcal{N}\left( 0, 1 \right)$. $T_v^{(i)} \gets$ $T_{vs} \gets$
-$j \gets \ceil*{M(1 - \alpha)}$ $T_{vs}^{(j)}$
+<div class="algorithm" markdown=1>
+  \caption{Approximate $q_\alpha$, the $(1 - \alpha)$-quantile of the
+distribution of $T_{n,m}$ under $H_0$.}
+  \label{alg:ks_q}
+<p class="algorithmic">     <strong>Require:</strong> $n = \dim X$. $m = \dim Y$. $M \in \mathbb{N}$. $\alpha \in (0, 1)$. </p>
+<p class="algorithmic">     <strong>Ensure:</strong> $q_\alpha \in [0, 1]$. </p>
+<p class="algorithmic">     <strong>Procedure</strong> <span style="font-variant: small-caps">KSQuantile</span>($n, m, M, \alpha$) </p>
+<p class="algorithmic">        $T_v \gets$ empty array of size $n$ </p>
+<p class="algorithmic">       <strong>for all</strong> $i \in \{0,\dots,M\}$ <strong>do</strong> </p>
+<p class="algorithmic">          $X_s \gets$ sample of size $n$ from $\N{0}{1}$. </p>
+<p class="algorithmic">          $Y_s \gets$ sample of size $m$ from $\N{0}{1}$. </p>
+<p class="algorithmic">          $T_v^{(i)} \gets$ <span style="font-variant: small-caps">KS2Sample</span>($X_s, Y_s$) <span style="float: right">&#x25B7; defined in Algorithm~\ref{alg:ks_stat</span>} </p>
+<p class="algorithmic">       <strong>end for</strong> </p>
+<p class="algorithmic">        $T_{vs} \gets$ <span style="font-variant: small-caps">Sort</span>($T_v$) </p>
+<p class="algorithmic">        $j \gets \ceil*{M(1 - \alpha)}$ </p>
+<p class="algorithmic">        <strong>Return</strong> $T_{vs}^{(j)}$ </p>
+<p class="algorithmic">     <strong>end procedure</strong> </p>
+</div>
 
 A plot of the distribution of
 
@@ -393,17 +445,19 @@ Algorithm <a href="#alg:ks_q" data-reference-type="ref" data-reference="alg:ks_
 we define a test with non-asymptotic level $\alpha$ for $H_0$ vs. $H_1$:
 
 $$
-\delta_\alpha = \mathbbm{1}\!\left\{T_{n,m} > \hat{q}_\alpha^{(n, M)}\right\}
+\delta_\alpha = \indic{T_{n,m} > \hat{q}_\alpha^{(n, M)}}
 $$
 
-where $T_{n,m}$ is found by
+ where
+$T_{n,m}$ is found by
 Algorithm <a href="#alg:ks_stat" data-reference-type="ref" data-reference="alg:ks_stat">[alg:ks_stat]</a>.
 The p-value for this test is
 
 $$
-\begin{aligned}
+\begin{align*}
   \text{p-value} &\coloneqq \mathbb{P}\left[Z \ge T_{n,m}\right] \\
-  &\approx \frac{\#\{j = 1, \dots, M \colon T_{n,m}^{(j)} \ge T_{n,m}\}}{M}\end{aligned}
+  &\approx \frac{\#\{j = 1, \dots, M \colon T_{n,m}^{(j)} \ge T_{n,m}\}}{M}
+\end{align*}
 $$
 
 where $Z$ is a random variable distributed as $T_{n,m}$.

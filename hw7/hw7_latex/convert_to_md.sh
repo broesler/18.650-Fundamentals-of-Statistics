@@ -19,13 +19,17 @@ texfile="hw7_main.tex"
 main_outfile="${texfile/.*/}.md"
 outfile="$post_basename.md"
 
-# white_square='\xE2\x97\xBB'  # hex code from `echo ◻ | hexdump -C`
+white_square=$'\u25FB'  # hex code from `echo ◻ | hexdump -C`
 
-# TODO figure out how to use pandoc template directly?
 # Filter some LaTeX before using pandoc, then filter the markdown.
 sed -E -f before.sed "$texfile" \
-    | pandoc --mathjax -f latex -t gfm+tex_math_dollars+footnotes \
+    | pandoc -f latex -t gfm+tex_math_dollars+footnotes --mathjax \
+    | sed -E ':x ; /\\displaystyle/ { N ; /EndFor/b ; s/\n//g ; b x}' \
     | sed -E -f after.sed \
+    | sed -E -e "/^[[:blank:]]*$white_square$/d" \
+        -e "s/$white_square/<span class=\"qed_symbol\">\0<\/span>/g" \
+        -e '/\\tag/! s/\\qedhere/\\tag*{\0}/' \
+        -e "/qedhere/ s/\\\qedhere/$white_square/" \
     | cat -s \
     > "$main_outfile"
 
@@ -49,7 +53,8 @@ rm "$tmpfile"      # remove the file when the script exits
 
 cat "$outfile" >&3  # write the output file to a temp file
 
-the_date=$(date +%F)
+# the_date=$(date +%F)
+the_date='2021-01-27'
 
 # Write the preamble to the outfile
 cat > "$outfile" << EOF
@@ -77,7 +82,7 @@ cat <&4 >> "$outfile"
 
 # Copy it to the final post name
 # cp -i "$outfile" "$HOME/src/web_dev/broesler.github.io/_drafts/$(date +'%F')-$outfile"
-# cp -i "$outfile" "$HOME/src/web_dev/broesler.github.io/_drafts/$the_date-$outfile"
+cp -i "$outfile" "$HOME/src/web_dev/broesler.github.io/_drafts/$the_date-$outfile"
 
 ##===============================================================================
 ##===============================================================================
