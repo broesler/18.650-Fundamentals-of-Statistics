@@ -24,7 +24,8 @@ white_square=$'\u25FB'  # hex code from `echo ◻ | hexdump -C`
 # Filter some LaTeX before using pandoc, then filter the markdown.
 sed -E -f before.sed "$texfile" \
     | pandoc -f latex -t gfm+tex_math_dollars+footnotes --mathjax \
-    | sed -E ':x ; /\\displaystyle/ { N ; /EndFor/b ; s/\n//g ; b x}' \
+    | sed -E '/\\displaystyle/ {:x; N; /EndFor/b; s/\n */ /g; b x}' \
+    | sed -E '/\\intertext/ {:x; N; /&/b; s/\n */ /g; b x}' \
     | sed -E -f after.sed \
     | sed -E -e "/^[[:blank:]]*$white_square$/d" \
         -e "s/$white_square/<span class=\"qed_symbol\">\0<\/span>/g" \

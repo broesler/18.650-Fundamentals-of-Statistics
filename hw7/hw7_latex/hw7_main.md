@@ -118,8 +118,13 @@ $$
 \begin{align*}
     F(t) &= \mathbb{P}\left[X \le t\right] \quad \forall t \in \mathbb{R}\\
          &= \mathbb{E}\left[\indic{X \le t}\right]. \\
-    \intertext{By the Law of Large Numbers, the expectation can be approximated
-        by the sample average, so we can define the \emph{empirical cdf} as}
+    \end{align*}
+$$
+
+ By the Law of Large Numbers, the expectation can be approximated by the sample average, so we can define the *empirical cdf* as
+
+$$
+\begin{align*}
     F_n(t) &= \frac{1}{n}\sum_{i=1}^{n} \indic{X_i \le t} \numberthis \label{eq:F_n}
     \end{align*}
 $$
@@ -163,9 +168,9 @@ maximum value of a finite set of numbers:
 $$
 \begin{split}
       T_{n,m} = \max_{i=0,\dots,n} \Bigg[
-      &\max_{j=0,\dots,m} \left| \frac{i}{n} - \frac{j}{m} \right| 
-        \indic{Y^{(j)} \le X^{(i)} < Y^{(j+1)}}, \\ 
-      &\max_{k=j+1, \dots, m} \left| \frac{i}{n} - \frac{k}{m} \right| 
+      &\max_{j=0,\dots,m} \left| \frac{i}{n} - \frac{j}{m} \right|
+        \indic{Y^{(j)} \le X^{(i)} < Y^{(j+1)}}, \\
+      &\max_{k=j+1, \dots, m} \left| \frac{i}{n} - \frac{k}{m} \right|
         \indic{Y^{(k)} \le X^{(i+1)}} \Bigg]
     \end{split}
 $$
@@ -181,29 +186,33 @@ The following algorithm calculates the KS test statistic for two given
 samples.
 
 <div class="algorithm" markdown=1>
-  \caption{Calculate the KS test statistic $T_{n,m}$ for two samples.}
+  <div class="alg_caption_div" markdown=1>
+<span class="alg_title">Algorithm</span>
+<span class="alg_caption">Calculate the KS test statistic $T_{n,m}$ for two samples.</span>
+</div>
   \label{alg:ks_stat}
-<p class="algorithmic">     <strong>Require:</strong> $X, Y$ are vectors of real numbers. </p>
-<p class="algorithmic">     <strong>Ensure:</strong> $0 \le T_{n,m} \le 1$. </p>
-<p class="algorithmic">     <strong>Procedure</strong> <span style="font-variant: small-caps">KS2Sample</span>($X, Y$) </p>
-<p class="algorithmic">      $X_s \gets \{-\infty,$ <span style="font-variant: small-caps">Sort</span>($X$)$\}$ </p>
-<p class="algorithmic">      $Y_s \gets$ <span style="font-variant: small-caps">Sort</span>($Y$) </p>
-<p class="algorithmic">      $n \gets \dim X_s$ </p>
-<p class="algorithmic">      $m \gets \dim Y_s$ </p>
-<p class="algorithmic">      $T_v \gets$ empty array of size $n$ </p>
-<p class="algorithmic">     <strong>for all</strong> $i \in \{0, \dots, n\}$ <strong>do</strong> </p>
-<p class="algorithmic">        $j \gets j$ + <span style="font-variant: small-caps">Rank</span>($\{Y_s^{(\ell)}\}_{\ell=j}^m, X_s^{(i)}$) </p>
-<p class="algorithmic">       <span style="float: right">&#x25B7; Only search remaining $j$ values</span> </p>
-<p class="algorithmic">        $k \gets j$ + <span style="font-variant: small-caps">Rank</span>($\{Y_s^{(\ell)}\}_{\ell=j}^m, X_s^{(\min(i+1, n))}$) </p>
-<p class="algorithmic">        $\displaystyle{T_v^{(i)} \gets         \max\left(\left|\frac{i}{n} - \frac{j}{m}\right|,              \left|\frac{i}{n} - \frac{k}{m}\right|\right)}$ </p>
-<p class="algorithmic">     <strong>end for</strong> </p>
-<p class="algorithmic">     <strong>Return</strong> $\max_i T_v$ </p>
-<p class="algorithmic">     <strong>end procedure</strong> </p>
-<p class="algorithmic">     <strong>Function</strong> <span style="font-variant: small-caps">Rank</span>($A, k$) </p>
-<p class="algorithmic">       </p>
-<p class="algorithmic">       <strong>Assert</strong> $A$ is sorted in ascending order. </p>
-<p class="algorithmic">       <strong>Return</strong> $\#\{i=1,\dots,\dim A \colon k < A_i\}$ </p>
-<p class="algorithmic">     <strong>end function</strong> </p>
+<div class="algorithmic" markdown=1>
+<p><strong>Require:</strong> $X, Y$ are vectors of real numbers. </p>
+<p><strong>Ensure:</strong> $0 \le T_{n,m} \le 1$. </p>
+<p><strong>Procedure</strong> <span style="font-variant: small-caps">KS2Sample</span>($X, Y$) </p>
+<p>	$X_s \gets \{-\infty,$ <span style="font-variant: small-caps">Sort</span>($X$)$\}$ </p>
+<p>	$Y_s \gets$ <span style="font-variant: small-caps">Sort</span>($Y$) </p>
+<p>	$n \gets \dim X_s$ </p>
+<p>	$m \gets \dim Y_s$ </p>
+<p>	$T_v \gets$ empty array of size $n$ </p>
+<p>	<strong>for all</strong> $i \in \{0, \dots, n\}$ <strong>do</strong> </p>
+<p>		$j \gets j$ + <span style="font-variant: small-caps">Rank</span>($\{Y_s^{(\ell)}\}_{\ell=j}^m, X_s^{(i)}$) <span style="float: right">&#x25B7; Only search remaining $j$ values</span> </p>
+<p>		$k \gets j$ + <span style="font-variant: small-caps">Rank</span>($\{Y_s^{(\ell)}\}_{\ell=j}^m, X_s^{(\min(i+1, n))}$) </p>
+<p>		$\displaystyle{T_v^{(i)} \gets \max\left(\left|\frac{i}{n} - \frac{j}{m}\right|, \left|\frac{i}{n} - \frac{k}{m}\right|\right)}$ </p>
+<p>	<strong>end for</strong> </p>
+<p>	<strong>Return</strong> $\max_i T_v$ </p>
+<p><strong>end procedure</strong> </p>
+<p><strong>Function</strong> <span style="font-variant: small-caps">Rank</span>($A, k$) </p>
+	
+<p>	<strong>Assert</strong> $A$ is sorted in ascending order. </p>
+<p>	<strong>Return</strong> $\#\{i=1,\dots,\dim A \colon k < A_i\}$ </p>
+<p><strong>end function</strong> </p>
+</div>
 </div>
 
 The following subroutine is an implementation of
@@ -283,14 +292,15 @@ Figure <a href="#fig:ks_test" data-reference-type="ref" data-reference="fig:ks_
 
 <div class="prop" markdown=1>
 
-**Proposition 3**. *If $H_0$ is true, then
+**Proposition 3**. *If $H_0$ is true, then the test statistic
 
 $$
 T_{n,m} = \sup_{0 \le x \le 1} \left| \frac{1}{n}\sum_{i=1}^{n} \indic{U_i \le x}
-- \frac{1}{m}\sum_{j=1}^{m} \indic{V_j \le x} \right|.
+- \frac{1}{m}\sum_{j=1}^{m} \indic{V_j \le x} \right|,
 $$
 
-*
+ which is a
+function only of the cdfs.*
 
 </div>
 
@@ -413,22 +423,26 @@ $q_\alpha$ can be approximated by choosing $i = \ceil{M(1 - \alpha)}$.
 An algorithm to approximate $q_\alpha$ given $\alpha$ is as follows.
 
 <div class="algorithm" markdown=1>
-  \caption{Approximate $q_\alpha$, the $(1 - \alpha)$-quantile of the
-distribution of $T_{n,m}$ under $H_0$.}
+  <div class="alg_caption_div" markdown=1>
+<span class="alg_title">Algorithm</span>
+<span class="alg_caption">Approximate $q_\alpha$, the $(1 - \alpha)$-quantile of the distribution of $T_{n,m}$ under $H_0$.</span>
+</div>
   \label{alg:ks_q}
-<p class="algorithmic">     <strong>Require:</strong> $n = \dim X$. $m = \dim Y$. $M \in \mathbb{N}$. $\alpha \in (0, 1)$. </p>
-<p class="algorithmic">     <strong>Ensure:</strong> $q_\alpha \in [0, 1]$. </p>
-<p class="algorithmic">     <strong>Procedure</strong> <span style="font-variant: small-caps">KSQuantile</span>($n, m, M, \alpha$) </p>
-<p class="algorithmic">        $T_v \gets$ empty array of size $n$ </p>
-<p class="algorithmic">       <strong>for all</strong> $i \in \{0,\dots,M\}$ <strong>do</strong> </p>
-<p class="algorithmic">          $X_s \gets$ sample of size $n$ from $\N{0}{1}$. </p>
-<p class="algorithmic">          $Y_s \gets$ sample of size $m$ from $\N{0}{1}$. </p>
-<p class="algorithmic">          $T_v^{(i)} \gets$ <span style="font-variant: small-caps">KS2Sample</span>($X_s, Y_s$) <span style="float: right">&#x25B7; defined in Algorithm~\ref{alg:ks_stat</span>} </p>
-<p class="algorithmic">       <strong>end for</strong> </p>
-<p class="algorithmic">        $T_{vs} \gets$ <span style="font-variant: small-caps">Sort</span>($T_v$) </p>
-<p class="algorithmic">        $j \gets \ceil*{M(1 - \alpha)}$ </p>
-<p class="algorithmic">        <strong>Return</strong> $T_{vs}^{(j)}$ </p>
-<p class="algorithmic">     <strong>end procedure</strong> </p>
+<div class="algorithmic" markdown=1>
+<p><strong>Require:</strong> $n = \dim X$. $m = \dim Y$. $M \in \mathbb{N}$. $\alpha \in (0, 1)$. </p>
+<p><strong>Ensure:</strong> $q_\alpha \in [0, 1]$. </p>
+<p><strong>Procedure</strong> <span style="font-variant: small-caps">KSQuantile</span>($n, m, M, \alpha$) </p>
+<p>	$T_v \gets$ empty array of size $n$ </p>
+<p>	<strong>for all</strong> $i \in \{0,\dots,M\}$ <strong>do</strong> </p>
+<p>		$X_s \gets$ sample of size $n$ from $\N{0}{1}$. </p>
+<p>		$Y_s \gets$ sample of size $m$ from $\N{0}{1}$. </p>
+<p>		$T_v^{(i)} \gets$ <span style="font-variant: small-caps">KS2Sample</span>($X_s, Y_s$) <span style="float: right">&#x25B7; defined in Algorithm~\ref{alg:ks_stat</span>} </p>
+<p>	<strong>end for</strong> </p>
+<p>	$T_{vs} \gets$ <span style="font-variant: small-caps">Sort</span>($T_v$) </p>
+<p>	$j \gets \ceil*{M(1 - \alpha)}$ </p>
+<p>	<strong>Return</strong> $T_{vs}^{(j)}$ </p>
+<p><strong>end procedure</strong> </p>
+</div>
 </div>
 
 A plot of the distribution of
@@ -610,7 +624,7 @@ converges to its respective parameter $(p, q, r)$. <span class="qed_symbol">◻
 $(\hat{p}, \hat{q}, \hat{r})$ is asymptotically normal, *i.e. *
 
 $$
-\sqrt{n} ((\hat{p}, \hat{q}, \hat{r}) - (p, q, r)) 
+\sqrt{n} ((\hat{p}, \hat{q}, \hat{r}) - (p, q, r))
         \xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, \operatorname{Cov}\left((\hat{p}, \hat{q}, \hat{r})\right) \right).
 $$
 
@@ -646,7 +660,7 @@ $$
 where $\Sigma$ is the 3-by-3 symmetric covariance matrix, defined as
 
 $$
-\Sigma \coloneqq 
+\Sigma \coloneqq
   \begin{bmatrix}
     \operatorname{Var}\left(\hat{p}\right) & \operatorname{Cov}\left(\hat{p}, \hat{q}\right) & \operatorname{Cov}\left(\hat{p}, \hat{r}\right) \\
     \cdot & \operatorname{Var}\left(\hat{q}\right) & \operatorname{Cov}\left(\hat{q}, \hat{r}\right) \\
@@ -764,10 +778,10 @@ $$
     \end{align*}
 $$
 
- Since $X \sim \mathop{\mathrm{Ber
+ Since $X \sim \mathop{\mathrm{Ber}}(p) \in \{0, 1\}$, $X^2 = X$, so we have
 
 $$
-\begin{align*}}(p) \in \{0, 1\}$, $X^2 = X$, so we have}
+\begin{align*}
     &= \mathbb{E}\left[X Y\right] - pr \\
     &= r - pr \\
     \therefore \operatorname{Cov}\left(\hat{p}, \hat{r}\right) &= r(1 - p) \tag*{◻}
@@ -819,7 +833,7 @@ where $V$ depends only on $p$, $q$, and $r$.*
 
 $$
 \hat{\theta} = \begin{bmatrix} \hat{p}\\ \hat{q}\\ \hat{r}
-\end{bmatrix} \text{, and } 
+\end{bmatrix} \text{, and }
     \theta = \begin{bmatrix} p \\ q \\ r \end{bmatrix}.
 $$
 
@@ -858,7 +872,7 @@ $$
  The gradient of $g(\theta)$ is then
 
 $$
-\nabla g(u,v,w) = \begin{bmatrix} -v \\ -u \\ 1 \end{bmatrix} 
+\nabla g(u,v,w) = \begin{bmatrix} -v \\ -u \\ 1 \end{bmatrix}
     \implies \nabla g(\theta) = \begin{bmatrix} -q \\ -p \\ 1 \end{bmatrix}
 $$
 
@@ -868,21 +882,21 @@ show is a function only of the parameters $(p, q, r)$.
 
 $$
 \begin{align*}
-    V &= \begin{bmatrix} -q & -p & 1 \end{bmatrix} 
+    V &= \begin{bmatrix} -q & -p & 1 \end{bmatrix}
     \begin{bmatrix}
       p(1-p) & r - pq & r(1-p) \\
       \cdot & q(1-q) & r(1-q) \\
       \cdot & \cdot & r(1-r)
     \end{bmatrix}
     \begin{bmatrix} -q \\ -p \\ 1 \end{bmatrix} \numberthis \label{eq:V_mat} \\
-    &= \begin{bmatrix} -q & -p & 1 \end{bmatrix} 
-    \begin{bmatrix} 
+    &= \begin{bmatrix} -q & -p & 1 \end{bmatrix}
+    \begin{bmatrix}
       -qp(1-p) - p(r - pq) + r(1-p) \\
       -q(r - pq) - pq(1-q) + r(1-q) \\
       -qr(1-p) - pr(1-q) + r(1-r)
     \end{bmatrix} \\
-    &= \begin{bmatrix} -q & -p & 1 \end{bmatrix} 
-    \begin{bmatrix} 
+    &= \begin{bmatrix} -q & -p & 1 \end{bmatrix}
+    \begin{bmatrix}
       (r - pq)(1 - 2p) \\
       (r - pq)(1 - 2q) \\
       r((1-p)(1-q) - (r-pq))
@@ -891,7 +905,7 @@ $$
       &= -q(r - pq)(1 - 2p) - p(r - pq)(1 - 2q)) \\
       &\,\quad + r((1-p)(1-q) - (r-pq))
     \end{split} \\
-    \therefore V &= (r - pq)[-q(1 - 2p) - p(1 - 2q) - r] + r(1-p)(1-q) 
+    \therefore V &= (r - pq)[-q(1 - 2p) - p(1 - 2q) - r] + r(1-p)(1-q)
     \numberthis \label{eq:V}
   \end{align*}
 $$
@@ -1022,284 +1036,278 @@ $$
   T_n = \frac{\displaystyle \sqrt{n}\frac{(\hat{r}- \hat{p}\hat{q})}{\sqrt{V}}}{\displaystyle \sqrt{\frac{\hat{V}}{V}}}
 $$
 
-Given this expression, we can determine the distribution of $T_n$.Equation <a href="#eq:Tn_norm" data-reference-type="eqref" data-reference="eq:Tn_norm" markdown=1>[eq:Tn_norm]</a>shows that the numerator is a standard normal random variable.[<u>Cochran’stheorem</u>](https://en.wikipedia.org/wiki/Cochran's_theorem) gives thedistribution of the denominator.<div class="lemma">**Lemma 4** (Result of Cochran’s Theorem). *If $X_1, \dots, X_n$ arei.i.d. random variables drawn from the distribution$\mathcal{N}\left( \mu, \sigma^2 \right)$, and$S_n^2 \coloneqq \sum_{i=1}^{n} (X_i - \overline{X}_n)^2$, then
-$$
+ Given this expression, we can determine the distribution of $T_n$. Equation <a href="#eq:Tn_norm" data-reference-type="eqref" data-reference="eq:Tn_norm" markdown=1>[eq:Tn_norm]</a> shows that the numerator is a standard normal random variable. [<u>Cochran’s theorem</u>](https://en.wikipedia.org/wiki/Cochran's_theorem) gives the distribution of the denominator.  <div class="lemma">  **Lemma 4** (Result of Cochran’s Theorem). *If $X_1, \dots, X_n$ are i.i.d. random variables drawn from the distribution $\mathcal{N}\left( \mu, \sigma^2 \right)$, and $S_n^2 \coloneqq \sum_{i=1}^{n} (X_i - \overline{X}_n)^2$, then
 
+$$
 \overline{X}_n\perp \!\!\! \perp S_n,
 $$
 
  and
-$$
 
+$$
 \frac{n S_n^2}{\sigma^2} \sim \chi^2_{n-1}.
 $$
 
-*</div>Since $\hat{V}$ and $V$ describe the sample variance and variance of a(asymptotically) normal distribution, $T_n$ is asymptoticallycharacterized by
-$$
+*  </div>  Since $\hat{V}$ and $V$ describe the sample variance and variance of a (asymptotically) normal distribution, $T_n$ is asymptotically characterized by
 
+$$
 T_n \xrightarrow[n \to \infty]{(d)}\frac{\displaystyle \mathcal{N}\left( 0, 1 \right)}{\displaystyle \sqrt{\frac{\chi^2_{n-1}}{n}}}
 $$
 
-which is the definition of a random variable drawn from *Student’sT-distribution* with $n-1$ degrees of freedom. In this case, however,the normality of the underlying random variables is asymptotic, so the$t_{n-1}$ distribution approaches a standard normal distribution
-$$
+ which is the definition of a random variable drawn from *Student’s T-distribution* with $n-1$ degrees of freedom. In this case, however, the normality of the underlying random variables is asymptotic, so the $t_{n-1}$ distribution approaches a standard normal distribution
 
-\begin{align*}  T_n &\xrightarrow[n \to \infty]{(d)}t_{n-1} \\  t_{n-1} &\xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, 1 \right) \numberthis \label{eq:t_to_N} \\  \implies T_n &\xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, 1 \right) \tag*{◻}
+$$
+\begin{align*} T_n &\xrightarrow[n \to \infty]{(d)}t_{n-1} \\ t_{n-1} &\xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, 1 \right) \numberthis \label{eq:t_to_N} \\ \implies T_n &\xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, 1 \right) \tag*{◻}
 \end{align*}
 $$
 
-A proof ofEquation <a href="#eq:t_to_N" data-reference-type="eqref" data-reference="eq:t_to_N">[eq:t_to_N]</a>is given in . <span class="qed_symbol">◻</span></div>Given the test statistic $T_n$, define the rejection region
-$$
+ A proof of Equation <a href="#eq:t_to_N" data-reference-type="eqref" data-reference="eq:t_to_N">[eq:t_to_N]</a> is given in . <span class="qed_symbol">◻</span>  </div>  Given the test statistic $T_n$, define the rejection region
 
+$$
 R_\psi = \left\{ \hat{\theta} \colon |T_n| > q_{\alpha/2} \right\}
 $$
 
-where
+ where
 
 $$
 q_{\alpha/2} = \Phi^{-1}\left(1 - \frac{\alpha}{2}\right)
 $$
 
- isthe $\left(1-\frac{\alpha}{2}\right)$-quantile of the standard normal$\mathcal{N}\left( 0, 1 \right)$ distribution.We would like to know whether the facts of being happy and being in arelationship are independent of each other. In a given population, 1000people (aged at least 21 years old) are sampled and asked two questions:“Do you consider yourself as happy?” and “Are you involved in arelationship?”. The answers are summarized inTable <a href="#tab:tab1" data-reference-type="ref" data-reference="tab:tab1">1</a>.<div id="tab:tab1">|                           | **Happy** | **Not Happy** | **Total** ||--------------------------:|:---------:|:-------------:|:---------:||     **In a Relationship** |    205    |      301      |    506    || **Not in a Relationship** |    179    |      315      |    494    ||                 **Total** |    384    |      616      |   1000    ||                           |           |               |           |</div>The values of our estimators are as follows:
+ is the $\left(1-\frac{\alpha}{2}\right)$-quantile of the standard normal $\mathcal{N}\left( 0, 1 \right)$ distribution.  We would like to know whether the facts of being happy and being in a relationship are independent of each other. In a given population, 1000 people (aged at least 21 years old) are sampled and asked two questions: “Do you consider yourself as happy?” and “Are you involved in a relationship?”. The answers are summarized in Table <a href="#tab:tab1" data-reference-type="ref" data-reference="tab:tab1">1</a>.  <div id="tab:tab1">  |                           | **Happy** | **Not Happy** | **Total** | |--------------------------:|:---------:|:-------------:|:---------:| |     **In a Relationship** |    205    |      301      |    506    | | **Not in a Relationship** |    179    |      315      |    494    | |                 **Total** |    384    |      616      |   1000    | |                           |           |               |           |  </div>  The values of our estimators are as follows:
 
 $$
-\begin{align*}  \hat{p}&= \frac{\text{\# Happy}}{N} = \frac{384}{1000} = 0.384 \\  \hat{q}&= \frac{\text{\# In a Relationship}}{N} = \frac{506}{1000} = 0.506 \\  \hat{r}&= \frac{\text{\# Happy} \cap \text{\# In a Relationship}}{N} = \frac{205}{1000} = 0.205.
+\begin{align*} \hat{p}&= \frac{\text{\# Happy}}{N} = \frac{384}{1000} = 0.384 \\ \hat{q}&= \frac{\text{\# In a Relationship}}{N} = \frac{506}{1000} = 0.506 \\ \hat{r}&= \frac{\text{\# Happy} \cap \text{\# In a Relationship}}{N} = \frac{205}{1000} = 0.205.
 \end{align*}
 $$
 
-The estimate of the asymptotic variance of the test statistic is
-$$
+ The estimate of the asymptotic variance of the test statistic is
 
-\hat{V} = \hat{p}\hat{q}(1-\hat{p})(1-\hat{q}) = (0.384)(0.506)(1 - 0.384)(1 - 0.506)  = 0.05913,
+$$
+\hat{V} = \hat{p}\hat{q}(1-\hat{p})(1-\hat{q}) = (0.384)(0.506)(1 - 0.384)(1 - 0.506) = 0.05913,
 $$
 
  giving the test statistic
+
+$$
+T_n = \frac{\sqrt{n}(\hat{r}- \hat{p}\hat{q})}{\sqrt{\hat{V}}} = \frac{\sqrt{1000}(0.205 - 0.384\cdot0.506)}{\sqrt{0.05913}} = 1.391.
 $$
 
-T_n = \frac{\sqrt{n}(\hat{r}- \hat{p}\hat{q})}{\sqrt{\hat{V}}}  = \frac{\sqrt{1000}(0.205 - 0.384\cdot0.506)}{\sqrt{0.05913}} = 1.391.
-$$
+ The standard normal quantile at $\alpha = 0.05$ is $q_{\alpha/2} = \Phi^{-1}\left(1 - \frac{\alpha}{2}\right) = 1.96$, so the test result is
 
-The standard normal quantile at $\alpha = 0.05$ is $q_{\alpha/2}= \Phi^{-1}\left(1- \frac{\alpha}{2}\right) = 1.96$, so the test result is
 $$
-
 |T_n| = 1.391 < q_{\alpha/2} = 1.96
 $$
 
- so we *fail to reject $H_0$ atthe 5% level*. The $p$-value of the test is
+ so we *fail to reject $H_0$ at the 5% level*. The $p$-value of the test is
 
 $$
-\begin{align*}  \text{$p$-value} &\coloneqq \mathbb{P}\left[Z > |T_n|\right] &\quad&\text{($Z \sim \mathcal{N}\left( 0, 1 \right)$)}  \\                   &= \mathbb{P}\left[Z \le |T_n|\right] &\quad&\text{(symmetry)} \\                   &= \mathbb{P}\left[Z \le -T_n\right] + \mathbb{P}\left[Z > T_n\right] \\                   &= 2\Phi(-|T_n|) \\  \implies \text{$p$-value} &= 0.1642.
+\begin{align*} \text{$p$-value} &\coloneqq \mathbb{P}\left[Z > |T_n|\right] &\quad&\text{($Z \sim \mathcal{N}\left( 0, 1 \right)$)}  \\ &= \mathbb{P}\left[Z \le |T_n|\right] &\quad&\text{(symmetry)} \\ &= \mathbb{P}\left[Z \le -T_n\right] + \mathbb{P}\left[Z > T_n\right] \\ &= 2\Phi(-|T_n|) \\ \implies \text{$p$-value} &= 0.1642.
 \end{align*}
 $$
 
- In other words,the lowest level at which we could reject the null hypothesis is at$\alpha = \text{$p$-value} = 0.1642 = 16.42\%$.## Appendix A: Additional Proofs<div class="prop">**Proposition 16**. *A $t$-distribution with $n$ degrees of freedromapproaches a standard normal distribution as $n$ approaches infinity:
-$$
+ In other words, the lowest level at which we could reject the null hypothesis is at $\alpha = \text{$p$-value} = 0.1642 = 16.42\%$.  ## Appendix A: Additional Proofs  <div class="prop">  **Proposition 16**. *A $t$-distribution with $n$ degrees of freedrom approaches a standard normal distribution as $n$ approaches infinity:
 
+$$
 t_n \xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, 1 \right).
 $$
 
-*</div>*Proof.* Student’s $t$-distribution with $\nu$ degrees of freedom isdefined as the distribution of the random variable $T$ such that
-$$
+*  </div>  *Proof.* Student’s $t$-distribution with $\nu$ degrees of freedom is defined as the distribution of the random variable $T$ such that
 
+$$
 t_{\nu} \sim T = \frac{\displaystyle Z}{\displaystyle \sqrt{\frac{V}{\nu}}}
 $$
 
-where $Z \sim \mathcal{N}\left( 0, 1 \right)$, $V \sim \chi^2_{\nu}$,and $Z \perp \!\!\! \perp V$.Let $X_1, \dots, X_n \sim \mathcal{N}\left( \mu, \sigma^2 \right)$ be asequence of i.i.d. random variables. Define the sample mean and samplevariance
+ where $Z \sim \mathcal{N}\left( 0, 1 \right)$, $V \sim \chi^2_{\nu}$, and $Z \perp \!\!\! \perp V$.  Let $X_1, \dots, X_n \sim \mathcal{N}\left( \mu, \sigma^2 \right)$ be a sequence of i.i.d. random variables. Define the sample mean and sample variance
 
 $$
-\begin{align*}  \overline{X}_n&\coloneqq \frac{1}{n}\sum_{i=1}^{n} X_i \\  S_n^2 &\coloneqq \frac{1}{n}\sum_{i=1}^{n} (X_i - \overline{X}_n)^2.
+\begin{align*} \overline{X}_n&\coloneqq \frac{1}{n}\sum_{i=1}^{n} X_i \\ S_n^2 &\coloneqq \frac{1}{n}\sum_{i=1}^{n} (X_i - \overline{X}_n)^2.
 \end{align*}
 $$
 
-Let the random variables
+ Let the random variables
 
 $$
-\begin{align*}  Z &= \frac{\sqrt{n}(\overline{X}_n- \mu)}{\sigma} \\  V &= \frac{n S_n^2}{\sigma^2}.
+\begin{align*} Z &= \frac{\sqrt{n}(\overline{X}_n- \mu)}{\sigma} \\ V &= \frac{n S_n^2}{\sigma^2}.
 \end{align*}
 $$
 
- such that$Z \sim \mathcal{N}\left( 0, 1 \right)$ by the Central Limit Theorem,and $V \sim\chi^2_{n-1}$ by Cochran’s Theorem (which also shows that$Z \perp \!\!\! \perp V$). Then, the $t$-distribution is *pivotal*
-$$
+ such that $Z \sim \mathcal{N}\left( 0, 1 \right)$ by the Central Limit Theorem, and $V \sim \chi^2_{n-1}$ by Cochran’s Theorem (which also shows that $Z \perp \!\!\! \perp V$). Then, the $t$-distribution is *pivotal*
 
+$$
 t_{n-1} = \frac{\displaystyle Z}{\displaystyle \sqrt{\frac{V}{n-1}}}.
 $$
 
-<div class="lemma">**Lemma 5**. *The sample variance converges in probability to thevariance,
+  <div class="lemma">  **Lemma 5**. *The sample variance converges in probability to the variance,
 
 $$
 S_n^2 \xrightarrow[n \to \infty]{\mathbb{P}}\sigma^2.
 $$
 
-*</div><div class="proof">*Proof.*
+*  </div>  <div class="proof">  *Proof.*
 
 $$
-\begin{align*}    S_n^2 &\coloneqq \frac{1}{n}\sum_{i=1}^{n}(X_i - \overline{X}_n)^2 \\          &= \frac{1}{n}\sum_{i=1}^{n}(X_i^2 - 2 \overline{X}_nX_i + \overline{X}_n^2) \\          &= \frac{1}{n}\sum_{i=1}^{n} X_i^2 - \frac{1}{n}\sum_{i=1}^{n} 2 \overline{X}_nX_i + \frac{1}{n}\sum_{i=1}^{n} \overline{X}_n^2  \\          &= \frac{1}{n}\sum_{i=1}^{n} X_i^2 - 2 \overline{X}_n\frac{1}{n}\sum_{i=1}^{n} X_i + \overline{X}_n^2  \\          &= \frac{1}{n}\sum_{i=1}^{n} X_i^2 - 2 \overline{X}_n^2  + \overline{X}_n^2  \\          &= \frac{1}{n}\sum_{i=1}^{n} X_i^2 - \overline{X}_n^2.  \end{align*}
+\begin{align*} S_n^2 &\coloneqq \frac{1}{n}\sum_{i=1}^{n}(X_i - \overline{X}_n)^2 \\ &= \frac{1}{n}\sum_{i=1}^{n}(X_i^2 - 2 \overline{X}_nX_i + \overline{X}_n^2) \\ &= \frac{1}{n}\sum_{i=1}^{n} X_i^2 - \frac{1}{n}\sum_{i=1}^{n} 2 \overline{X}_nX_i + \frac{1}{n}\sum_{i=1}^{n} \overline{X}_n^2  \\ &= \frac{1}{n}\sum_{i=1}^{n} X_i^2 - 2 \overline{X}_n\frac{1}{n}\sum_{i=1}^{n} X_i + \overline{X}_n^2  \\ &= \frac{1}{n}\sum_{i=1}^{n} X_i^2 - 2 \overline{X}_n^2  + \overline{X}_n^2  \\ &= \frac{1}{n}\sum_{i=1}^{n} X_i^2 - \overline{X}_n^2. \end{align*}
 $$
 
- The second term in the expression for $S_n^2$ isdetermined by
+ The second term in the expression for $S_n^2$ is determined by
 
 $$
-\begin{align*}    \overline{X}_n&\xrightarrow[n \to \infty]{\mathbb{P}}\mathbb{E}\left[X\right] &\quad&\text{(LLN)} \\    \mathbb{E}\left[X\right] &= \mu &\quad&\text{(given)}. \\    g(\overline{X}_n) &\xrightarrow[n \to \infty]{\mathbb{P}}g(\mu) &\quad&\text{(CMT)} \\    \implies \overline{X}_n^2 &\xrightarrow[n \to \infty]{\mathbb{P}}\mu^2.  \end{align*}
+\begin{align*} \overline{X}_n&\xrightarrow[n \to \infty]{\mathbb{P}}\mathbb{E}\left[X\right] &\quad&\text{(LLN)} \\ \mathbb{E}\left[X\right] &= \mu &\quad&\text{(given)}. \\ g(\overline{X}_n) &\xrightarrow[n \to \infty]{\mathbb{P}}g(\mu) &\quad&\text{(CMT)} \\ \implies \overline{X}_n^2 &\xrightarrow[n \to \infty]{\mathbb{P}}\mu^2. \end{align*}
 $$
 
- The first term in the expression for $S_n^2$ is thendetermined by
+ The first term in the expression for $S_n^2$ is then determined by
 
 $$
-\begin{align*}    \frac{1}{n}\sum_{i=1}^{n} X_i^2 &\xrightarrow[n \to \infty]{\mathbb{P}}\mathbb{E}\left[X^2\right] &\quad&\text{(LLN)} \\    \operatorname{Var}\left(X\right) &= \mathbb{E}\left[X^2\right] - \mathbb{E}\left[X\right]^2 &\quad&\text{(definition)} \\    \implies \mathbb{E}\left[X^2\right] &= \operatorname{Var}\left(X\right) + \mathbb{E}\left[X\right]^2 \\                     &= \sigma^2 + \mu^2. &\quad&\text{(given)} \\    \therefore S_n^2 &\xrightarrow[n \to \infty]{\mathbb{P}}\sigma^2 + \mu^2 - \mu^2 \\    \implies S_n^2 &\xrightarrow[n \to \infty]{\mathbb{P}}\sigma^2 \tag*{◻}  \end{align*}
+\begin{align*} \frac{1}{n}\sum_{i=1}^{n} X_i^2 &\xrightarrow[n \to \infty]{\mathbb{P}}\mathbb{E}\left[X^2\right] &\quad&\text{(LLN)} \\ \operatorname{Var}\left(X\right) &= \mathbb{E}\left[X^2\right] - \mathbb{E}\left[X\right]^2 &\quad&\text{(definition)} \\ \implies \mathbb{E}\left[X^2\right] &= \operatorname{Var}\left(X\right) + \mathbb{E}\left[X\right]^2 \\ &= \sigma^2 + \mu^2. &\quad&\text{(given)} \\ \therefore S_n^2 &\xrightarrow[n \to \infty]{\mathbb{P}}\sigma^2 + \mu^2 - \mu^2 \\ \implies S_n^2 &\xrightarrow[n \to \infty]{\mathbb{P}}\sigma^2 \tag*{◻} \end{align*}
 $$
 
- <span class="qed_symbol">◻</span></div>Thus,$V \xrightarrow[n \to \infty]{\mathbb{P}}\frac{n \sigma^2}{\sigma^2} = n$,a constant.<div class="theorem">**Theorem 6** (Slutsky’s Theorem). *If the sequences of random variables$X_n~\xrightarrow[n \to \infty]{(d)}~X$, and$Y_n~\xrightarrow[n \to \infty]{(d)}~c$, a constant, then
-$$
-
-\begin{align*}    X_n + Y_n &\xrightarrow[n \to \infty]{(d)}X + c \text{, and} \\    X_n Y_n &\xrightarrow[n \to \infty]{(d)}cX.  \end{align*}
-$$
-
-*</div>Since convergence in probability implies convergence in distribution,and $Z\xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, 1 \right)$,Slutsky’s theorem implies that
+ <span class="qed_symbol">◻</span>  </div>  Thus, $V \xrightarrow[n \to \infty]{\mathbb{P}}\frac{n \sigma^2}{\sigma^2} = n$, a constant.  <div class="theorem">  **Theorem 6** (Slutsky’s Theorem). *If the sequences of random variables $X_n~\xrightarrow[n \to \infty]{(d)}~X$, and $Y_n~\xrightarrow[n \to \infty]{(d)}~c$, a constant, then
 
 $$
-\begin{align*}  t_{n-1} = \frac{\displaystyle Z}{\displaystyle \sqrt{\frac{V}{n-1}}}         &\xrightarrow[n \to \infty]{(d)}\frac{\displaystyle \mathcal{N}\left( 0, 1 \right)}{\displaystyle \sqrt{\frac{n}{n-1}}} \\        \implies t_{n-1} &\xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, 1 \right).  \qed
+\begin{align*} X_n + Y_n &\xrightarrow[n \to \infty]{(d)}X + c \text{, and} \\ X_n Y_n &\xrightarrow[n \to \infty]{(d)}cX. \end{align*}
+$$
+
+*  </div>  Since convergence in probability implies convergence in distribution, and $Z \xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, 1 \right)$, Slutsky’s theorem implies that
+
+$$
+\begin{align*} t_{n-1} = \frac{\displaystyle Z}{\displaystyle \sqrt{\frac{V}{n-1}}} &\xrightarrow[n \to \infty]{(d)}\frac{\displaystyle \mathcal{N}\left( 0, 1 \right)}{\displaystyle \sqrt{\frac{n}{n-1}}} \\ \implies t_{n-1} &\xrightarrow[n \to \infty]{(d)}\mathcal{N}\left( 0, 1 \right).  \qed
 \end{align*}
 $$
 
-# Test of Independence for Samples with Continuous CDFConsider the i.i.d. pairs of random variables$(X_1, Y_1), \dots, (X_n, Y_n)$ with some continuous distribution. Whileeach pair is independent, $X_i \perp \!\!\! \perpX_j$ for $i \ne j$, we would like to test if$X_i \perp \!\!\! \perp Y_i$ for all $i$.Define the hypotheses
+  # Test of Independence for Samples with Continuous CDF  Consider the i.i.d. pairs of random variables $(X_1, Y_1), \dots, (X_n, Y_n)$ with some continuous distribution. While each pair is independent, $X_i \perp \!\!\! \perp X_j$ for $i \ne j$, we would like to test if $X_i \perp \!\!\! \perp Y_i$ for all $i$.  Define the hypotheses
 
 $$
-\begin{align*}  H_0 &\colon X_1 \perp \!\!\! \perp Y_1 \\  H_1 &\colon X_1 \centernot\perp \!\!\! \perp Y_1.
+\begin{align*} H_0 &\colon X_1 \perp \!\!\! \perp Y_1 \\ H_1 &\colon X_1 \centernot\perp \!\!\! \perp Y_1.
 \end{align*}
 $$
 
- For$i = 1, \dots, n$, let $R_i$ be the *rank* of $X_i$ in the sample $X_1,\dots, X_n$. The rank function is defined as
-$$
+ For $i = 1, \dots, n$, let $R_i$ be the *rank* of $X_i$ in the sample $X_1, \dots, X_n$. The rank function is defined as
 
+$$
 R_i = \operatorname{rank}(X_i) \coloneqq \#\{j \colon X_j \le X_i\}
 $$
 
-*i.e. *if $X_i = \min_j X_j$, then $R_i = 1$, and if $X_i = \max_jX_j$, then $R_j = n$. Similarly, let $Q_i$ be the rank of $Y_i$ in$Y_1, \dots, Y_n$.## Example ExperimentAn example experiment in which testing for independence of twocontinuous random variables is important is in a scientific experimentin which two devices are measured using sensors powered by the samecircuitry. We would like to ensure that the measurements are notcorrelated.## Dependence of the RanksThe ranks $R_1, \dots, R_n$ are *not* independent because the rank of$X_i$ in the sample is unique. Therefore, if you know that $R_1 = 1$,*e.g.*, then $R_2,\dots,R_n \ne 1$.## Proof of Distribution of Ranks<div class="prop">**Proposition 17**. *The distribution of the vector $(R_1, \dots, R_n)$does *not* depend on the distribution of $X_i$’s (and, similarly, thedistribution of $(Q_1,  \dots, Q_n)$ does not depend on the distribution of $Y_i$’s).*</div><div class="proof">*Proof.* Given the definition of $R_i
+ *i.e. *if $X_i = \min_j X_j$, then $R_i = 1$, and if $X_i = \max_j X_j$, then $R_j = n$. Similarly, let $Q_i$ be the rank of $Y_i$ in $Y_1, \dots, Y_n$.  ## Example Experiment  An example experiment in which testing for independence of two continuous random variables is important is in a scientific experiment in which two devices are measured using sensors powered by the same circuitry. We would like to ensure that the measurements are not correlated.  ## Dependence of the Ranks  The ranks $R_1, \dots, R_n$ are *not* independent because the rank of $X_i$ in the sample is unique. Therefore, if you know that $R_1 = 1$, *e.g.*, then $R_2,\dots,R_n \ne 1$.  ## Proof of Distribution of Ranks  <div class="prop">  **Proposition 17**. *The distribution of the vector $(R_1, \dots, R_n)$ does *not* depend on the distribution of $X_i$’s (and, similarly, the distribution of $(Q_1, \dots, Q_n)$ does not depend on the distribution of $Y_i$’s).*  </div>  <div class="proof">  *Proof.* Given the definition of $R_i$
+
+$$
+R_i = \operatorname{rank}(X_i) \coloneqq \#\{j \colon X_j \le X_i
 $$
 
-$R_i = \operatorname{rank}(X_i) \coloneqq \#\{j \colon X_j \le X_i
-$$
+ we can determine its distribution. Let
 
- wecan determine its distribution. Let
 $$
-
 F_n(t) = \frac{1}{n}\sum_{i=1}^{n} \indic{X_i \le t}
 $$
 
- for some$t \in \mathbb{R}$ be the empirical cdf of the sample $X_i$’s. We canthen rewrite the definition of the rank as
-$$
+ for some $t \in \mathbb{R}$ be the empirical cdf of the sample $X_i$’s. We can then rewrite the definition of the rank as
 
+$$
 R_i = \sum_{j=1}^{n} \indic{X_j \le X_i} = n F_n(X_i).
 $$
 
- The cdf of$R_i$, $F_R(t)$ is then
+ The cdf of $R_i$, $F_R(t)$ is then
 
 $$
-\begin{align*}    \mathbb{P}\left[R_i \le t\right] &= \mathbb{P}\left[n F_n(X_i) \le t\right] \\                     &= \mathbb{P}\left[X_i \le F_n^{-1}\left(\tfrac{t}{n}\right)\right] \\                     &= F_n\left(F_n^{-1}\left(\tfrac{t}{n}\right)\right)  \end{align*}
+\begin{align*} \mathbb{P}\left[R_i \le t\right] &= \mathbb{P}\left[n F_n(X_i) \le t\right] \\ &= \mathbb{P}\left[X_i \le F_n^{-1}\left(\tfrac{t}{n}\right)\right] \\ &= F_n\left(F_n^{-1}\left(\tfrac{t}{n}\right)\right) \end{align*}
 $$
 
- Since $F_n$ is a piecewise-constant function,$F_n^{-1}$ does not exist. To avoid ambiguity, define
-$$
+ Since $F_n$ is a piecewise-constant function, $F_n^{-1}$ does not exist. To avoid ambiguity, define
 
+$$
 F_n^{-1}(p) = \inf\{x \colon F_n(x) \ge p\}
 $$
 
- where $p \in (0, 1)$.Given the definition of the empirical cdf, its inverse can only take thediscrete values $X_1, \dots, X_n$, so
-$$
+ where $p \in (0, 1)$. Given the definition of the empirical cdf, its inverse can only take the discrete values $X_1, \dots, X_n$, so
 
-F_n\left(F_n^{-1}\left(\tfrac{t}{n}\right)\right)       = \frac{\floor{t}}{n} \quad t \in [0, n]
+$$
+F_n\left(F_n^{-1}\left(\tfrac{t}{n}\right)\right) = \frac{\floor{t}}{n} \quad t \in [0, n]
 $$
 
  Therefore,
+
+$$
+\begin{align*} \mathbb{P}\left[R_i \le t\right] &= \frac{\floor{t}}{n} \quad t \in [0, n] \\ &= \left\{0, \tfrac{1}{n}, \tfrac{2}{n}, \dots, 1\right\} \\ \implies F_R(t) &= \left\{0, \tfrac{1}{n}, \tfrac{2}{n}, \dots, 1\right\} \\ \implies f_R(t) &= \mathcal{U}(\{0,\dots,n\}) \\ \implies F_R(t) &\perp \!\!\! \perp F_X(t) \tag*{◻} \end{align*}
 $$
 
-\begin{align*}    \mathbb{P}\left[R_i \le t\right] &= \frac{\floor{t}}{n} \quad t \in [0, n] \\                    &= \left\{0, \tfrac{1}{n}, \tfrac{2}{n}, \dots, 1\right\} \\    \implies F_R(t) &= \left\{0, \tfrac{1}{n}, \tfrac{2}{n}, \dots, 1\right\} \\    \implies f_R(t) &= \mathcal{U}(\{0,\dots,n\}) \\    \implies F_R(t) &\perp \!\!\! \perp F_X(t) \tag*{◻}  \end{align*}
-$$
+ <span class="qed_symbol">◻</span>  </div>  An interpretation of this result is that $(R_1, \dots, R_n)$ is a permutation of the vector $(1, \dots, n)$, with equal probability of any permutation.  ## The Null Hypothesis  <div class="prop">  **Proposition 18**. *If $H_0$ is true, then $(R_1, \dots, R_n) \perp \!\!\! \perp(Q_1, \dots, Q_n)$.*  </div>  <div class="proof">  *Proof.* Under $H_0$, $X_i \perp \!\!\! \perp Y_i$, so
 
- <span class="qed_symbol">◻</span></div>An interpretation of this result is that $(R_1, \dots, R_n)$ is apermutation of the vector $(1, \dots, n)$, with equal probability of anypermutation.## The Null Hypothesis<div class="prop">**Proposition 18**. *If $H_0$ is true, then$(R_1, \dots, R_n) \perp \!\!\! \perp(Q_1, \dots, Q_n)$.*</div><div class="proof">*Proof.* Under $H_0$, $X_i \perp \!\!\! \perp Y_i$, so
 $$
-
 \mathbb{P}\left[X = x \land Y = y\right] = \mathbb{P}\left[X=x\right]\mathbb{P}\left[Y=y\right]
 $$
 
-Since the empirical cdfs $F_n$ and $G_n$ of $X_i$ and $Y_j$,respectively, are monotonically increasing, we can apply them to everyvalue to get the expression
+ Since the empirical cdfs $F_n$ and $G_n$ of $X_i$ and $Y_j$, respectively, are monotonically increasing, we can apply them to every value to get the expression
 
 $$
-\begin{split}      &\mathbb{P}\left[nF_n(X) = nF_n(x) \land nG_n(Y) = nG_n(y)\right] \\      &\quad = \mathbb{P}\left[nF_n(X)=nF_n(x)\right]\mathbb{P}\left[nG_n(Y)=nG_n(y)\right].      \end{split}
+\begin{split} &\mathbb{P}\left[nF_n(X) = nF_n(x) \land nG_n(Y) = nG_n(y)\right] \\ &\quad = \mathbb{P}\left[nF_n(X)=nF_n(x)\right]\mathbb{P}\left[nG_n(Y)=nG_n(y)\right]. \end{split}
 $$
 
- The rank $R_i = n F_n(X_i)$, and, similarly,$Q_j = n G_n(Y_j)$. The non-random values $nF_n(x)$ and $nG_n(y)$ arearbitrary integers in $(0, \dots, n)$, which we denote by $k$ and$\ell$. Therefore,
+ The rank $R_i = n F_n(X_i)$, and, similarly, $Q_j = n G_n(Y_j)$. The non-random values $nF_n(x)$ and $nG_n(y)$ are arbitrary integers in $(0, \dots, n)$, which we denote by $k$ and $\ell$. Therefore,
 
 $$
-\begin{align*}    \mathbb{P}\left[R_i = k \land Q_j = \ell\right] &= \mathbb{P}\left[R_i = k\right]\mathbb{P}\left[Q_j = \ell\right] \\    \implies R &\perp \!\!\! \perp Q. \tag*{◻}  \end{align*}
+\begin{align*} \mathbb{P}\left[R_i = k \land Q_j = \ell\right] &= \mathbb{P}\left[R_i = k\right]\mathbb{P}\left[Q_j = \ell\right] \\ \implies R &\perp \!\!\! \perp Q. \tag*{◻} \end{align*}
 $$
 
- <span class="qed_symbol">◻</span></div>## Conclusion Under the Null HypothesisUnder $H_0$, we have just shown that $R \perp \!\!\! \perp Q$, so thejoint distribution of the $2n$ random variables$R_1, \dots, R_n, Q_1, \dots, Q_n$ is a discrete uniform distribution on$[0, n]$, and does not depend on the distributions of the $X$’s or$Y$’s.## The Test StatisticConsider the test statistic
-$$
+ <span class="qed_symbol">◻</span>  </div>  ## Conclusion Under the Null Hypothesis  Under $H_0$, we have just shown that $R \perp \!\!\! \perp Q$, so the joint distribution of the $2n$ random variables $R_1, \dots, R_n, Q_1, \dots, Q_n$ is a discrete uniform distribution on $[0, n]$, and does not depend on the distributions of the $X$’s or $Y$’s.  ## The Test Statistic  Consider the test statistic
 
+$$
 T_n \coloneqq \frac{\displaystyle \sum_{i=1}^{n}(R_i - \overline{R}_n)(Q_i - \overline{Q}_n)}{\displaystyle \sqrt{\sum_{i=1}^{n} (R_i - \overline{R}_n)^2 \sum_{i=1}^{n} (Q_i - \overline{Q}_n)^2}}.
 $$
 
-This test statistic is the empirical correlation between the twosamples. If $H_0$ is true, then $T_n \to 0$. We will now show that $T_n$has a much simpler expression.### Simplifying the Rank Averages<div id="prop:rn1" class="prop">**Proposition 19**. *
+ This test statistic is the empirical correlation between the two samples. If $H_0$ is true, then $T_n \to 0$. We will now show that $T_n$ has a much simpler expression.  ### Simplifying the Rank Averages  <div id="prop:rn1" class="prop">  **Proposition 19**. *
 $$
 
 \overline{R}_n= \overline{Q}_n= \frac{n+1}{2}
 $$
 
-*</div><div class="proof">*Proof.* Because $R \perp \!\!\! \perp Q$ and $R, Q$ are eachpermutations of $(1, \dots, n)$, the first equality is true.
-$$
+*  </div>  <div class="proof">  *Proof.* Because $R \perp \!\!\! \perp Q$ and $R, Q$ are each permutations of $(1, \dots, n)$, the first equality is true.
 
-\begin{align*}    \overline{R}_n&\coloneqq \frac{1}{n}\sum_{i=1}^{n} R_i \\           &= \frac{1}{n}\sum_{i=1}^{n} i &\quad&\text{(permutation of $(1, \dots, n)$)} \\           &= \frac{1}{n}\sum_{i=1}^{n} Q_i &\quad&\text{($R \perp \!\!\! \perp Q$)} \\    \implies \overline{R}_n&= \overline{Q}_n.  \end{align*}
+$$
+\begin{align*} \overline{R}_n&\coloneqq \frac{1}{n}\sum_{i=1}^{n} R_i \\ &= \frac{1}{n}\sum_{i=1}^{n} i &\quad&\text{(permutation of $(1, \dots, n)$)} \\ &= \frac{1}{n}\sum_{i=1}^{n} Q_i &\quad&\text{($R \perp \!\!\! \perp Q$)} \\ \implies \overline{R}_n&= \overline{Q}_n. \end{align*}
 $$
 
  Recognize the average as a geometric series
+
+$$
+\begin{align*} \overline{R}_n&= \frac{1}{n}\sum_{i=1}^{n} \\ &= \frac{1}{n} \frac{n(n+1)}{2} &\quad&\text{(geometric series)} \\ \implies \overline{R}_n= \overline{Q}_n&= \frac{n+1}{2}. \tag*{◻} \end{align*}
 $$
 
-\begin{align*}    \overline{R}_n&= \frac{1}{n}\sum_{i=1}^{n} \\           &= \frac{1}{n} \frac{n(n+1)}{2} &\quad&\text{(geometric series)} \\   \implies \overline{R}_n= \overline{Q}_n&= \frac{n+1}{2}. \tag*{◻}  \end{align*}
-$$
-
- <span class="qed_symbol">◻</span></div><div id="prop:rn2" class="prop">**Proposition 20**.*
+ <span class="qed_symbol">◻</span>  </div>  <div id="prop:rn2" class="prop">  **Proposition 20**. *
 $$
 
 \sum_{i=1}^{n} (R_i - \overline{R}_n)^2 = \sum_{i=1}^{n} (Q_i - \overline{Q}_n)^2 = \frac{n(n^2 - 1)}{12}
 $$
 
-*</div><div class="proof">*Proof.* The first equality is true because $R, Q$ are each permutationsof $(1, \dots, n)$. The sum evaluates to
+*  </div>  <div class="proof">  *Proof.* The first equality is true because $R, Q$ are each permutations of $(1, \dots, n)$. The sum evaluates to
 
 $$
-\begin{align*}    \sum_{i=1}^{n} (R_i - \overline{R}_n)^2 &= \sum_{i=1}^{n} (R_i^2 - 2\overline{R}_nR_i + \overline{R}_n^2) \\    &= \sum_{i=1}^{n} \left(i^2 - 2 i \frac{n+1}{2} + \left(\frac{n+1}{2}\right)^2 \right) \\    &= \sum_{i=1}^{n} i^2 - (n+1)\sum_{i=1}^{n} i + \frac{(n+1)^2}{4} \sum_{i=1}^{n} 1 \\    \end{align*}
+\begin{align*} \sum_{i=1}^{n} (R_i - \overline{R}_n)^2 &= \sum_{i=1}^{n} (R_i^2 - 2\overline{R}_nR_i + \overline{R}_n^2) \\ &= \sum_{i=1}^{n} \left(i^2 - 2 i \frac{n+1}{2} + \left(\frac{n+1}{2}\right)^2 \right) \\ &= \sum_{i=1}^{n} i^2 - (n+1)\sum_{i=1}^{n} i + \frac{(n+1)^2}{4} \sum_{i=1}^{n} 1 \\ \intertext{Using the fact that $\sum_{i=1}^{n} i^2 = \frac{n(n+1)(2n+1)}{6}$, and the previous result,} &= \frac{n(n+1)(2n+1)}{6} - (n+1) \frac{n(n+1)}{2} + \frac{n(n+1)^2}{4} \\ &= \frac{2n^3 + 3n^2 + n}{6} - \frac{n^3 + 2n^2 + n}{2} + \frac{n^3 + 2n^2 + n}{4}  \\ &= \frac{1}{12} (4n^3 + 6n^2 + 2n - 6n^3 - 12n^2 - 6n + 3n^3 + 6n^2 + 3n) \\ &= \frac{1}{12} (n^3 - n) \\ &= \frac{n(n^2 - 1)}{12} \tag*{◻} \end{align*}
 $$
 
- Using the fact that $\sum_{i=1
+ <span class="qed_symbol">◻</span>  </div>  ### The Test Statistic Simplified  <div class="prop">  **Proposition 21**. *The test statistic can be written as
 
 $$
-\begin{align*}^{n} i^2 = \frac{n(n+1)(2n+1)}{6}$,      and the previous result,}    &= \frac{n(n+1)(2n+1)}{6} - (n+1) \frac{n(n+1)}{2} + \frac{n(n+1)^2}{4} \\    &= \frac{2n^3 + 3n^2 + n}{6} - \frac{n^3 + 2n^2 + n}{2} + \frac{n^3 + 2n^2 + n}{4}  \\    &= \frac{1}{12} (4n^3 + 6n^2 + 2n - 6n^3 - 12n^2 - 6n + 3n^3 + 6n^2 + 3n) \\    &= \frac{1}{12} (n^3 - n) \\    &= \frac{n(n^2 - 1)}{12} \tag*{◻}  \end{align*}
-$$
-
- <span class="qed_symbol">◻</span></div>### The Test Statistic Simplified<div class="prop">**Proposition 21**. *The test statistic can be written as
-$$
-
 T_n = \frac{12}{n(n^2 - 1)} \sum_{i=1}^{n}R_iQ_i - \frac{3(n+1)}{n-1}.
 $$
 
-*</div><div class="proof">*Proof.* Plugging the expressions fromPropositions <a href="#prop:rn1" data-reference-type="ref" data-reference="prop:rn1">Proposition 19</a>and <a href="#prop:rn2" data-reference-type="ref" data-reference="prop:rn2">Proposition 20</a>into the definition of $T_n$,
+*  </div>  <div class="proof">  *Proof.* Plugging the expressions from Propositions <a href="#prop:rn1" data-reference-type="ref" data-reference="prop:rn1">Proposition 19</a> and <a href="#prop:rn2" data-reference-type="ref" data-reference="prop:rn2">Proposition 20</a> into the definition of $T_n$,
 
 $$
-\begin{align*}    T_n &\coloneqq \frac{\displaystyle \sum_{i=1}^{n}(R_i - \overline{R}_n)(Q_i - \overline{Q}_n)}{\displaystyle \sqrt{\sum_{i=1}^{n} (R_i - \overline{R}_n)^2 \sum_{i=1}^{n} (Q_i - \overline{Q}_n)^2}} \\    &= \frac{\displaystyle \sum_{i=1}^{n}\left(R_i - \frac{n+1}{2}\right)\left(Q_i - \frac{n+1}{2}\right)}{\displaystyle \sqrt{\frac{n(n^2 - 1)}{12} \frac{n(n^2 - 1)}{12}}} \\    &= \frac{\displaystyle \sum_{i=1}^{n}\left(R_iQ_i                                 - \frac{n+1}{2}(R_i + Q_i)                                 + \left(\frac{n+1}{2}\right)^2 \right)}{\displaystyle \frac{n(n^2 - 1)}{12}} \\    &= \frac{12}{n(n^2 - 1)} \left[ \sum_{i=1}^{n}R_iQ_i     + \left(\frac{n+1}{2}\right)^2  \sum_{i=1}^{n} 1    - \frac{n+1}{2}\sum_{i=1}^{n}(R_i + Q_i) \right]  \end{align*}
+\begin{align*} T_n &\coloneqq \frac{\displaystyle \sum_{i=1}^{n}(R_i - \overline{R}_n)(Q_i - \overline{Q}_n)}{\displaystyle \sqrt{\sum_{i=1}^{n} (R_i - \overline{R}_n)^2 \sum_{i=1}^{n} (Q_i - \overline{Q}_n)^2}} \\ &= \frac{\displaystyle \sum_{i=1}^{n}\left(R_i - \frac{n+1}{2}\right)\left(Q_i - \frac{n+1}{2}\right)}{\displaystyle \sqrt{\frac{n(n^2 - 1)}{12} \frac{n(n^2 - 1)}{12}}} \\ &= \frac{\displaystyle \sum_{i=1}^{n}\left(R_iQ_i - \frac{n+1}{2}(R_i + Q_i) + \left(\frac{n+1}{2}\right)^2 \right)}{\displaystyle \frac{n(n^2 - 1)}{12}} \\ &= \frac{12}{n(n^2 - 1)} \left[ \sum_{i=1}^{n}R_iQ_i + \left(\frac{n+1}{2}\right)^2  \sum_{i=1}^{n} 1 - \frac{n+1}{2}\sum_{i=1}^{n}(R_i + Q_i) \right] \end{align*}
 $$
 
- The first term matches the first term of theproposition. The remaining two terms simplify to
+ The first term matches the first term of the proposition. The remaining two terms simplify to
 
 $$
-\begin{align*}    &\phantom{=} \frac{12}{n(n^2 - 1)} \left[ \left(\frac{n+1}{2}\right)^2  \sum_{i=1}^{n} 1    - \frac{n+1}{2}\sum_{i=1}^{n}(R_i + Q_i) \right]  \\    &= \frac{12}{n(n^2 - 1)} \left[ \frac{n(n+1)^2}{4} - \frac{n+1}{2}\sum_{i=1}^{n}2i \right] \\    &= \frac{12}{n(n^2 - 1)} \left[ \frac{n(n+1)^2}{4} - (n+1)\frac{n(n+1)}{2} \right] \\    &= \frac{12}{n(n+1)(n-1)} \left[ \frac{n(n+1)^2}{4} - \frac{n(n+1)^2}{2} \right] \\    &= \frac{12}{n-1} \left[ \frac{n+1}{4} - \frac{n+1}{2} \right] \\    &= \frac{12}{n-1} \left[ -\frac{n+1}{4} \right] \\    &= \frac{3(n+1)}{n-1} \\    \implies T_n &= \frac{12}{n(n^2 - 1)} \sum_{i=1}^{n}R_iQ_i - \frac{3(n+1)}{n-1}. \tag*{◻}  \end{align*}
+\begin{align*} &\phantom{=} \frac{12}{n(n^2 - 1)} \left[ \left(\frac{n+1}{2}\right)^2  \sum_{i=1}^{n} 1 - \frac{n+1}{2}\sum_{i=1}^{n}(R_i + Q_i) \right]  \\ &= \frac{12}{n(n^2 - 1)} \left[ \frac{n(n+1)^2}{4} - \frac{n+1}{2}\sum_{i=1}^{n}2i \right] \\ &= \frac{12}{n(n^2 - 1)} \left[ \frac{n(n+1)^2}{4} - (n+1)\frac{n(n+1)}{2} \right] \\ &= \frac{12}{n(n+1)(n-1)} \left[ \frac{n(n+1)^2}{4} - \frac{n(n+1)^2}{2} \right] \\ &= \frac{12}{n-1} \left[ \frac{n+1}{4} - \frac{n+1}{2} \right] \\ &= \frac{12}{n-1} \left[ -\frac{n+1}{4} \right] \\ &= \frac{3(n+1)}{n-1} \\ \implies T_n &= \frac{12}{n(n^2 - 1)} \sum_{i=1}^{n}R_iQ_i - \frac{3(n+1)}{n-1}. \tag*{◻} \end{align*}
 $$
 
- <span class="qed_symbol">◻</span></div>## The Distribution of the Test Statistic is Pivotal<div class="prop">**Proposition 22**. *If $H_0 \colon X \perp \!\!\! \perp Y$ is true,then
-$$
+ <span class="qed_symbol">◻</span>  </div>  ## The Distribution of the Test Statistic is Pivotal  <div class="prop">  **Proposition 22**. *If $H_0 \colon X \perp \!\!\! \perp Y$ is true, then
 
+$$
 T_n \sim S_n = \frac{12}{n(n^2 - 1)} \sum_{i=1}^{n} R_i' Q_i' - \frac{3(n+1)}{n-1},
 $$
 
-where $(R_1', \dots, R_n')$ and $(Q_1', \dots, Q_n')$ are ranks of twoi.i.d. samples of $\mathcal{U}\left(\left[ 0, 1 \right]\right)$.*</div><div class="proof">*Proof.* Using the previous arguments, the proof is as follows:-   By the argument in    §<a href="#subsec:3" data-reference-type="ref" data-reference="subsec:3">4.3</a>,    the distributions of $R_i', Q_i'$ do not depend on the distributions    of the underlying random variables.-   By the argument in    §<a href="#subsec:4" data-reference-type="ref" data-reference="subsec:4">4.4</a>,    the vector $(R_1', \dots, R_n')          \perp \!\!\! \perp(Q_1', \dots, Q_n')$ under $H_0$, so their    distribution is known, and is the same discrete uniform distribution    as $R, Q$.-   By the argument in    §<a href="#subsec:6" data-reference-type="ref" data-reference="subsec:6">4.6</a>,    $T_n = S_n(R, Q)$.Therefore, by the Continuous Mapping Theorem, $T_n \sim S_n$. <span class="qed_symbol">◻</span></div>## Computing Quantiles of the Test StatisticLet $\alpha \in (0, 1)$.Algorithm <a href="#alg:sn_q" data-reference-type="ref" data-reference="alg:sn_q">[alg:sn_q]</a>approximates the $(1-\alpha)$-quantile of $S_n$, $q_\alpha$.``` algorithm\fi\begin{algorithm}[H]  \caption{Approximate $q_\alpha$, the $(1 - \alpha)$-quantile of thedistribution of $S_n$ under $H_0$.}  \label{alg:sn_q}  \begin{algorithmic}    \Require $M, n \in \mathbb{N}$. $\alpha \in (0, 1)$.    \Ensure $q_\alpha \in [0, 1]$.    \Procedure{SnQuantile}{$n, M, \alpha$}      \State $S_v \gets$ empty array of size $M$      \ForAll{$i \in \{1,\dots,M\}$}        \State $R \gets$ random permutation of $(1, \dots, n)$.        \State $Q \gets$ random permutation of $(1, \dots, n)$.        \State $S_v^{(i)} \gets \frac{12}{n(n^2 - 1)} \langle R, Q \rangle - \frac{3(n+1)}{n-1}$
+ where $(R_1', \dots, R_n')$ and $(Q_1', \dots, Q_n')$ are ranks of two i.i.d. samples of $\mathcal{U}\left(\left[ 0, 1 \right]\right)$.*  </div>  <div class="proof">  *Proof.* Using the previous arguments, the proof is as follows:  -   By the argument in §<a href="#subsec:3" data-reference-type="ref" data-reference="subsec:3">4.3</a>, the distributions of $R_i', Q_i'$ do not depend on the distributions of the underlying random variables.  -   By the argument in §<a href="#subsec:4" data-reference-type="ref" data-reference="subsec:4">4.4</a>, the vector $(R_1', \dots, R_n') \perp \!\!\! \perp(Q_1', \dots, Q_n')$ under $H_0$, so their distribution is known, and is the same discrete uniform distribution as $R, Q$.  -   By the argument in §<a href="#subsec:6" data-reference-type="ref" data-reference="subsec:6">4.6</a>, $T_n = S_n(R, Q)$.  Therefore, by the Continuous Mapping Theorem, $T_n \sim S_n$. <span class="qed_symbol">◻</span>  </div>  ## Computing Quantiles of the Test Statistic  Let $\alpha \in (0, 1)$. Algorithm <a href="#alg:sn_q" data-reference-type="ref" data-reference="alg:sn_q">[alg:sn_q]</a> approximates the $(1-\alpha)$-quantile of $S_n$, $q_\alpha$.  ``` algorithm \fi \begin{algorithm}[H] \caption{Approximate $q_\alpha$, the $(1 - \alpha)$-quantile of the distribution of $S_n$ under $H_0$.} \label{alg:sn_q} \begin{algorithmic} \Require $M, n \in \mathbb{N}$. $\alpha \in (0, 1)$. \Ensure $q_\alpha \in [0, 1]$. \Procedure{SnQuantile}{$n, M, \alpha$} \State $S_v \gets$ empty array of size $M$ \ForAll{$i \in \{1,\dots,M\}$} \State $R \gets$ random permutation of $(1, \dots, n)$. \State $Q \gets$ random permutation of $(1, \dots, n)$. \State $S_v^{(i)} \gets \frac{12}{n(n^2 - 1)} \langle R, Q \rangle - \frac{3(n+1)}{n-1}$
       \EndFor
       \State $S_{vs} \gets$ \Call{Sort}{$S_v$}
       \State $j \gets \ceil*{M(1 - \alpha)}$
