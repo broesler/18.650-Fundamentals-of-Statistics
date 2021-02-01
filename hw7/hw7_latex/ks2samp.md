@@ -26,7 +26,7 @@ whether $F = G$. Consider the following hypotheses:
 $$
 \begin{align}
   H_0 \colon ``F = G" \nonumber\\
-  H_1 \colon ``F \ne G"
+  H_1 \colon ``F \ne G"\nonumber
 \end{align}
 $$
 
@@ -47,7 +47,7 @@ Let
 $$
 \begin{align}
   U_i &= F(X_i), \quad \forall i = 1, \dots, n, \nonumber\\
-  V_j &= G(Y_j), \quad \forall j = 1, \dots, n.
+  V_j &= G(Y_j), \quad \forall j = 1, \dots, n.\nonumber
 \end{align}
 $$
 
@@ -73,7 +73,7 @@ $$
                    &= F(F^{-1}(t)) &\quad&\text{(definition of cdf)} \nonumber\\
                    &= t \nonumber\\
   \therefore F_U(t) &= t \nonumber\\
-  \implies f_U(t) &= \mathcal{U}\left(\left[ 0, 1 \right]\right) \tag*{◻}
+  \implies f_U(t) &= \mathcal{U}\left(\left[ 0, 1 \right]\right) \tag*{◻}\nonumber
 \end{align}
 $$
 
@@ -298,8 +298,9 @@ which is a function only of the cdfs.*
 *Proof.* By $\eqref{eq:F_n}$ and $\eqref{eq:G_m}$,
 
 $$
-\label{eq:Tnm_supt}
+\begin{equation} \label{eq:Tnm_supt}
     T_{n,m} = \sup_{t \in \mathbb{R}} \left| \frac{1}{n}\sum_{i=1}^{n} \mathbb{1}\!\left\{X_i \le t\right\} - \frac{1}{m}\sum_{j=1}^{m} \mathbb{1}\!\left\{Y_j \le t\right\} \right|.
+  \end{equation}
 $$
 
 To show the proposition is true, we make a change of variable. Let
@@ -328,9 +329,9 @@ $$
 
 $$
 \begin{align}
-    Y_i \le t &\iff G(Y_i) \le G(t) \\
-              &\iff G(Y_i) \le F(t) &\quad&\text{(under $H_0$)} \\
-              &\iff V_i \le x &\quad&\text{(definition)}.
+    Y_i \le t &\iff G(Y_i) \le G(t) \nonumber\\
+              &\iff G(Y_i) \le F(t) &\quad&\text{(under $H_0$)} \nonumber\\
+              &\iff V_i \le x &\quad&\text{(definition)}.\nonumber
   \end{align}
 $$
 
@@ -367,11 +368,11 @@ $$
 
 $$
 \begin{align}
-                     &= \mathbb{P}\left[X_1 \le F^{-1}(t)\right] \\
-                     &= F(F^{-1}(t)) &\quad&\text{(definition of cdf)} \\
-                     &= t \\
-    \therefore F_U(t) &= G_V(t) = t \\
-    \implies f_{U,V}(t) &= \mathcal{U}\left(\left[ 0, 1 \right]\right) \tag*{◻}
+                     &= \mathbb{P}\left[X_1 \le F^{-1}(t)\right] \nonumber\\
+                     &= F(F^{-1}(t)) &\quad&\text{(definition of cdf)} \nonumber\\
+                     &= t \nonumber\\
+    \therefore F_U(t) &= G_V(t) = t \nonumber\\
+    \implies f_{U,V}(t) &= \mathcal{U}\left(\left[ 0, 1 \right]\right) \tag*{◻}\nonumber
   \end{align}
 $$
 
@@ -400,7 +401,7 @@ $$
            &= \inf\{x \colon F(x) \ge 1 - \alpha\} \nonumber\\
            &\approx \min\{x \colon F_n(x) \ge 1 - \alpha\}, \quad n < \infty \nonumber\\
            \implies q_\alpha \approx \hat{q}_\alpha &= \min_i \left\{\nonumber
-               T_{n,m}^{(i)} \colon \tfrac{i}{M} \ge 1 - \alpha \right\}
+               T_{n,m}^{(i)} \colon \tfrac{i}{M} \ge 1 - \alpha \right\}\nonumber
 \end{align}
 $$
 
@@ -468,7 +469,7 @@ The p-value for this test is
 $$
 \begin{align}
   \text{p-value} &\coloneqq \mathbb{P}\left[Z \ge T_{n,m}\right] \nonumber\\
-  &\approx \frac{\#\{j = 1, \dots, M \colon T_{n,m}^{(j)} \ge T_{n,m}\}}{M}
+  &\approx \frac{\#\{j = 1, \dots, M \colon T_{n,m}^{(j)} \ge T_{n,m}\}}{M}\nonumber
 \end{align}
 $$
 

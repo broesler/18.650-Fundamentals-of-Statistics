@@ -20,19 +20,6 @@ s/\\intertext\{(.+)\}$/\\end{align}$$ \1 $$\\begin{align}/
 }
 # place \end{} on new line
 /([^[:blank:]])(\\end)/ s//\1\n\2/g
-# In align environments, don't number equations unless labeled
-/\\begin\{align/,/\\end\{align/ { 
-    # /\\begin\{(bmatrix|split)\}/,/\\end\{(bmatrix|split)\}/! {
-        /\\(begin|end)/! {
-            /\\numberthis/! {
-                s/(\\\\)?$/\\nonumber\1/g
-            }
-        }
-    # }
-    # /\\end\{(bmatrix|split)\}/ s/(\\\\)?$/\\nonumber\1/g
-}
-# Remove the \numberthis commands
-s/\\numberthis//
 # Parse algorithm environment
 /^``` algorithm$/,/^```$/ {
     # remove comments and extraneous lines

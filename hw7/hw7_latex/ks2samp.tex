@@ -215,9 +215,9 @@ empirical cdf of $\{Y_1, \dots, Y_m\}$.
 
 \subsubsection{The Test Statistic}
 Let
-\begin{equation}
+\[
   T_{n,m} = \sup_{t \in \R} \left| F_n(t) - G_m(t) \right|
-\end{equation}
+\]
 
 \begin{prop}
   The test statistic $T_{n,m}$ can be written as the maximum value of a finite set of numbers.
@@ -234,9 +234,9 @@ Let
     \intertext{Likewise,}
     G_m(t) &= \avg{j}{m} \indic{Y_j \le t}. \numberthis \label{eq:G_m}
   \end{alignat*}
-  \begin{equation}
+  \[
     \therefore T_{n,m} = \sup_{t \in \R} \left| \avg{i}{n} \indic{X_i \le t} - \avg{j}{m} \indic{Y_j \le t} \right|.
-  \end{equation}
+  \]
   The empirical cdfs~\eqref{eq:F_n}~and~\eqref{eq:G_m} can also be written
   \begin{alignat}{3}
     F_n(t) &= \#\{i=1, \dots, n \colon X_i \le t\} \cdot \frac{1}{n} \\
@@ -249,7 +249,7 @@ Let
   \end{align}
   Therefore, the test statistic can be rewritten as the maximum value of
   a finite set of numbers:
-  \begin{equation}
+  \[
     \begin{split}
       T_{n,m} = \max_{i=0,\dots,n} \Bigg[
       &\max_{j=0,\dots,m} \left| \frac{i}{n} - \frac{j}{m} \right|
@@ -257,7 +257,7 @@ Let
       &\max_{k=j+1, \dots, m} \left| \frac{i}{n} - \frac{k}{m} \right|
         \indic{Y^{(k)} \le X^{(i+1)}} \Bigg]
     \end{split}
-  \end{equation}
+  \]
   where $X^{(i)}$ is the $i^\text{th}$ value in the ordered set of data
   $X^{(1)} \le \cdots \le X^{(n)}$. The values $X^{(0)}, Y^{(0)} \coloneqq -\infty$
   are prepended to the otherwise finite realizations to simplify the
@@ -433,9 +433,9 @@ quantiles.
 Given the aproximation for $\hat{q}_\alpha$ for $q_\alpha$ from
 Algorithm~\ref{alg:ks_q}, we define a test with non-asymptotic level $\alpha$
 for $H_0$ vs.\ $H_1$:
-\begin{equation}
+\[
   \delta_\alpha = \indic{T_{n,m} > \hat{q}_\alpha^{(n, M)}}
-\end{equation}
+\]
 where $T_{n,m}$ is found by Algorithm~\ref{alg:ks_stat}. The p-value for this
 test is
 \begin{align}

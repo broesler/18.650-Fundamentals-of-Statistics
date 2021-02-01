@@ -38,7 +38,7 @@ sed -E -n -e '1,/\\maketitle/ p' \
 # Filter some LaTeX before using pandoc, then filter the markdown.
 sed -E -f before.sed "$post_texfile" \
     | pandoc -f latex -t gfm+tex_math_dollars+footnotes --mathjax \
-    | sed -E '/\\displaystyle/ {:x; N; /EndFor/b; s/\n */ /g; b x}' \
+    | sed -E '/\\displaystyle/ {:x; N; s/\n */ /g; /\}\$/b; b x}' \
     | sed -E '/\\intertext/ {:x; N; /&/b; s/\n */ /g; b x}' \
     | sed -E -f after.sed \
     | sed -E -e "/^[[:blank:]]*$WHITE_SQUARE$/d" \
@@ -46,8 +46,21 @@ sed -E -f before.sed "$post_texfile" \
         -e '/\\tag/! s/\\qedhere/\\tag*{\0}/' \
         -e "/qedhere/ s/\\\qedhere/$WHITE_SQUARE/" \
         -e "s,<embed\s+src=\"([^\"]*)\",<img src=\"${figure_path}\1\",g" \
+    | sed -E \
+        '/\\begin\{align/,/\\end\{align/ { 
+            /\\begin\{(bmatrix|split)\}/,/\\end\{(bmatrix|split)\}/! {
+                /\\(begin|end)/! {
+                    /\\numberthis/! {
+                        s/(\\\\)?$/\\nonumber\1/g
+                    }
+                }
+            }
+            /\\end\{(bmatrix|split)\}/ s/(\\\\)?$/\\nonumber\1/g
+        }' \
+    | sed -E 's/\\numberthis//' \
     | cat -s \
     > "$post_outfile"
+    # | sed -E -e 's/\\numberthis//' \
 
 # Update figure captions to be: 'Figure X. [the caption here]'.
 awk -i inplace \
