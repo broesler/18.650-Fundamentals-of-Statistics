@@ -8,7 +8,6 @@ tags: statistics hypothesis-testing python
 
 $$
 \newcommand{\coloneqq}{\mathrel{\vcenter{:}}=}
-\newcommand{\indic}[1]{\unicode[Garamond]{x1D7D9}\!\left\{ #1 \right\}}
 \newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
 \newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
 $$
@@ -17,7 +16,7 @@ $$
 Consider two independent samples $X_1, \dots, X_n$, and
 $Y_1, \dots, Y_m$ of independent, real-valued, continuous random
 variables, and assume that the $X_i$’s are i.i.d. with some cdf $F$ and
-that the $Y_i$’s are i.i.d. with some cdf $G$. [^1] We want to test
+that the $Y_i$’s are i.i.d. with some cdf $G$.[^1] We want to test
 whether $F = G$. Consider the following hypotheses:
 
 $$
@@ -105,7 +104,7 @@ maximum value of a finite set of numbers.*
 $$
 \begin{align*}
     F(t) &= \mathbb{P}\left[X \le t\right] \quad \forall t \in \mathbb{R}\\
-         &= \mathbb{E}\left[\indic{X \le t}\right]. \\
+         &= \mathbb{E}\left[\mathbb{1}\!\left\{X \le t\right\}\right]. \\
     \end{align*}
 $$
 
@@ -113,7 +112,7 @@ $$
 
 $$
 \begin{align*}
-    F_n(t) &= \frac{1}{n}\sum_{i=1}^{n} \indic{X_i \le t} \numberthis \label{eq:F_n}
+    F_n(t) &= \frac{1}{n}\sum_{i=1}^{n} \mathbb{1}\!\left\{X_i \le t\right\} \numberthis \label{eq:F_n}
     \end{align*}
 $$
 
@@ -121,12 +120,12 @@ $$
 
 $$
 \begin{align*}
-    G_m(t) &= \frac{1}{m}\sum_{j=1}^{m} \indic{Y_j \le t}. \numberthis \label{eq:G_m}
+    G_m(t) &= \frac{1}{m}\sum_{j=1}^{m} \mathbb{1}\!\left\{Y_j \le t\right\}. \numberthis \label{eq:G_m}
   \end{align*}
 $$
 
 $$
-\therefore T_{n,m} = \sup_{t \in \mathbb{R}} \left| \frac{1}{n}\sum_{i=1}^{n} \indic{X_i \le t} - \frac{1}{m}\sum_{j=1}^{m} \indic{Y_j \le t} \right|.
+\therefore T_{n,m} = \sup_{t \in \mathbb{R}} \left| \frac{1}{n}\sum_{i=1}^{n} \mathbb{1}\!\left\{X_i \le t\right\} - \frac{1}{m}\sum_{j=1}^{m} \mathbb{1}\!\left\{Y_j \le t\right\} \right|.
 $$
 
 The empirical
@@ -157,9 +156,9 @@ $$
 \begin{split}
       T_{n,m} = \max_{i=0,\dots,n} \Bigg[
       &\max_{j=0,\dots,m} \left| \frac{i}{n} - \frac{j}{m} \right|
-        \indic{Y^{(j)} \le X^{(i)} < Y^{(j+1)}}, \\
+        \mathbb{1}\!\left\{Y^{(j)} \le X^{(i)} < Y^{(j+1)}\right\}, \\
       &\max_{k=j+1, \dots, m} \left| \frac{i}{n} - \frac{k}{m} \right|
-        \indic{Y^{(k)} \le X^{(i+1)}} \Bigg]
+        \mathbb{1}\!\left\{Y^{(k)} \le X^{(i+1)}\right\} \Bigg]
     \end{split}
 $$
 
@@ -270,10 +269,10 @@ def _rank(A, k):
 ```
 
 An example two-sample KS-test is shown in
-Figure <a href="#fig:ks_test" data-reference-type="ref" data-reference="fig:ks_test">2</a>.
+<a href="#fig:ks_test" data-reference-type="ref" data-reference="fig:ks_test">Figure 1</a>.
 
 <figure>
-<img src="/assets/images/ks2samp/ks_test.pdf" id="fig:ks_test" style="width:90.0%" /><figcaption aria-hidden="true">The empirical cdfs of two independent random samples from <span class="math inline">\(\mathcal{N}\left( 0, 1 \right)\)</span> and <span class="math inline">\(\mathcal{N}\left( 0, 2 \right)\)</span>. The test statistic <span class="math inline">\(T_{n,m}\)</span> is shown by the double arrow.</figcaption>
+<img src="/assets/images/ks2samp/ks_test.pdf" id="fig:ks_test" style="width:90.0%" /><figcaption><span class="fig_number">Figure 1</span>. The empirical cdfs of two independent random samples from <span class="math inline">\(\mathcal{N}\left( 0, 1 \right)\)</span> and <span class="math inline">\(\mathcal{N}\left( 0, 2 \right)\)</span>. The test statistic <span class="math inline">\(T_{n,m}\)</span> is shown by the double arrow.</figcaption>
 </figure>
 
 ### The Null Hypothesis
@@ -283,12 +282,11 @@ Figure <a href="#fig:ks_test" data-reference-type="ref" data-reference="fig:ks_
 **Proposition 3**. *If $H_0$ is true, then the test statistic
 
 $$
-T_{n,m} = \sup_{0 \le x \le 1} \left| \frac{1}{n}\sum_{i=1}^{n} \indic{U_i \le x}
-- \frac{1}{m}\sum_{j=1}^{m} \indic{V_j \le x} \right|,
+T_{n,m} = \sup_{0 \le x \le 1} \left| \frac{1}{n}\sum_{i=1}^{n} \mathbb{1}\!\left\{U_i \le x\right\}
+- \frac{1}{m}\sum_{j=1}^{m} \mathbb{1}\!\left\{V_j \le x\right\} \right|,
 $$
 
- which is a
-function only of the cdfs.*
+which is a function only of the cdfs.*
 
 </div>
 
@@ -299,7 +297,7 @@ By <a href="#eq:F_n" data-reference-type="eqref" data-reference="eq:F_n">[eq:F_
 
 $$
 \label{eq:Tnm_supt}
-    T_{n,m} = \sup_{t \in \mathbb{R}} \left| \frac{1}{n}\sum_{i=1}^{n} \indic{X_i \le t} - \frac{1}{m}\sum_{j=1}^{m} \indic{Y_j \le t} \right|.
+    T_{n,m} = \sup_{t \in \mathbb{R}} \left| \frac{1}{n}\sum_{i=1}^{n} \mathbb{1}\!\left\{X_i \le t\right\} - \frac{1}{m}\sum_{j=1}^{m} \mathbb{1}\!\left\{Y_j \le t\right\} \right|.
 $$
 
 To show the proposition is true, we make a change of variable. Let
@@ -440,7 +438,7 @@ $$
 $$
 
 is shown in
-Figure <a href="#fig:Tnm" data-reference-type="ref" data-reference="fig:Tnm">3</a>
+<a href="#fig:Tnm" data-reference-type="ref" data-reference="fig:Tnm">Figure 2</a>
 in comparison to a standard normal. The test statistic distribution is
 skewed to the left, and has a longer right tail than the standard
 normal. Since the asymptotic distribution of the test statistic is not
@@ -449,7 +447,7 @@ Algorithm <a href="#alg:ks_q" data-reference-type="ref" data-reference="alg:ks_
 to estimate the quantiles.
 
 <figure>
-<img src="/assets/images/ks2samp/ks_dist.pdf" id="fig:Tnm" style="width:95.0%" /><figcaption aria-hidden="true">Empirical distribution of samples of the test statistic <span class="math inline">\(T_{n,m}\)</span>.</figcaption>
+<img src="/assets/images/ks2samp/ks_dist.pdf" id="fig:Tnm" style="width:95.0%" /><figcaption><span class="fig_number">Figure 2</span>. Empirical distribution of samples of the test statistic <span class="math inline">\(T_{n,m}\)</span>.</figcaption>
 </figure>
 
 ### The Hypothesis Test
@@ -459,11 +457,10 @@ Algorithm <a href="#alg:ks_q" data-reference-type="ref" data-reference="alg:ks_
 we define a test with non-asymptotic level $\alpha$ for $H_0$ vs. $H_1$:
 
 $$
-\delta_\alpha = \indic{T_{n,m} > \hat{q}_\alpha^{(n, M)}}
+\delta_\alpha = \mathbb{1}\!\left\{T_{n,m} > \hat{q}_\alpha^{(n, M)}\right\}
 $$
 
- where
-$T_{n,m}$ is found by
+where $T_{n,m}$ is found by
 Algorithm <a href="#alg:ks_stat" data-reference-type="ref" data-reference="alg:ks_stat">[alg:ks_stat]</a>.
 The p-value for this test is
 
@@ -476,3 +473,4 @@ $$
 
 where $Z$ is a random variable distributed as $T_{n,m}$.
 
+[^1]: Note that the two samples may have different sizes (if $n \ne m$).

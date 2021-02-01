@@ -5,9 +5,12 @@
 }
 # rename environments
 /aligned/ s/(begin|end)\{aligned\}/\1{align*}/g
-# TODO would like to join/substitute intertext *before* pandoc, but we don't
-# know what kind of environment surrounds it in general (align*, alignat, etc.)
+# TODO would like to join/substitute intertext *before* pandoc, so that pandoc
+# parses the text as, well... text, but we don't know what kind of environment
+# surrounds it in general (align*, alignat, etc.)
 s/\\intertext\{(.+)\}$/\\end{align*}$$ \1 $$\\begin{align*}/
+# This line should only apply to text from `intertext` since it occurs after
+# pandoc has parsed the rest of the file
 /\\emph/ s/\\emph\{([^}]*)\}/*\1*/g
 # place opening/closing math delims on own line
 /\$\$/ {
@@ -51,7 +54,10 @@ s/\\intertext\{(.+)\}$/\\end{align*}$$ \1 $$\\begin{align*}/
     # Make algorithmic class for formatting the paragraph
     s/^.*\\begin\{algorithmic\}.*$/<div class="algorithmic">/
     s@^.*\\end\{algorithmic\}.*$@</div>@
+    # Drop the latex statements
     /\\(begin|end)/d
 }
 # allow markdown to work in divs
 /<div/ s/>/ markdown=1>/
+# remove spaces before footnotes
+/\[\^[0-9]+\]/ s/\. (\[\^[0-9]+\])/.\1/g
