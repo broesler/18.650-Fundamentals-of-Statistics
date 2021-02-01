@@ -421,7 +421,7 @@ $q_\alpha$ given $\alpha$ is as follows.
   \caption{Approximate $q_\alpha$, the $(1 - \alpha)$-quantile of the distribution of $T_{n,m}$ under $H_0$.}
   \label{alg:ks_q}
   \begin{algorithmic}
-    \Require $n = \dim X$. $m = \dim Y$. $M \in \mathbb{N}$. $\alpha \in (0, 1)$.
+    \Require $n = \dim X$, $m = \dim Y$, $M \in \mathbb{N}$, and $\alpha \in (0, 1)$.
     \Ensure $q_\alpha \in [0, 1]$.
     \Procedure{KSQuantile}{$n, m, M, \alpha$}
       \State $T_v \gets$ empty array of size $n$

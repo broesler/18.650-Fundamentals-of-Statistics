@@ -31,6 +31,10 @@ sed -E -n -e '1,/\\maketitle/ p' \
           -e '/\\end\{document\}/p' \
           "$main_texfile" > "$post_texfile"
 
+# NOTE 
+#   * line-gathering sed calls should be separated
+#   * commands using bash variables need to be here, not in `(before|after).sed`
+
 # Filter some LaTeX before using pandoc, then filter the markdown.
 sed -E -f before.sed "$post_texfile" \
     | pandoc -f latex -t gfm+tex_math_dollars+footnotes --mathjax \
@@ -41,32 +45,32 @@ sed -E -f before.sed "$post_texfile" \
         -e "s/$WHITE_SQUARE/<span class=\"qed_symbol\">\0<\/span>/g" \
         -e '/\\tag/! s/\\qedhere/\\tag*{\0}/' \
         -e "/qedhere/ s/\\\qedhere/$WHITE_SQUARE/" \
+        -e "s,<embed\s+src=\"([^\"]*)\",<img src=\"${figure_path}\1\",g" \
     | cat -s \
     > "$post_outfile"
 
-# Update figure paths, use "img" instead of "embed", fix numbers
-sed -E -i'' "s,<embed\s+src=\"([^\"]*)\",<img src=\"${figure_path}\1\",g" "$post_outfile"
-sed -E -i'' '/Figure[[:blank:]]<a href=\"#fig/ {
-                s/Figure[[:blank:]]<a/<a/g;
-                s@>([0-9]+)<@>Figure \1<@g
-             }' "$post_outfile"
-
+# Update figure captions to be: 'Figure X. [the caption here]'.
 awk -i inplace \
     'BEGIN {count=1} 
     /<figcaption/ {
         sub(/<figcaption[^>]*>/, "<figcaption><span class=\"fig_number\">Figure " count "</span>. ");
         count++
     };
-    // {print $0}' \
+    {print $0}' \
     "$post_outfile"
 
-## TODO Number equations!? replace "\numberthis"
+# TODO 
+#   * Number equations!? replace "\numberthis"
+#   * add expected reading time!
 
 # Extract post title
 the_title=$(sed -E -n '1s/^# (.*)/\1/p' "$post_outfile")
 sed -i'' '1d' "$post_outfile"   # remove header line
 
-# Prepend preamble
+
+#------------------------------------------------------------------------------- 
+#        Prepend preamble
+#-------------------------------------------------------------------------------
 # <https://stackoverflow.com/questions/55435352/bad-file-descriptor-when-reading-from-fd-3-pointing-to-a-temp-file>
 tmpfile=$(mktemp /tmp/$post_name.XXXXX)
 exec 3>"$tmpfile"  # file descriptor to write
@@ -75,6 +79,8 @@ rm "$tmpfile"      # remove the file when the script exits
 
 cat "$post_outfile" >&3  # write the output file to a temp file
 
+# date:   "$(date +'%F %T %z')"  # long date format for post preamble
+# the_date=$(date +'%F')
 the_date='2021-01-27'
 
 # Write the preamble to the post_outfile
@@ -95,13 +101,10 @@ tags: statistics hypothesis-testing python
 
 EOF
 
-# date:   "$(date +'%F %T %z')"
-
 # Write the actual markdown to the post_outfile
 cat <&4 >> "$post_outfile"
 
 # Copy it to the final post name
-# cp -i "$post_outfile" "$HOME/src/web_dev/broesler.github.io/_drafts/$(date +'%F')-$post_outfile"
 cp -i "$post_outfile" "$HOME/src/web_dev/broesler.github.io/_drafts/$the_date-$post_outfile"
 
 #===============================================================================
