@@ -787,15 +787,14 @@ a consistent estimator is given by
 \end{prop}
 
 \begin{proof}
-  Proposition~\ref{prop:delta} gives the distribution of $g(\theta)$ (given by
-  Equation~\eqref{eq:g}) under $H_0$.
-  Assume that $p, q \in (0, 1)$ s.t.\ $V > 0$.
-  \begin{alignat*}{3}
+Proposition~\ref{prop:delta} gives the distribution of $g(\theta)$ (given by
+Equation~\eqref{eq:g}) under $H_0$.
+Assume that $p, q \in (0, 1)$ s.t.\ $V > 0$.
+\begin{alignat*}{3}
   \sqrt{n}\mleft((\rhat - \phat\qhat) - (r - pq)\mright) &\Dlim \N{0}{V}
   \by{Proposition~\ref{prop:delta}} \\
   \sqrt{n}(\rhat - \phat\qhat) &\Dlim \N{0}{V} \by{$r = pq$ under $H_0$} \\
-  \sqrt{n}\frac{(\rhat - \phat\qhat)}{\sqrt{V}} &\Dlim \N{0}{1} \numberthis
-  \label{eq:Tn_norm}
+  \sqrt{n}\frac{(\rhat - \phat\qhat)}{\sqrt{V}} &\Dlim \N{0}{1} \numberthis \label{eq:Tn_norm}
 \end{alignat*}
 The asymptotic variance $V$, however, is unknown, so we divide the estimator by
 $\sqrt{\frac{\hat{V}}{V}}$ to get an expression that will evaluate to our
@@ -1016,7 +1015,7 @@ $R_2,\dots,R_n \ne 1$.
 
 \begin{proof}
   Given the definition of $R_i$
-  \[ R_i = \operatorname{rank}(X_i) \coloneqq \#\{j \colon X_j \le X_i \]
+  \[ R_i = \operatorname{rank}(X_i) \coloneqq \#\{j \colon X_j \le X_i\} \]
   we can determine its distribution.
   Let
   \[ F_n(t) = \avg{i}{n} \indic{X_i \le t} \]

@@ -4,11 +4,11 @@
     /^# <<end/,/^```$/ {/^```$/!d}
 }
 # rename environments
-/(begin|end)\{aligned\}/ s//\1{align*}/g
+/(begin|end)\{aligned\}/ s//\1{align}/g
 # TODO would like to join/substitute intertext *before* pandoc, so that pandoc
 # parses the text as, well... text, but we don't know what kind of environment
 # surrounds it in general (align*, alignat, etc.)
-s/\\intertext\{(.+)\}$/\\end{align*}$$ \1 $$\\begin{align*}/
+s/\\intertext\{(.+)\}$/\\end{align}$$ \1 $$\\begin{align}/
 # This line should only apply to text from `intertext` since it occurs after
 # pandoc has parsed the rest of the file
 /\\emph\{([^}]*)\}/ s//*\1*/g
@@ -19,7 +19,20 @@ s/\\intertext\{(.+)\}$/\\end{align*}$$ \1 $$\\begin{align*}/
     s/XXmath_openXX/$$/g
 }
 # place \end{} on new line
-/\\end/ s/([^[[:blank:]])(\\end)/\1\n\2/g
+/([^[:blank:]])(\\end)/ s//\1\n\2/g
+# In align environments, don't number equations unless labeled
+/\\begin\{align/,/\\end\{align/ { 
+    # /\\begin\{(bmatrix|split)\}/,/\\end\{(bmatrix|split)\}/! {
+        /\\(begin|end)/! {
+            /\\numberthis/! {
+                s/(\\\\)?$/\\nonumber\1/g
+            }
+        }
+    # }
+    # /\\end\{(bmatrix|split)\}/ s/(\\\\)?$/\\nonumber\1/g
+}
+# Remove the \numberthis commands
+s/\\numberthis//
 # Parse algorithm environment
 /^``` algorithm$/,/^```$/ {
     # remove comments and extraneous lines

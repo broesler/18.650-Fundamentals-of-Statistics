@@ -93,11 +93,15 @@ categories: statistics
 tags: statistics hypothesis-testing python
 ---
 
+<div style="visibility: hidden">
 \$\$
+\begin{align*}
 \newcommand{\coloneqq}{\mathrel{\vcenter{:}}=}
 \newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
 \newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\end{align*}
 \$\$
+</div>
 
 EOF
 
