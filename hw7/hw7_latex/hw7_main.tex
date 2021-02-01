@@ -239,9 +239,9 @@ empirical cdf of $\{Y_1, \dots, Y_m\}$.
 
 \subsubsection{The Test Statistic}
 Let
-\begin{equation}
+\[
   T_{n,m} = \sup_{t \in \R} \left| F_n(t) - G_m(t) \right|
-\end{equation}
+\]
 
 \begin{prop}
   The test statistic $T_{n,m}$ can be written as the maximum value of a finite set of numbers.
@@ -258,9 +258,9 @@ Let
     \intertext{Likewise,}
     G_m(t) &= \avg{j}{m} \indic{Y_j \le t}. \numberthis \label{eq:G_m}
   \end{alignat*}
-  \begin{equation}
+  \[
     \therefore T_{n,m} = \sup_{t \in \R} \left| \avg{i}{n} \indic{X_i \le t} - \avg{j}{m} \indic{Y_j \le t} \right|.
-  \end{equation}
+  \]
   The empirical cdfs~\eqref{eq:F_n}~and~\eqref{eq:G_m} can also be written
   \begin{alignat}{3}
     F_n(t) &= \#\{i=1, \dots, n \colon X_i \le t\} \cdot \frac{1}{n} \\
@@ -273,7 +273,7 @@ Let
   \end{align}
   Therefore, the test statistic can be rewritten as the maximum value of
   a finite set of numbers:
-  \begin{equation}
+  \[
     \begin{split}
       T_{n,m} = \max_{i=0,\dots,n} \Bigg[
       &\max_{j=0,\dots,m} \left| \frac{i}{n} - \frac{j}{m} \right|
@@ -281,7 +281,7 @@ Let
       &\max_{k=j+1, \dots, m} \left| \frac{i}{n} - \frac{k}{m} \right|
         \indic{Y^{(k)} \le X^{(i+1)}} \Bigg]
     \end{split}
-  \end{equation}
+  \]
   where $X^{(i)}$ is the $i^\text{th}$ value in the ordered set of data
   $X^{(1)} \le \cdots \le X^{(n)}$. The values $X^{(0)}, Y^{(0)} \coloneqq -\infty$
   are prepended to the otherwise finite realizations to simplify the
@@ -457,9 +457,9 @@ quantiles.
 Given the aproximation for $\hat{q}_\alpha$ for $q_\alpha$ from
 Algorithm~\ref{alg:ks_q}, we define a test with non-asymptotic level $\alpha$
 for $H_0$ vs.\ $H_1$:
-\begin{equation}
+\[
   \delta_\alpha = \indic{T_{n,m} > \hat{q}_\alpha^{(n, M)}}
-\end{equation}
+\]
 where $T_{n,m}$ is found by Algorithm~\ref{alg:ks_stat}. The p-value for this
 test is
 \begin{align}
@@ -679,10 +679,10 @@ estimators $(\phat, \qhat, \rhat)$ is asymptotically normal. \qed
 
 \begin{proof}
   Let $\hat{\theta}$ and $\theta$ be vectors in $\R^3$
-  \begin{equation*}
+  \[
     \hat{\theta} = \begin{bmatrix} \phat \\ \qhat \\ \rhat \end{bmatrix} \text{, and }
     \theta = \begin{bmatrix} p \\ q \\ r \end{bmatrix}.
-  \end{equation*}
+  \]
   From our proof of Proposition~\ref{prop:normality_pqr}, we have
   \begin{alignat*}{3}
     \sqrt{n}(\hat{\theta} - \theta) &\Dlim \N{0}{\Sigma} \by{CLT} \\
@@ -701,10 +701,10 @@ estimators $(\phat, \qhat, \rhat)$ is asymptotically normal. \qed
     g(\theta) &= r - pq.
   \end{align*}
   The gradient of $g(\theta)$ is then
-  \begin{equation}
+  \[
     \nabla g(u,v,w) = \begin{bmatrix} -v \\ -u \\ 1 \end{bmatrix}
     \implies \nabla g(\theta) = \begin{bmatrix} -q \\ -p \\ 1 \end{bmatrix}
-  \end{equation}
+  \]
   The asymptotic variance $V = \nabla g(\theta)^\T \Sigma \nabla g(\theta)$,
   which we will now show is a function only of the parameters $(p, q, r)$.
   \begin{alignat*}{3}
@@ -779,9 +779,9 @@ a consistent estimator is given by
 \subsubsection{A Hypothesis Test}
 \begin{prop}
   Given $\alpha \in (0, 1)$, we propose the test statistic
-  \begin{equation}
+  \[
     T_n \coloneqq \frac{\sqrt{n}(\rhat - \phat\qhat)}{\sqrt{\hat{V}}} \Dlim \N{0}{1}
-  \end{equation}
+  \]
   where $\hat{V}$ is given by Proposition~\ref{prop:Vhat}, and $t_{n-1}$ is
   Student's $t$-distribution with $n-1$ degrees of freedom.
 \end{prop}
@@ -799,10 +799,10 @@ Assume that $p, q \in (0, 1)$ s.t.\ $V > 0$.
 The asymptotic variance $V$, however, is unknown, so we divide the estimator by
 $\sqrt{\frac{\hat{V}}{V}}$ to get an expression that will evaluate to our
 desired test statistic
-\begin{equation} \label{eq:t1}
+\[
   T_n = \ddfrac{\sqrt{n}\frac{(\rhat - \phat\qhat)}{\sqrt{V}}}
                {\sqrt{\frac{\hat{V}}{V}}}
-\end{equation}
+\]
 Given this expression, we can determine the distribution of $T_n$.
 Equation~\eqref{eq:Tn_norm} shows that the numerator is a standard normal random
 variable.
@@ -818,9 +818,7 @@ gives the distribution of the denominator.
 \end{lemma}
 Since $\hat{V}$ and $V$ describe the sample variance and variance of a
 (asymptotically) normal distribution, $T_n$ is asymptotically characterized by
-\begin{equation}
-  T_n \Dlim \ddfrac{\N{0}{1}}{\sqrt{\frac{\chi^2_{n-1}}{n}}}
-\end{equation}
+\[ T_n \Dlim \ddfrac{\N{0}{1}}{\sqrt{\frac{\chi^2_{n-1}}{n}}} \]
 which is the definition of a random variable drawn from \emph{Student's
 T-distribution} with $n-1$ degrees of freedom. In this case, however, the
 normality of the underlying random variables is asymptotic, so the $t_{n-1}$
@@ -834,13 +832,9 @@ A proof of Equation~\eqref{eq:t_to_N} is given in \nameref{app:t_to_N}.
 \end{proof}
 
 Given the test statistic $T_n$, define the rejection region
-\begin{equation}
-  R_\psi = \left\{ \hat{\theta} \colon |T_n| > q_{\alpha/2} \right\}
-\end{equation}
+\[ R_\psi = \left\{ \hat{\theta} \colon |T_n| > q_{\alpha/2} \right\} \]
 where
-\begin{equation}
-  q_{\alpha/2} = \Phi^{-1}\mleft(1 - \frac{\alpha}{2}\mright)
-\end{equation}
+\[ q_{\alpha/2} = \Phi^{-1}\mleft(1 - \frac{\alpha}{2}\mright) \]
 is the $\mleft(1-\frac{\alpha}{2}\mright)$-quantile of the standard normal $\N{0}{1}$
 distribution.
 
