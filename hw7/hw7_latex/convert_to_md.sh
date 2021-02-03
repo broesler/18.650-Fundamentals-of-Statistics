@@ -87,6 +87,7 @@ awk -i inplace \
 # Subsitute any remaining `\ref`s
 sed -E -i'' '/\\ref/ s@Algorithm~\\ref\{([^}]*)\}@Algorithm <a href="#\1">[\1]</a>@g' "$post_outfile"
 
+# Update Algorithm numbers in links
 kvs=$(sed -E -n '
     /<div class="algorithm"/ {
     :x
@@ -103,11 +104,11 @@ while IFS='=' read -r key val; do
     sed -E -i'' "s/Algorithm[[:blank:]](<a [^>]*>)\[$key\]</\1Algorithm\&nbsp;$val</" "$post_outfile"
 done < <(echo "$kvs")
 
-
 # Extract post title
 the_title=$(sed -E -n '1s/^# (.*)/\1/p' "$post_outfile")
 sed -i'' '1d' "$post_outfile"   # remove header line
 
+reading_time=$(./reading_time.sh "$post_outfile")
 
 #------------------------------------------------------------------------------- 
 #        Prepend preamble
@@ -132,6 +133,7 @@ title:  "$the_title"
 date: $the_date
 categories: statistics
 tags: statistics hypothesis-testing python
+reading_time: $reading_time
 ---
 
 <div style="visibility: hidden">
