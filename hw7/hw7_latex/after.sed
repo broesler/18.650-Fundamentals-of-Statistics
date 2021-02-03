@@ -22,17 +22,26 @@ s/\\intertext\{(.+)\}$/\\end{align}$$ \1 $$\\begin{align}/
 /([^[:blank:]])(\\end)/ s//\1\n\2/g
 # Parse algorithm environment
 /^``` algorithm$/,/^```$/ {
-    # remove comments and extraneous lines
-    s/([^\\])%.*$/\1/
+    # Convert caption and label into header
+    /^``` algorithm$/ {
+        :x
+        N
+        /\\label/ { 
+            s@(.*)\\caption\{(.*)\}[[:space:]]*\\label\{(.*)\}@\
+<div class="algorithm" id="\3">\
+<div class="alg_caption_div">\
+<span class="alg_title">Algorithm</span>\
+<span class="alg_caption">\2</span>\
+</div>@
+            b
+        }
+        b x
+    }
+    # Remove tex lines
     /\\iffalse/d
     /\\fi/d
-    # create algorithm divs
-    s/^``` algorithm/<div class="algorithm">/
-    s|^```$|</div>|
-    # Convert caption into header
-    s@\\caption\{(.*)\}[[:blank:]]*$@<div class="alg_caption_div">\n<span class="alg_title">Algorithm</span>\n<span class="alg_caption">\1</span>\n</div>@
-    # TODO: label
-    # <a href="#eq:Tnm_supt">[eq:Tnm_supt]</a>
+    # remove comments 
+    s/([^\\])%.*$/\1/
     # Format algorithmic commands
     /\\begin\{algorithmic\}/,/\\end\{algorithmic\}/ {
         # un-escape commands
@@ -50,7 +59,7 @@ s/\\intertext\{(.+)\}$/\\end{align}$$ \1 $$\\begin{align}/
         s/^ {4}//
         s/ {2}/\t/g
         # wrap every non-blank line in a paragraph
-        /[^[:blank:]]/ s@.*@<p>& </p>@
+        /[^[:blank:]]/ s@.*@<p>&</p>@
         # sub normal macros just this once...
         s/\\N\{([^}]*)\}\{([^}]*)\}/\\mathcal{N}\\left( \1, \2 \\right)/g
     }
@@ -59,6 +68,8 @@ s/\\intertext\{(.+)\}$/\\end{align}$$ \1 $$\\begin{align}/
     s@^.*\\end\{algorithmic\}.*$@</div>@
     # Drop the latex statements
     /\\(begin|end)/d
+    # Replace final div marker
+    s|^```$|</div>|
 }
 # allow markdown to work in divs
 /<div/ s/>/ markdown=1>/

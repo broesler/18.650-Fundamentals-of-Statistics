@@ -175,33 +175,32 @@ finite realizations to simplify the computation. <span class="qed_symbol">◻</
 The following algorithm calculates the KS test statistic for two given
 samples.
 
-<div class="algorithm" markdown=1>
-  <div class="alg_caption_div" markdown=1>
-<span class="alg_title">Algorithm</span>
+<div class="algorithm" id="alg:ks_stat">
+<div class="alg_caption_div">
+<span class="alg_title">Algorithm 1. </span>
 <span class="alg_caption">Calculate the KS test statistic $T_{n,m}$ for two samples.</span>
 </div>
-  \label{alg:ks_stat}
 <div class="algorithmic" markdown=1>
-<p><span class="alg_command">Require:</span> $X, Y$ are vectors of real numbers. </p>
-<p><span class="alg_command">Ensure:</span> $0 \le T_{n,m} \le 1$. </p>
-<p><span class="alg_command">Procedure</span> <span class="alg_proc">KS2Sample</span>($X, Y$) </p>
-<p>	$X_s \gets \{-\infty,$ <span class="alg_call">Sort</span>($X$)$\}$ </p>
-<p>	$Y_s \gets$ <span class="alg_call">Sort</span>($Y$) </p>
-<p>	$n \gets \dim X_s$ </p>
-<p>	$m \gets \dim Y_s$ </p>
-<p>	$T_v \gets$ empty array of size $n$ </p>
-<p>	<span class="alg_command">for all</span> $i \in \{0, \dots, n\}$ <span class="alg_command">do</span> </p>
-<p>		$j \gets j$ + <span class="alg_call">Rank</span>($\{Y_s^{(\ell)}\}_{\ell=j}^m, X_s^{(i)}$) <span style="float: right">&#x25B7; Only search remaining $j$ values</span> </p>
-<p>		$k \gets j$ + <span class="alg_call">Rank</span>($\{Y_s^{(\ell)}\}_{\ell=j}^m, X_s^{(\min(i+1, n))}$) </p>
-<p>		$\displaystyle{T_v^{(i)} \gets \max\left(\left|\frac{i}{n} - \frac{j}{m}\right|, \left|\frac{i}{n} - \frac{k}{m}\right|\right)}$ </p>
-<p>	<span class="alg_command">end for</span> </p>
-<p>	<span class="alg_command">Return</span> $\max_i T_v$ </p>
-<p><span class="alg_command">end procedure</span> </p>
-<p><span class="alg_command">Function</span> <span class="alg_proc">Rank</span>($A, k$) </p>
+<p><span class="alg_command">Require:</span> $X, Y$ are vectors of real numbers.</p>
+<p><span class="alg_command">Ensure:</span> $0 \le T_{n,m} \le 1$.</p>
+<p><span class="alg_command">Procedure</span> <span class="alg_proc">KS2Sample</span>($X, Y$)</p>
+<p>	$X_s \gets \{-\infty,$ <span class="alg_call">Sort</span>($X$)$\}$</p>
+<p>	$Y_s \gets$ <span class="alg_call">Sort</span>($Y$)</p>
+<p>	$n \gets \dim X_s$</p>
+<p>	$m \gets \dim Y_s$</p>
+<p>	$T_v \gets$ empty array of size $n$</p>
+<p>	<span class="alg_command">for all</span> $i \in \{0, \dots, n\}$ <span class="alg_command">do</span></p>
+<p>		$j \gets j$ + <span class="alg_call">Rank</span>($\{Y_s^{(\ell)}\}_{\ell=j}^m, X_s^{(i)}$) <span style="float: right">&#x25B7; Only search remaining $j$ values</span></p>
+<p>		$k \gets j$ + <span class="alg_call">Rank</span>($\{Y_s^{(\ell)}\}_{\ell=j}^m, X_s^{(\min(i+1, n))}$)</p>
+<p>		$\displaystyle{T_v^{(i)} \gets \max\left(\left|\frac{i}{n} - \frac{j}{m}\right|, \left|\frac{i}{n} - \frac{k}{m}\right|\right)}$</p>
+<p>	<span class="alg_command">end for</span></p>
+<p>	<span class="alg_command">Return</span> $\max_i T_v$</p>
+<p><span class="alg_command">end procedure</span></p>
+<p><span class="alg_command">Function</span> <span class="alg_proc">Rank</span>($A, k$)</p>
 	
-<p>	<span class="alg_command">Assert</span> $A$ is sorted in ascending order. </p>
-<p>	<span class="alg_command">Return</span> $\#\{i=1,\dots,\dim A \colon k < A_i\}$ </p>
-<p><span class="alg_command">end function</span> </p>
+<p>	<span class="alg_command">Assert</span> $A$ is sorted in ascending order.</p>
+<p>	<span class="alg_command">Return</span> $\#\{i=1,\dots,\dim A \colon k < A_i\}$</p>
+<p><span class="alg_command">end function</span></p>
 </div>
 </div>
 
@@ -285,11 +284,13 @@ An example two-sample KS-test is shown in
 **Proposition 3**. *If $H_0$ is true, then the test statistic
 
 $$
-T_{n,m} = \sup_{0 \le x \le 1} \left| \frac{1}{n}\sum_{i=1}^{n} \mathbb{1}\!\left\{U_i \le x\right\}
-- \frac{1}{m}\sum_{j=1}^{m} \mathbb{1}\!\left\{V_j \le x\right\} \right|,
+T_{n,m} = \sup_{0 \le x \le 1} \left|
+        \frac{1}{n}\sum_{i=1}^{n} \mathbb{1}\!\left\{U_i \le x\right\}
+      - \frac{1}{m}\sum_{j=1}^{m} \mathbb{1}\!\left\{V_j \le x\right\}
+    \right|.
 $$
 
-which is a function only of the cdfs.*
+*
 
 </div>
 
@@ -410,26 +411,25 @@ $i^\text{th}$ value in a sorted sample of $M$ test statistics. Thus,
 $q_\alpha$ can be approximated by choosing $i = \ceil{M(1 - \alpha)}$.
 An algorithm to approximate $q_\alpha$ given $\alpha$ is as follows.
 
-<div class="algorithm" markdown=1>
-  <div class="alg_caption_div" markdown=1>
-<span class="alg_title">Algorithm</span>
+<div class="algorithm" id="alg:ks_q">
+<div class="alg_caption_div">
+<span class="alg_title">Algorithm 2. </span>
 <span class="alg_caption">Approximate $q_\alpha$, the $(1 - \alpha)$-quantile of the distribution of $T_{n,m}$ under $H_0$.</span>
 </div>
-  \label{alg:ks_q}
 <div class="algorithmic" markdown=1>
-<p><span class="alg_command">Require:</span> $n = \dim X$, $m = \dim Y$, $M \in \mathbb{N}$, and $\alpha \in (0, 1)$. </p>
-<p><span class="alg_command">Ensure:</span> $q_\alpha \in [0, 1]$. </p>
-<p><span class="alg_command">Procedure</span> <span class="alg_proc">KSQuantile</span>($n, m, M, \alpha$) </p>
-<p>	$T_v \gets$ empty array of size $n$ </p>
-<p>	<span class="alg_command">for all</span> $i \in \{0,\dots,M\}$ <span class="alg_command">do</span> </p>
-<p>		$X_s \gets$ sample of size $n$ from $\mathcal{N}\left( 0, 1 \right)$. </p>
-<p>		$Y_s \gets$ sample of size $m$ from $\mathcal{N}\left( 0, 1 \right)$. </p>
-<p>		$T_v^{(i)} \gets$ <span class="alg_call">KS2Sample</span>($X_s, Y_s$) <span style="float: right">&#x25B7; defined in Algorithm~\ref{alg:ks_stat</span>} </p>
-<p>	<span class="alg_command">end for</span> </p>
-<p>	$T_{vs} \gets$ <span class="alg_call">Sort</span>($T_v$) </p>
-<p>	$j \gets \ceil*{M(1 - \alpha)}$ </p>
-<p>	<span class="alg_command">Return</span> $T_{vs}^{(j)}$ </p>
-<p><span class="alg_command">end procedure</span> </p>
+<p><span class="alg_command">Require:</span> $n = \dim X$, $m = \dim Y$, $M \in \mathbb{N}$, and $\alpha \in (0, 1)$.</p>
+<p><span class="alg_command">Ensure:</span> $q_\alpha \in [0, 1]$.</p>
+<p><span class="alg_command">Procedure</span> <span class="alg_proc">KSQuantile</span>($n, m, M, \alpha$)</p>
+<p>	$T_v \gets$ empty array of size $n$</p>
+<p>	<span class="alg_command">for all</span> $i \in \{0,\dots,M\}$ <span class="alg_command">do</span></p>
+<p>		$X_s \gets$ sample of size $n$ from $\mathcal{N}\left( 0, 1 \right)$.</p>
+<p>		$Y_s \gets$ sample of size $m$ from $\mathcal{N}\left( 0, 1 \right)$.</p>
+<p>		$T_v^{(i)} \gets$ <span class="alg_call">KS2Sample</span>($X_s, Y_s$) <span style="float: right">&#x25B7; defined in Algorithm~\ref{alg:ks_stat</span>}</p>
+<p>	<span class="alg_command">end for</span></p>
+<p>	$T_{vs} \gets$ <span class="alg_call">Sort</span>($T_v$)</p>
+<p>	$j \gets \ceil*{M(1 - \alpha)}$</p>
+<p>	<span class="alg_command">Return</span> $T_{vs}^{(j)}$</p>
+<p><span class="alg_command">end procedure</span></p>
 </div>
 </div>
 

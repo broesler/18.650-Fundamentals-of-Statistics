@@ -191,8 +191,7 @@ distribution.
 \section{Kolmogorov-Smirnov Test for Two Samples}
 Consider two independent samples $X_1, \dots, X_n$, and $Y_1, \dots, Y_m$ of
 independent, real-valued, continuous random variables, and assume that the $X_i$'s
-are \iid\ with some cdf $F$ and that the $Y_i$'s are \iid\ with some cdf $G$.
-\footnote{Note that the two samples may have different sizes (if $n \ne m$).}
+are \iid\ with some cdf $F$ and that the $Y_i$'s are \iid\ with some cdf $G$.\footnote{Note that the two samples may have different sizes (if $n \ne m$).}
 We want to test whether $F = G$.
 Consider the following hypotheses:
 \begin{align*}
@@ -343,9 +342,12 @@ An example two-sample KS-test is shown in Figure~\ref{fig:ks_test}.
 \subsubsection{The Null Hypothesis}
 \begin{prop}
   If $H_0$ is true, then the test statistic
-  \[ T_{n,m} = \sup_{0 \le x \le 1} \left| \avg{i}{n} \indic{U_i \le x}
-- \avg{j}{m} \indic{V_j \le x} \right|, \]
-  which is a function only of the cdfs.
+  \[ 
+    T_{n,m} = \sup_{0 \le x \le 1} \left|
+        \avg{i}{n} \indic{U_i \le x}
+      - \avg{j}{m} \indic{V_j \le x} 
+    \right|.
+  \]
 \end{prop}
 
 \begin{proof}

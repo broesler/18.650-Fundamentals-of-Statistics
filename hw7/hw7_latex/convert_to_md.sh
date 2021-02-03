@@ -60,7 +60,6 @@ sed -E -f before.sed "$post_texfile" \
     | sed -E 's/\\numberthis//' \
     | cat -s \
     > "$post_outfile"
-    # | sed -E -e 's/\\numberthis//' \
 
 # Update figure captions to be: 'Figure X. [the caption here]'.
 awk -i inplace \
@@ -72,8 +71,17 @@ awk -i inplace \
     {print $0}' \
     "$post_outfile"
 
+# Number algorithms. Algorithm captions to be: 'Algorithm X. [the caption here]'.
+awk -i inplace \
+    'BEGIN {count=1} 
+    /<span class="alg_title">/ {
+        sub(/<span class="alg_title">Algorithm/, "<span class=\"alg_title\">Algorithm " count ". ");
+        count++
+    };
+    {print $0}' \
+    "$post_outfile"
+
 # TODO 
-#   * Number equations!? replace "\numberthis"
 #   * add expected reading time!
 
 # Extract post title
