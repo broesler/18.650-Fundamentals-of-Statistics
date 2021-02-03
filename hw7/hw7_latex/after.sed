@@ -54,7 +54,7 @@ s/\\intertext\{(.+)\}$/\\end{align}$$ \1 $$\\begin{align}/
         s/State *//
         s@(Return|Assert)@<span class="alg_command">\u\1</span>@
         # TODO define comment style and character in HTML class
-        s@Comment\{([^}]+)\}@<span style="float: right">\&#x25B7; \1</span>@g
+        s@Comment\{(.*)\}$@<span style="float: right">\&#x25B7; \1</span>@g
         # Change spaces to tabs for nice indenting
         s/^ {4}//
         s/ {2}/\t/g

@@ -51,7 +51,9 @@ sed -E -f before.sed "$post_texfile" \
             /\\begin\{(bmatrix|split)\}/,/\\end\{(bmatrix|split)\}/! {
                 /\\(begin|end)/! {
                     /\\numberthis/! {
-                        s/(\\\\)?$/\\nonumber\1/g
+                        /\\tag/! {
+                            s/(\\\\)?$/\\nonumber\1/g
+                        }
                     }
                 }
             }
@@ -61,28 +63,46 @@ sed -E -f before.sed "$post_texfile" \
     | cat -s \
     > "$post_outfile"
 
-# Update figure captions to be: 'Figure X. [the caption here]'.
+# Number figures and algorithms.
+# Captions: '(Figure|Algorithm) X. [the caption here]'.
 awk -i inplace \
-    'BEGIN {count=1} 
+    'BEGIN {
+        fig_count=1;
+        alg_count=1;
+    } 
     /<figcaption/ {
-        sub(/<figcaption[^>]*>/, "<figcaption><span class=\"fig_number\">Figure " count "</span>. ");
-        count++
+        sub(/<figcaption[^>]*>/, "<figcaption><span class=\"fig_number\">Figure " fig_count "</span>. ");
+        fig_count++;
     };
-    {print $0}' \
-    "$post_outfile"
-
-# Number algorithms. Algorithm captions to be: 'Algorithm X. [the caption here]'.
-awk -i inplace \
-    'BEGIN {count=1} 
     /<span class="alg_title">/ {
-        sub(/<span class="alg_title">Algorithm/, "<span class=\"alg_title\">Algorithm " count ". ");
-        count++
+        sub(/<span class="alg_title">Algorithm/, "<span class=\"alg_title\">Algorithm " alg_count ". ");
+        alg_count++;
     };
     {print $0}' \
     "$post_outfile"
 
 # TODO 
 #   * add expected reading time!
+
+# Subsitute any remaining `\ref`s
+sed -E -i'' '/\\ref/ s@Algorithm~\\ref\{([^}]*)\}@Algorithm <a href="#\1">[\1]</a>@g' "$post_outfile"
+
+kvs=$(sed -E -n '
+    /<div class="algorithm"/ {
+    :x
+    N
+    /<span class="alg_title"/ {
+        s/.*id="([^"]*)".*Algorithm ([0-9]+)\..*/\1=\2/
+        p
+        b
+    }
+    b x
+}' "$post_outfile")
+
+while IFS='=' read -r key val; do
+    sed -E -i'' "s/Algorithm[[:blank:]](<a [^>]*>)\[$key\]</\1Algorithm\&nbsp;$val</" "$post_outfile"
+done < <(echo "$kvs")
+
 
 # Extract post title
 the_title=$(sed -E -n '1s/^# (.*)/\1/p' "$post_outfile")
