@@ -14,17 +14,20 @@
 #     exit 1
 # fi
 
+# TODO 
+#   * add expected reading time!
+
 post_name="ks2samp"
 main_texfile="hw7_main.tex"
-# main_outfile="${main_texfile/.*/}.md"
 post_texfile="$post_name.tex"
 post_outfile="$post_name.md"
 
 figure_path="/assets/images/$post_name/"
 
 WHITE_SQUARE=$'\u25FB'  # hex code from `echo ◻ | hexdump -C`
+# BLACK_SQUARE=$'\u25A0'  # hex code from `echo ■ | hexdump -C`
 
-# TODO Slice K-S Test section BEFORE filtering so we get the full preamble, and
+# Slice K-S Test section BEFORE pandoc so we get the full preamble, and
 # then figure numbers, etc. will be translated correctly.
 sed -E -n -e '1,/\\maketitle/ p' \
           -e '/^\\section\{Kolmogorov/,/^\\section/ { /^\\section\{[^K]/! p}' \
@@ -80,9 +83,6 @@ awk -i inplace \
     };
     {print $0}' \
     "$post_outfile"
-
-# TODO 
-#   * add expected reading time!
 
 # Subsitute any remaining `\ref`s
 sed -E -i'' '/\\ref/ s@Algorithm~\\ref\{([^}]*)\}@Algorithm <a href="#\1">[\1]</a>@g' "$post_outfile"

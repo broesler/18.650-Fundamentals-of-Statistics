@@ -27,12 +27,14 @@ s/\\intertext\{(.+)\}$/\\end{align}$$ \1 $$\\begin{align}/
         :x
         N
         /\\label/ { 
+            # perform substitions
             s@(.*)\\caption\{(.*)\}[[:space:]]*\\label\{(.*)\}@\
 <div class="algorithm" id="\3">\
 <div class="alg_caption_div">\
 <span class="alg_title">Algorithm</span>\
 <span class="alg_caption">\2</span>\
 </div>@
+            # then break out
             b
         }
         b x
@@ -80,3 +82,6 @@ s/\\intertext\{(.+)\}$/\\end{align}$$ \1 $$\\begin{align}/
     s//<a/g;
     s@>([0-9]+)<@>Figure \1<@g
 }
+# fix ceil/floor\*
+/\\(ceil|floor)\*?/ s//\\\1/g
+
