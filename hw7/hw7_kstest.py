@@ -23,6 +23,8 @@ import seaborn as sns
 from matplotlib.gridspec import GridSpec
 from scipy import stats
 
+SAVE_FIGS = False
+
 
 def ks_2samp(X, Y, alpha=0.05):
     r"""Compute the Kolmogorov-Smirnov statistic on 2 samples.
@@ -307,7 +309,8 @@ else:
 # -----------------------------------------------------------------------------
 fig, ax = plot_cdfs(X, Y)
 ax.set(title=r'Empirical CDF: $X \sim \mathcal{N}(0,1)$, $Y \sim \mathcal{N}(0, 2)$')
-fig.savefig('./hw7_latex/figures/ks_test.pdf')
+if SAVE_FIGS:
+    fig.savefig('./hw7_latex/figures/ks_test.pdf')
 
 # -----------------------------------------------------------------------------
 #         Plot distribution of the test statistic
@@ -352,7 +355,8 @@ ax.set(xlabel=r'Theoretical Quantiles $\mathcal{N}(0, 1)$',
        )
 
 gs.tight_layout(fig)
-fig.savefig('./hw7_latex/figures/ks_dist.pdf')
+if SAVE_FIGS:
+    fig.savefig('./hw7_latex/figures/ks_dist.pdf')
 
 plt.show()
 # =============================================================================
