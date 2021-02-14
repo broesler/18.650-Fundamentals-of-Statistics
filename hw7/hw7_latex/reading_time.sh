@@ -20,9 +20,9 @@ figs=$(sed -E -n '/<img/ p' "$1"  | wc -l)
 
 # Estimate reading time
 # <https://blog.medium.com/read-time-and-you-bc2048ab620c>
-WPM=275  # [words/min] avg adult human reading time
-SPERFIG=12  # [sec/fig] seconds per figure 
-SPEREQN=10  # [sec/eqn] seconds per equation 
+WPM=275     # [words/min] avg adult human reading time
+SPERFIG=12  # [sec/fig] seconds per figure
+SPEREQN=10  # [sec/eqn] seconds per equation
 
 reading_time=$(echo "$words / $WPM\
                     + $SPERFIG/60 * $figs\

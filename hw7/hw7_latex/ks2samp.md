@@ -1,13 +1,13 @@
 ---
 layout: post
 title:  "Kolmogorov-Smirnov Test for Two Samples"
-date: 2021-01-27
+date:   "2021-02-14 15:48:32 -0500"
 categories: statistics
 tags: statistics hypothesis-testing python
 reading_time: 15
 ---
 
-<div style="visibility: hidden">
+<div style="visibility: hidden; padding: 0; margin-bottom: -2rem;">
 $$
 \begin{align*}
 \newcommand{\coloneqq}{\mathrel{\vcenter{:}}=}
@@ -21,8 +21,13 @@ $$
 Consider two independent samples $X_1, \dots, X_n$, and
 $Y_1, \dots, Y_m$ of independent, real-valued, continuous random
 variables, and assume that the $X_i$’s are i.i.d. with some cdf $F$ and
-that the $Y_i$’s are i.i.d. with some cdf $G$.[^1] We want to test
-whether $F = G$. Consider the following hypotheses:
+that the $Y_i$’s are i.i.d. with some cdf $G$.<span
+class="sidenote-wrapper"><label for="sn-0" class="margin-toggle sidenote-number"></label><input type="checkbox" id="sn-0" class="margin-toggle"/><span
+class="sidenote">Note that the two samples may have different sizes (if
+$n \ne m$).  
+  
+</span></span> We want to test whether $F = G$. Consider the following
+hypotheses:
 
 $$
 \begin{align}
@@ -275,7 +280,7 @@ An example two-sample KS-test is shown in
 <a href="#fig:ks_test" data-reference-type="ref" data-reference="fig:ks_test">Figure 1</a>.
 
 <figure>
-<img src="/assets/images/ks2samp/ks_test.pdf" id="fig:ks_test" style="width:90.0%" /><figcaption><span class="fig_number">Figure 1</span>. The empirical cdfs of two independent random samples from <span class="math inline">\(\mathcal{N}\left( 0, 1 \right)\)</span> and <span class="math inline">\(\mathcal{N}\left( 0, 2 \right)\)</span>. The test statistic <span class="math inline">\(T_{n,m}\)</span> is shown by the double arrow.</figcaption>
+<img src="{{ '/assets/images/ks2samp/ks_test.pdf' | absolute_url }}" id="fig:ks_test" style="width:90.0%" /><figcaption><span class="fig_number">Figure 1</span>. The empirical cdfs of two independent random samples from <span class="math inline">\(\mathcal{N}\left( 0, 1 \right)\)</span> and <span class="math inline">\(\mathcal{N}\left( 0, 2 \right)\)</span>. The test statistic <span class="math inline">\(T_{n,m}\)</span> is shown by the double arrow.</figcaption>
 </figure>
 
 ### The Null Hypothesis
@@ -450,7 +455,7 @@ readily found in theory, we rely on simulation via
 to estimate the quantiles.
 
 <figure>
-<img src="/assets/images/ks2samp/ks_dist.pdf" id="fig:Tnm" style="width:95.0%" /><figcaption><span class="fig_number">Figure 2</span>. Empirical distribution of samples of the test statistic <span class="math inline">\(T_{n,m}\)</span>.</figcaption>
+<img src="{{ '/assets/images/ks2samp/ks_dist.pdf' | absolute_url }}" id="fig:Tnm" style="width:95.0%" /><figcaption><span class="fig_number">Figure 2</span>. Empirical distribution of samples of the test statistic <span class="math inline">\(T_{n,m}\)</span>.</figcaption>
 </figure>
 
 ### The Hypothesis Test
@@ -475,5 +480,3 @@ $$
 $$
 
 where $Z$ is a random variable distributed as $T_{n,m}$.
-
-[^1]: Note that the two samples may have different sizes (if $n \ne m$).

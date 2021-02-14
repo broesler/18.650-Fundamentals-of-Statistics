@@ -40,7 +40,8 @@ sed -E -n -e '1,/\\maketitle/ p' \
 
 # Filter some LaTeX before using pandoc, then filter the markdown.
 sed -E -f before.sed "$post_texfile" \
-    | pandoc -f latex -t gfm+tex_math_dollars+footnotes --mathjax \
+    | pandoc -f latex -t gfm+tex_math_dollars+footnotes \
+        --mathjax --filter pandoc-sidenote \
     | sed -E '/\\displaystyle/ {:x; N; s/\n */ /g; /\}\$/b; b x}' \
     | sed -E '/\\intertext/ {:x; N; /&/b; s/\n */ /g; b x}' \
     | sed -E -f after.sed \
@@ -48,7 +49,7 @@ sed -E -f before.sed "$post_texfile" \
         -e "s/$WHITE_SQUARE/<span class=\"qed_symbol\">\0<\/span>/g" \
         -e '/\\tag/! s/\\qedhere/\\tag*{\0}/' \
         -e "/qedhere/ s/\\\qedhere/$WHITE_SQUARE/" \
-        -e "s,<embed\s+src=\"([^\"]*)\",<img src=\"${figure_path}\1\",g" \
+        -e "s,<embed\s+src=\"([^\"]*)\",<img src=\"{{ '${figure_path}\1' | absolute_url }}\",g" \
     | sed -E \
         '/\\begin\{align/,/\\end\{align/ { 
             /\\begin\{(bmatrix|split)\}/,/\\end\{(bmatrix|split)\}/! {
@@ -121,22 +122,21 @@ rm "$tmpfile"      # remove the file when the script exits
 
 cat "$post_outfile" >&3  # write the output file to a temp file
 
-# date:   "$(date +'%F %T %z')"  # long date format for post preamble
-# the_date=$(date +'%F')
-the_date='2021-01-27'
+# the_date='2021-01-27'
+the_date=$(date +'%F')
 
 # Write the preamble to the post_outfile
 cat > "$post_outfile" << EOF
 ---
 layout: post
 title:  "$the_title"
-date: $the_date
+date:   "$(date +'%F %T %z')"
 categories: statistics
 tags: statistics hypothesis-testing python
 reading_time: $reading_time
 ---
 
-<div style="visibility: hidden">
+<div style="visibility: hidden; padding: 0; margin-bottom: -2rem;">
 \$\$
 \begin{align*}
 \newcommand{\coloneqq}{\mathrel{\vcenter{:}}=}
