@@ -138,7 +138,22 @@ def _ks_2samp(X, Y):
 
 
 def _rank(A, k):
-    """Return the number of keys in `A` strictly less than `k`."""
+    """Return the number of keys in `A` strictly less than `k`.
+
+    Parameters
+    ----------
+    A : (M,) array_like
+        Array of values, must be sorted in ascending order.
+    k : comparable
+        Key for which to search in `A`. Must be comparable to values in `A`.
+        `k` need not be in the array.
+
+    Returns
+    -------
+    result : int
+        Number of keys in `A` strictly less than `k`. 0 if `k` is less than all
+        elements of `A`. `len(A)` if `k` is greater than all elements of `A`.
+    """
     assert all(A == sorted(A))
     lo = 0
     hi = len(A) - 1
@@ -197,7 +212,8 @@ def plot_cdfs(X, Y, fignum=1):
                                 shrinkB=0.0,
                                 lw=2))
 
-    if n < 10 or m < 10:
+    # Show the actual points if there aren't many
+    if n < 10 and m < 10:
         ax.scatter(Xs, Fn)
         ax.scatter(Ys, Gm)
 
@@ -205,7 +221,6 @@ def plot_cdfs(X, Y, fignum=1):
            ylabel='$F_n$, $G_m$')
     ax.legend()
 
-    # import ipdb; ipdb.set_trace()
     return fig, ax
 
 
