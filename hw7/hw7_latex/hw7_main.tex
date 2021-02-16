@@ -473,7 +473,13 @@ where $Z$ is a random variable distributed as $T_{n,m}$.
 \clearpage
 \section{Aside: Homework 6, Problem 3 -- Test of Independence for Bernoulli Random Variables}
 Let $X, Y$ be two Bernoulli random variables, not necessarily independent, and
-let $p = \Prob{X=1}$, $q = \Prob{Y=1}$, and $r = \Prob{X=1, Y=1}$.
+let 
+\begin{align*}
+  p &= \Prob{X=1}, \\
+  q &= \Prob{Y=1}, \text{ and} \\
+  r &= \Prob{X=1, Y=1}.
+\end{align*}
+We now look to define a test to show that the variables are independent.
 
 \subsection{Condition for Independence}
 \begin{prop}
@@ -488,9 +494,9 @@ let $p = \Prob{X=1}$, $q = \Prob{Y=1}$, and $r = \Prob{X=1, Y=1}$.
   \end{equation}
   By the given definition of the Bernoulli random variables,
   \begin{align*}
-    \Prob{X \cap Y} &= \Prob{X, Y} = \Prob{X=1, Y=1} = r \\
-    \Prob{X} &= \Prob{X=1} = p \\
-    \Prob{Y} &= \Prob{Y=1} = q \\
+    \Prob{X \cap Y} &\equiv \Prob{X, Y} \equiv \Prob{X=1, Y=1} = r \\
+    \Prob{X} &\equiv \Prob{X=1} = p \\
+    \Prob{Y} &\equiv \Prob{Y=1} = q \\
     \therefore r = pq &\iff \Prob{X,Y} = \Prob{X}\Prob{Y} \\
     &\iff X \indep Y  \qedhere
   \end{align*}
@@ -501,7 +507,7 @@ Let $(X_1, Y_1), \dots, (X_n, Y_n)$ be a sample of $n$ \iid\ copies of $(X, Y)$
 (\ie $X_i \indep X_j$ for $i \ne j$, but $X_i$ may not be independent of $Y_i$).
 Based on this sample, we want to test whether $X \indep Y$, \ie whether $r = pq$.
 
-\subsubsection{Estimators of $p, q, r$}
+\subsubsection{Estimators of the Parameters}
 Define the estimators:
 \begin{align*}
   \phat &= \avg{i}{n} X_i, \\
