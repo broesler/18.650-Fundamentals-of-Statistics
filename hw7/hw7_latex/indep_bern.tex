@@ -1,0 +1,676 @@
+\documentclass[letterpaper, reqno]{amsart}
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[comma, compress, numbers, square]{natbib}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{bbm}  % for indicator function
+\usepackage{centernot}
+\usepackage{mathtools}
+\usepackage{mleftright}
+\usepackage{enumerate}
+\usepackage{array, multirow}
+\usepackage[section, ruled]{algorithm}
+\usepackage{algpseudocode}
+\usepackage{url}
+\usepackage[font=small, hypcap=true]{caption}                % link to top of figures and subfigures
+\usepackage[font=small, hypcap=true, list=true]{subcaption}   % use for subfigures instead of {subfigure}
+
+\usepackage{hyperref}
+\hypersetup{
+    linktoc=all,    % link table of contents to sections
+    colorlinks,
+    allcolors=black,
+    urlcolor=dblue,
+  }
+
+% Declare theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{prop}{Proposition}[section]
+
+\renewcommand{\qedsymbol}{\ensuremath{\blacksquare}}
+
+% new environment for proofs of claims within proofs
+\newenvironment{subproof}[1][\proofname]{%
+  \renewcommand{\qedsymbol}{\ensuremath{\square}}%
+  \begin{proof}[#1]%
+}{%
+  \end{proof}%
+}
+
+\numberwithin{equation}{section}
+
+% lists as 1., 2., ...
+\renewcommand{\labelenumi}{\theenumi.}
+
+% Letter subsections
+\renewcommand{\thesubsubsection}{\thesubsection(\alph{subsubsection})}
+
+% number only specific equation in, say, align* environment
+\newcommand{\numberthis}{\addtocounter{equation}{1}\tag{\theequation}}
+
+% Algorithm
+% \renewcommand{\algorithmicrequire}{\textbf{Input:}}
+% \renewcommand{\algorithmicensure}{\textbf{Output:}}
+\algnewcommand\Assert{\State \textbf{assert} }
+
+%-------------------------------------------------------------------------------
+%     {listings + color} package options
+%-------------------------------------------------------------------------------
+% Define colors for code
+\usepackage{xcolor}
+\definecolor{gray}{rgb}{0.6, 0.6, 0.6}
+\definecolor{mauve}{rgb}{0.58, 0, 0.82}
+\definecolor{dblue}{HTML}{0645AD}
+\definecolor{lblue}{HTML}{1F77B4}
+
+\usepackage{listings}
+\lstset{
+  language = Python,
+  basicstyle = \scriptsize\ttfamily,
+  numbers = left,
+  numberstyle = \tiny\color{gray},
+  stepnumber = 1,
+  numbersep = 8pt,
+  breaklines = true,
+  keywordstyle = \bfseries\color{lblue},
+  commentstyle = \color{gray},
+  % stringstyle = \color{mauve}
+}
+
+% Place loose figures at actual top of page
+% \makeatletter
+%   \setlength{\@fptop}{0pt}
+% \makeatother
+
+%-------------------------------------------------------------------------------
+% NO HYPHENATION
+%-------------------------------------------------------------------------------
+\tolerance=1
+\emergencystretch=\maxdimen
+\hyphenpenalty=10000
+\hbadness=10000
+
+%==============================================================================
+% General macros
+%==============================================================================
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+
+\newcommand{\T}{\top} % transpose symbol
+\newcommand{\vect}[1]{\boldsymbol{\mathbf{#1}}} % use BOTH to cover all cases
+
+% Misc.
+\newcommand{\ie}{\emph{i.e.\ }}
+\newcommand{\eg}{\emph{e.g.\ }}
+
+% Use for fractions with large terms
+\newcommand{\ddfrac}[2]{\frac{\displaystyle #1}{\displaystyle #2}}
+
+% Derivatives
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\ddx}[2]{\frac{\dd #1}{\dd #2}}
+\newcommand{\dx}[1]{\,\dd #1} % for inside integration
+
+% Probability helpers
+\newcommand{\Prob}[1]{\mathbb{P}\mleft[#1\mright]}
+\newcommand{\E}[1]{\mathbb{E}\mleft[#1\mright]}
+\newcommand{\V}[1]{\mathbb{V}\mleft[#1\mright]}
+\newcommand{\Var}[1]{\operatorname{Var}\mleft(#1\mright)}
+\newcommand{\Cov}[1]{\operatorname{Cov}\mleft(#1\mright)}
+\newcommand{\R}{\mathbb{R}}  % real numbers
+\newcommand{\N}[2]{\mathcal{N}\mleft( #1, #2 \mright)}
+\newcommand{\U}[2]{\mathcal{U}\mleft(\mleft[ #1, #2 \mright]\mright)}
+\newcommand{\indep}{\perp \!\!\! \perp}  % "is independent from"
+\newcommand{\nindep}{\centernot\indep}
+\newcommand{\indic}[1]{\mathbbm{1}\!\mleft\{#1\mright\}} % indicator function
+\newcommand{\iid}{i.i.d.}
+
+\newcommand{\sumi}[2]{\sum_{#1=1}^{#2}}
+\newcommand{\avg}[2]{\frac{1}{#2}\sumi{#1}{#2}}
+
+\newcommand{\by}[1]{&\quad&\text{(#1)}}
+
+\newcommand{\Alim}{\xrightarrow[n \to \infty]{\text{a.s.}}}
+\newcommand{\Plim}{\xrightarrow[n \to \infty]{\mathbb{P}}}
+\newcommand{\Dlim}{\xrightarrow[n \to \infty]{(d)}}
+
+\newcommand{\phat}{\hat{p}}
+\newcommand{\qhat}{\hat{q}}
+\newcommand{\rhat}{\hat{r}}
+
+\newcommand{\Xnbar}{\overline{X}_n}
+\newcommand{\Rnbar}{\overline{R}_n}
+\newcommand{\Qnbar}{\overline{Q}_n}
+
+\DeclareMathOperator{\Ber}{Ber}
+% \DeclareMathOperator{\Var}{Var}
+% \DeclareMathOperator{\Cov}{Cov}
+
+%%%% TITLE ----------------------------
+\title[Homework 7 -- Problem \thesection]{18.650 Fundamentals of Statistics\\{\large Homework 7}}
+\author{Bernie Roesler}
+\date{\today}
+%%%%
+
+%%%%%%% BEGIN DOCUMENT ----------------
+\begin{document}
+% \sloppy
+
+\graphicspath{{./figures/}}
+
+\maketitle
+\section{Aside: Homework 6, Problem 3 -- Test of Independence for Bernoulli Random Variables}
+Let $X, Y$ be two Bernoulli random variables, not necessarily independent, and
+let 
+\begin{align*}
+  p &= \Prob{X=1}, \\
+  q &= \Prob{Y=1}, \text{ and} \\
+  r &= \Prob{X=1, Y=1}.
+\end{align*}
+We now look to define a test to show that the variables are independent.
+
+\subsection{Condition for Independence}
+\begin{prop}
+  $X \indep Y \iff r = pq$.
+\end{prop}
+
+\begin{proof}
+  Two random variables are independent iff
+  \begin{equation}
+    \Prob{X \cap Y} = \Prob{X}\Prob{Y} \label{eq:indep}
+    % \iff \Prob{X} = \frac{\Prob{X,Y}}{\Prob{Y}} = \Prob{X | Y}
+  \end{equation}
+  By the given definition of the Bernoulli random variables,
+  \begin{align*}
+    \Prob{X \cap Y} &= \Prob{X, Y} = \Prob{X=1, Y=1} = r \\
+    \Prob{X} &= \Prob{X=1} = p \\
+    \Prob{Y} &= \Prob{Y=1} = q \\
+    \therefore r = pq &\iff \Prob{X,Y} = \Prob{X}\Prob{Y} \\
+    &\iff X \indep Y  \qedhere
+  \end{align*}
+\end{proof}
+
+\subsection{Test for Independence}
+Let $(X_1, Y_1), \dots, (X_n, Y_n)$ be a sample of $n$ \iid\ copies of $(X, Y)$
+(\ie $X_i \indep X_j$ for $i \ne j$, but $X_i$ may not be independent of $Y_i$).
+Based on this sample, we want to test whether $X \indep Y$, \ie whether $r = pq$.
+
+\subsubsection{Estimators of $p, q, r$}
+Define the estimators:
+\begin{align*}
+  \phat &= \avg{i}{n} X_i, \\
+  \qhat &= \avg{i}{n} Y_i, \\
+  \rhat &= \avg{i}{n} X_i Y_i.
+\end{align*}
+
+\begin{prop}
+  These estimators $\phat$, $\qhat$, and $\rhat$ are consistent estimators of
+  the true values $p$, $q$, and $r$.
+\end{prop}
+
+\begin{proof}
+  To show that an estimator is \emph{consistent}, we must prove that it
+  converges to the true value of the parameter in the limit as $n \to \infty$.
+  Since the sequence of $X_i$'s are \iid, we can use the Weak Law of Large
+  Numbers (LLN) to prove that $\phat$ converges to $p$.
+
+  \begin{theorem}[Weak Law of Large Numbers] \label{eq:LLN}
+    If the sequence of random variables $X_1, \dots, X_n$ are \iid, then
+    \[ \avg{i}{n} X_i \Plim \E{X}. \]
+  \end{theorem}
+
+  The expectation of $X$ is given by
+  \begin{alignat*}{3}
+    \E{X} &= \E{\Ber(p)} \by{given} \\
+          &= p \by{definition of Bernoulli r.v.} \\
+    \therefore \avg{i}{n} X_i &\Plim p \by{LLN} \\
+    \implies \phat &\Plim p.
+  \end{alignat*}
+  Likewise $\qhat \Plim q$.
+
+  To show that $\rhat$ converges to $r$, let $R \coloneqq X Y$ be
+  a Bernoulli random variable with parameter $r = \Prob{X=1, Y=1}$, so that the
+  estimator
+  \begin{equation} \label{eq:rhat}
+    \rhat = \avg{i}{n} X_i Y_i = \avg{i}{n} R_i.
+  \end{equation}
+  Note that the values of $R_i$ \emph{are} \iid\ since each pair $(X_i, Y_i)$
+  are \iid, even though $X_i$ and $Y_j$ may not be independent for $i \ne j$.
+  As before, we apply the Law of Large Numbers to the average of $R_i$'s. The
+  expectation of $R$ is
+  \begin{alignat*}{3}
+    \E{R} &= \E{\Ber(r)} \by{definition} \\
+          &= r \by{definition of Bernoulli r.v.} \\
+    \therefore \avg{i}{n} R_i &\Plim r \by{LLN} \\
+    \implies \rhat &\Plim r.
+  \end{alignat*}
+  Thus, each estimator $(\phat, \qhat, \rhat)$ converges to its
+  respective parameter $(p, q, r)$.
+\end{proof}
+
+\subsubsection{Asymptotic Normality of the Estimators}
+\begin{prop} \label{prop:normality_pqr}
+    The vector of estimators $(\phat, \qhat, \rhat)$ is asymptotically normal, \ie
+    \[ \sqrt{n} ((\phat, \qhat, \rhat) - (p, q, r))
+        \Dlim \N{0}{\Cov{(\phat, \qhat, \rhat)}}. \]
+\end{prop}
+\emph{Proof.} To prove that the vector of estimators is asymptotically normal, we employ the
+Central Limit Theorem (CLT).
+
+\begin{theorem}[Central Limit Theorem]
+    Let $X_1, \dots, X_n$ be a sequence of \iid\ random vectors $X_i \in \R^k$,
+    and $\Xnbar = \avg{i}{n} X_i$.
+    Then,
+    \[ \sqrt{n}(\Xnbar - \E{X}) \Dlim \N{0}{\Sigma}. \]
+    where $\Sigma$ is the $k$-by-$k$ matrix $\Cov{X}$.
+\end{theorem}
+
+By the CLT,
+\begin{equation} \label{eq:CLT}
+  \sqrt{n} ((\phat, \qhat, \rhat) - \E{(\phat, \qhat, \rhat)}) \Dlim \N{0}{\Sigma}
+\end{equation}
+where $\Sigma$ is the 3-by-3 symmetric covariance matrix, defined as
+\begin{equation}
+  \Sigma \coloneqq
+  \begin{bmatrix}
+    \Var{\phat} & \Cov{\phat, \qhat} & \Cov{\phat, \rhat} \\
+    \cdot & \Var{\qhat} & \Cov{\qhat, \rhat} \\
+    \cdot & \cdot & \Var{\rhat}
+  \end{bmatrix}.
+\end{equation}
+
+We first need to determine the expectations of the estimators.
+
+\begin{prop}
+  The expectation of the estimator $\phat$ is $\E{\phat} = p$.
+\end{prop}
+\begin{subproof}
+  \begin{alignat*}{3}
+    \E{\phat} &= \E{\avg{i}{n} X_i} \by{definition} \\
+              &= \frac{1}{n} \sumi{i}{n} \E{X_i} \by{linearity of expectation} \\
+              &= \frac{1}{n} n \E{X} \by{\iid} \\
+              &= \E{\Ber(p)} \by{definition} \\
+    \implies \E{\phat} &= p \by{definition} \tag*{\qedhere}
+  \end{alignat*}
+\end{subproof}
+\noindent Similarly, $\E{\qhat} = q$ and $\E{\rhat} = r$. This proposition
+also shows that the estimators are \emph{unbiased}, since $\E{\phat - p} = 0$,
+\emph{etc}.
+
+We now determine the entries in the covariance matrix to complete the proof of
+asymptotic normality.
+\begin{prop}
+The variance of $\phat$ is given by $\Var{\phat} = \frac{1}{n} p(1 - p)$.
+\end{prop}
+\begin{subproof}
+  Using the definition of $\phat$,
+  \begin{alignat*}{3}
+    \Var{\phat} &= \Var{\avg{i}{n} X_i} \by{definition} \\
+                &= \frac{1}{n^2}\Var{\sumi{i}{n} X_i} \by{variance rule} \\
+                &= \frac{1}{n^2}\sumi{i}{n}\Var{X_i} \by{\iid} \\
+                &= \frac{1}{n^2}n\Var{X} \by{\iid} \\
+   \therefore \Var{\phat} &= \frac{1}{n} p(1-p) \by{variance of $\Ber(p)$}
+  \end{alignat*}
+  Likewise, $\Var{\qhat} = \frac{1}{n} q(1 - q)$,
+  and $\Var{\rhat} = \frac{1}{n} r(1 - r)$.
+\end{subproof}
+
+\begin{prop}
+  The covariance of $\phat$ and $\qhat$ is given by $\Cov{\phat, \qhat} = r - pq$.
+\end{prop}
+\begin{subproof}
+  \begin{alignat*}{3}
+    \Cov{\phat, \qhat} &= \Cov{\avg{i}{n} X_i, \avg{i}{n} Y_i} \\
+    &= \frac{1}{n^2} \Cov{\sumi{i}{n} X_i, \sumi{i}{n} Y_i} \by{covariance property} \\
+    &= \frac{1}{n^2} \sumi{i}{n} \sumi{j}{n} \Cov{X_i, Y_j} \by{bilinearity of covariance} \\
+    &= \frac{1}{n^2} n^2 \Cov{X, Y} \by{identically distributed} \\
+    &= \Cov{X, Y}  \\
+    &= \E{XY} - \E{X}\E{Y} \by{definition of covariance} \\
+    &= \E{R} - \E{X}\E{Y} \by{definition of $R$} \\
+    \therefore \Cov{\phat, \qhat} &= r - pq \tag*{\qedhere}
+  \end{alignat*}
+\end{subproof}
+
+\begin{prop}
+  The covariance of $\phat$ and $\rhat$ is given by $\Cov{\phat, \rhat} = r(1 - p)$.
+\end{prop}
+\begin{subproof}
+  \begin{alignat*}{3}
+    \Cov{\phat, \rhat} &= \Cov{\avg{i}{n} X_i, \avg{i}{n} R_i} \\
+    &= \frac{1}{n^2} \Cov{\sumi{i}{n} X_i, \sumi{i}{n} R_i} \by{covariance property} \\
+    &= \frac{1}{n^2} \sumi{i}{n} \sumi{j}{n} \Cov{X_i, R_j} \by{bilinearity of covariance} \\
+    &= \frac{1}{n^2} n^2 \Cov{X, R} \by{identically distributed} \\
+    &= \Cov{X, R}  \\
+    &= \E{X R} - \E{X}\E{R} \by{definition of covariance} \\
+    &= \E{X R} - pr \by{given} \\
+    &= \E{X (X Y)} - pr \by{definition of $R$} \\
+    \intertext{Since $X \sim \Ber(p) \in \{0, 1\}$, $X^2 = X$, so we have}
+    &= \E{X Y} - pr \\
+    &= r - pr \\
+    \therefore \Cov{\phat, \rhat} &= r(1 - p) \tag*{\qedhere}
+  \end{alignat*}
+\end{subproof}
+\noindent Similarly, $\Cov{\qhat, \rhat} = r(1 - q)$.
+
+The entire asymptotic covariance matrix is then
+\begin{equation} \label{eq:sigma}
+  \Sigma =
+  \begin{bmatrix}
+    p(1-p) & r - pq & r(1-p) \\
+    \cdot & q(1-q) & r(1-q) \\
+    \cdot & \cdot & r(1-r)
+  \end{bmatrix}.
+\end{equation}
+
+Since we have determined the expectation $\E{(\phat, \qhat, \rhat)} = (p, q,
+r)$, and the covariance matrix $\Sigma$ in terms of $p$, $q$, and $r$, we
+conclude that Proposition~\ref{prop:normality_pqr} is true, and the vector of
+estimators $(\phat, \qhat, \rhat)$ is asymptotically normal. \qed
+
+\subsubsection{The Delta Method}
+\begin{prop} \label{prop:delta}
+  \[ \sqrt{n}\mleft((\rhat - \phat\qhat) - (r - pq)\mright) \Dlim \N{0}{V} \]
+  where $V$ depends only on $p$, $q$, and $r$.
+\end{prop}
+
+\begin{proof}
+  Let $\hat{\theta}$ and $\theta$ be vectors in $\R^3$
+  \[
+    \hat{\theta} = \begin{bmatrix} \phat \\ \qhat \\ \rhat \end{bmatrix} \text{, and }
+    \theta = \begin{bmatrix} p \\ q \\ r \end{bmatrix}.
+  \]
+  From our proof of Proposition~\ref{prop:normality_pqr}, we have
+  \begin{alignat*}{3}
+    \sqrt{n}(\hat{\theta} - \theta) &\Dlim \N{0}{\Sigma} \by{CLT} \\
+    \implies \sqrt{n}(g(\hat{\theta}) - g(\theta)) &\Dlim \N{0}{\nabla g(\theta)^\T \Sigma
+      \nabla g(\theta)} \by{Delta method}
+  \end{alignat*}
+  for any differentiable function $g \colon \R^k \to \R$, and $\Sigma$ given by
+  Equation~\eqref{eq:sigma}.
+  Define the function
+  \begin{equation} \label{eq:g}
+    g(u, v, w) = w - uv
+  \end{equation}
+  such that
+  \begin{align*}
+    g(\hat{\theta}) &= \rhat - \phat\qhat, \\
+    g(\theta) &= r - pq.
+  \end{align*}
+  The gradient of $g(\theta)$ is then
+  \[
+    \nabla g(u,v,w) = \begin{bmatrix} -v \\ -u \\ 1 \end{bmatrix}
+    \implies \nabla g(\theta) = \begin{bmatrix} -q \\ -p \\ 1 \end{bmatrix}
+  \]
+  The asymptotic variance $V = \nabla g(\theta)^\T \Sigma \nabla g(\theta)$,
+  which we will now show is a function only of the parameters $(p, q, r)$.
+  \begin{alignat*}{3}
+    V &= \begin{bmatrix} -q & -p & 1 \end{bmatrix}
+    \begin{bmatrix}
+      p(1-p) & r - pq & r(1-p) \\
+      \cdot & q(1-q) & r(1-q) \\
+      \cdot & \cdot & r(1-r)
+    \end{bmatrix}
+    \begin{bmatrix} -q \\ -p \\ 1 \end{bmatrix} \numberthis \label{eq:V_mat} \\
+    &= \begin{bmatrix} -q & -p & 1 \end{bmatrix}
+    \begin{bmatrix}
+      -qp(1-p) - p(r - pq) + r(1-p) \\
+      -q(r - pq) - pq(1-q) + r(1-q) \\
+      -qr(1-p) - pr(1-q) + r(1-r)
+    \end{bmatrix} \\
+    &= \begin{bmatrix} -q & -p & 1 \end{bmatrix}
+    \begin{bmatrix}
+      (r - pq)(1 - 2p) \\
+      (r - pq)(1 - 2q) \\
+      r((1-p)(1-q) - (r-pq))
+    \end{bmatrix} \\
+    \begin{split}
+      &= -q(r - pq)(1 - 2p) - p(r - pq)(1 - 2q)) \\
+      &\,\quad + r((1-p)(1-q) - (r-pq))
+    \end{split} \\
+    \therefore V &= (r - pq)[-q(1 - 2p) - p(1 - 2q) - r] + r(1-p)(1-q)
+    \numberthis \label{eq:V}
+  \end{alignat*}
+  which is a function only of $(p, q, r)$.
+\end{proof}
+
+\subsubsection{The Null Hypothesis}
+Consider the hypotheses
+\begin{align*}
+  H_0 \colon X \indep Y \\
+  H_1 \colon X \nindep Y
+\end{align*}
+
+\begin{prop} \label{prop:V_H0}
+  If $H_0$ is true, then $V = pq(1-p)(1-q)$.
+\end{prop}
+
+\begin{proof}
+  Under $H_0$, $r = pq$. Using the previous expression for $V$,
+  Equation~\eqref{eq:V}, replace $r$ by $pq$ to find
+  \[ V = (pq - pq)[-q(1 - 2p) - p(1 - 2q) - pq] + pq(1-p)(1-q). \]
+  The first term is identically 0, so
+  \[ V = pq(1-p)(1-q). \qedhere \]
+\end{proof}
+
+\begin{prop} \label{prop:Vhat}
+Given
+  \[ V = pq(1-p)(1-q), \]
+a consistent estimator is given by
+  \[ \hat{V} = \phat\qhat(1 - \phat)(1 - \qhat). \]
+\end{prop}
+
+\begin{proof}
+  To prove that $\hat{V}$ converges to $V$, we employ the Continuous Mapping
+  Theorem.
+  \begin{theorem}[Continuous Mapping Theorem]
+    Let $X \in \R^n$ be a vector of random variables, and $g \colon \R^n \to \R$
+    be a continuous function. Let $X_n = X_1, X_2, \dots$ be a sequence of
+    random vectors. If $X_n \Plim X$, then $g(X_n) \Plim g(X)$.
+  \end{theorem}
+
+  Since $\phat \Plim p$ and $\qhat \Plim q$,
+  $\hat{V}(\phat, \qhat) \Plim V(p, q)$.
+\end{proof}
+
+\subsubsection{A Hypothesis Test}
+\begin{prop}
+  Given $\alpha \in (0, 1)$, we propose the test statistic
+  \[
+    T_n \coloneqq \frac{\sqrt{n}(\rhat - \phat\qhat)}{\sqrt{\hat{V}}} \Dlim \N{0}{1}
+  \]
+  where $\hat{V}$ is given by Proposition~\ref{prop:Vhat}, and $t_{n-1}$ is
+  Student's $t$-distribution with $n-1$ degrees of freedom.
+\end{prop}
+
+\begin{proof}
+Proposition~\ref{prop:delta} gives the distribution of $g(\theta)$ (given by
+Equation~\eqref{eq:g}) under $H_0$.
+Assume that $p, q \in (0, 1)$ s.t.\ $V > 0$.
+\begin{alignat*}{3}
+  \sqrt{n}\mleft((\rhat - \phat\qhat) - (r - pq)\mright) &\Dlim \N{0}{V}
+  \by{Proposition~\ref{prop:delta}} \\
+  \sqrt{n}(\rhat - \phat\qhat) &\Dlim \N{0}{V} \by{$r = pq$ under $H_0$} \\
+  \sqrt{n}\frac{(\rhat - \phat\qhat)}{\sqrt{V}} &\Dlim \N{0}{1} \numberthis \label{eq:Tn_norm}
+\end{alignat*}
+The asymptotic variance $V$, however, is unknown, so we divide the estimator by
+$\sqrt{\frac{\hat{V}}{V}}$ to get an expression that will evaluate to our
+desired test statistic
+\[
+  T_n = \ddfrac{\sqrt{n}\frac{(\rhat - \phat\qhat)}{\sqrt{V}}}
+               {\sqrt{\frac{\hat{V}}{V}}}
+\]
+Given this expression, we can determine the distribution of $T_n$.
+Equation~\eqref{eq:Tn_norm} shows that the numerator is a standard normal random
+variable.
+\href{https://en.wikipedia.org/wiki/Cochran's_theorem}{\underline{Cochran's theorem}}
+gives the distribution of the denominator.
+\begin{lemma}[Result of Cochran's Theorem]
+  If $X_1, \dots, X_n$ are \iid\ random variables drawn from the distribution
+  $\N{\mu}{\sigma^2}$, and $S_n^2 \coloneqq \sumi{i}{n} (X_i - \Xnbar)^2$,
+  then
+  \[ \Xnbar \indep S_n, \]
+  and
+  \[ \frac{n S_n^2}{\sigma^2} \sim \chi^2_{n-1}. \]
+\end{lemma}
+Since $\hat{V}$ and $V$ describe the sample variance and variance of a
+(asymptotically) normal distribution, $T_n$ is asymptotically characterized by
+\[ T_n \Dlim \ddfrac{\N{0}{1}}{\sqrt{\frac{\chi^2_{n-1}}{n}}} \]
+which is the definition of a random variable drawn from \emph{Student's
+T-distribution} with $n-1$ degrees of freedom. In this case, however, the
+normality of the underlying random variables is asymptotic, so the $t_{n-1}$
+distribution approaches a standard normal distribution
+\begin{align*}
+  T_n &\Dlim t_{n-1} \\
+  t_{n-1} &\Dlim \N{0}{1} \numberthis \label{eq:t_to_N} \\
+  \implies T_n &\Dlim \N{0}{1} \qedhere
+\end{align*}
+A proof of Equation~\eqref{eq:t_to_N} is given in \nameref{app:t_to_N}.
+\end{proof}
+
+Given the test statistic $T_n$, define the rejection region
+\[ R_\psi = \left\{ \hat{\theta} \colon |T_n| > q_{\alpha/2} \right\} \]
+where
+\[ q_{\alpha/2} = \Phi^{-1}\mleft(1 - \frac{\alpha}{2}\mright) \]
+is the $\mleft(1-\frac{\alpha}{2}\mright)$-quantile of the standard normal $\N{0}{1}$
+distribution.
+
+We would like to know whether the facts of being happy and being in
+a relationship are independent of each other. In a given population, 1000 people
+(aged at least 21 years old) are sampled and asked two questions: ``Do you
+consider yourself as happy?'' and ``Are you involved in a relationship?''. The
+answers are summarized in Table~\ref{tab:tab1}.
+
+\begin{table}[H]
+  \setlength{\tabcolsep}{8pt}
+  \def\arraystretch{1.1}
+  \caption{}
+  \label{tab:tab1}
+    \centering
+    \begin{tabular}{|r|c c|c|}
+      \firsthline
+                                  & {\bf Happy} & {\bf Not Happy} & {\bf Total} \\
+      \hline
+      {\bf In a Relationship}     & 205         & 301             & 506 \\
+      {\bf Not in a Relationship} & 179         & 315             & 494 \\
+      \hline
+      {\bf Total}                 & 384         & 616             & 1000 \\
+      \lasthline
+    \end{tabular}
+\end{table}
+
+The values of our estimators are as follows:
+\begin{align*}
+  \phat &= \frac{\text{\# Happy}}{N} = \frac{384}{1000} = 0.384 \\
+  \qhat &= \frac{\text{\# In a Relationship}}{N} = \frac{506}{1000} = 0.506 \\
+  \rhat &= \frac{\text{\# Happy} \cap \text{\# In a Relationship}}{N} = \frac{205}{1000} = 0.205.
+\end{align*}
+The estimate of the asymptotic variance of the test statistic is
+\[ \hat{V} = \phat\qhat(1-\phat)(1-\qhat) = (0.384)(0.506)(1 - 0.384)(1 - 0.506)
+  = 0.05913, \]
+giving the test statistic
+\[ T_n = \frac{\sqrt{n}(\rhat - \phat\qhat)}{\sqrt{\hat{V}}}
+  = \frac{\sqrt{1000}(0.205 - 0.384\cdot0.506)}{\sqrt{0.05913}} = 1.391. \]
+The standard normal quantile at $\alpha = 0.05$ is $q_{\alpha/2}
+= \Phi^{-1}\mleft(1
+- \frac{\alpha}{2}\mright) = 1.96$, so the test result is
+\[ |T_n| = 1.391 < q_{\alpha/2} = 1.96 \]
+so we \emph{fail to reject $H_0$ at the 5\% level}. The $p$-value of the test is
+\begin{align*}
+  \text{$p$-value} &\coloneqq \Prob{Z > |T_n|} \by{$Z \sim \N{0}{1}$}  \\
+                   &= \Prob{Z \le |T_n|} \by{symmetry} \\
+                   &= \Prob{Z \le -T_n} + \Prob{Z > T_n} \\
+                   &= 2\Phi(-|T_n|) \\
+  \implies \text{$p$-value} &= 0.1642.
+\end{align*}
+In other words, the lowest level at which we could reject the null hypothesis is
+at $\alpha = \text{$p$-value} = 0.1642 = 16.42\%$.
+
+\clearpage
+\subsection*{Appendix A: Additional Proofs} \label{app:t_to_N}
+\begin{prop}
+  A $t$-distribution with $n$ degrees of freedrom approaches a standard normal
+  distribution as $n$ approaches infinity:
+  \[ t_n \Dlim \N{0}{1}. \]
+\end{prop}
+
+\emph{Proof.}
+Student's $t$-distribution with $\nu$ degrees of freedom is defined as the
+distribution of the random variable $T$ such that
+\[ t_{\nu} \sim T = \ddfrac{Z}{\sqrt{\frac{V}{\nu}}} \]
+where $Z \sim \N{0}{1}$, $V \sim \chi^2_{\nu}$, and $Z \indep V$.
+
+Let $X_1, \dots, X_n \sim \N{\mu}{\sigma^2}$ be a sequence of \iid\ random
+variables. Define the sample mean and sample variance
+\begin{align*}
+  \Xnbar &\coloneqq \avg{i}{n} X_i \\
+  S_n^2 &\coloneqq \avg{i}{n} (X_i - \Xnbar)^2.
+\end{align*}
+Let the random variables
+\begin{align*}
+  Z &= \frac{\sqrt{n}(\Xnbar - \mu)}{\sigma} \\
+  V &= \frac{n S_n^2}{\sigma^2}.
+\end{align*}
+such that $Z \sim \N{0}{1}$ by the Central Limit Theorem, and $V \sim
+\chi^2_{n-1}$ by Cochran's Theorem (which also shows that $Z \indep V$).
+Then, the $t$-distribution is \emph{pivotal}
+\[  t_{n-1} = \ddfrac{Z}{\sqrt{\frac{V}{n-1}}}. \]
+
+\begin{lemma}
+  The sample variance converges in probability to the variance,
+  \[ S_n^2 \Plim \sigma^2. \]
+\end{lemma}
+
+\begin{subproof}
+  \begin{alignat*}{3}
+    S_n^2 &\coloneqq \avg{i}{n}(X_i - \Xnbar)^2 \\
+          &= \avg{i}{n}(X_i^2 - 2 \Xnbar X_i + \Xnbar^2) \\
+          &= \avg{i}{n} X_i^2 - \avg{i}{n} 2 \Xnbar X_i + \avg{i}{n} \Xnbar^2  \\
+          &= \avg{i}{n} X_i^2 - 2 \Xnbar \avg{i}{n} X_i + \Xnbar^2  \\
+          &= \avg{i}{n} X_i^2 - 2 \Xnbar^2  + \Xnbar^2  \\
+          &= \avg{i}{n} X_i^2 - \Xnbar^2.
+  \end{alignat*}
+  The second term in the expression for $S_n^2$ is determined by
+  \begin{alignat*}{3}
+    \Xnbar &\Plim \E{X} \by{LLN} \\
+    \E{X} &= \mu \by{given}. \\
+    g(\Xnbar) &\Plim g(\mu) \by{CMT} \\
+    \implies \Xnbar^2 &\Plim \mu^2.
+  \end{alignat*}
+  The first term in the expression for $S_n^2$ is then determined by
+  \begin{alignat*}{3}
+    \avg{i}{n} X_i^2 &\Plim \E{X^2} \by{LLN} \\
+    \Var{X} &= \E{X^2} - \E{X}^2 \by{definition} \\
+    \implies \E{X^2} &= \Var{X} + \E{X}^2 \\
+                     &= \sigma^2 + \mu^2. \by{given} \\
+    \therefore S_n^2 &\Plim \sigma^2 + \mu^2 - \mu^2 \\
+    \implies S_n^2 &\Plim \sigma^2 \tag*{\qedhere}
+  \end{alignat*}
+\end{subproof}
+
+Thus, $V \Plim \frac{n \sigma^2}{\sigma^2} = n$, a constant.
+
+\begin{theorem}[Slutsky's Theorem]
+  If the sequences of random variables $X_n~\Dlim~X$, and $Y_n~\Dlim~c$,
+  a constant, then
+  \begin{alignat*}{3}
+    X_n + Y_n &\Dlim X + c \text{, and} \\
+    X_n Y_n &\Dlim cX.
+  \end{alignat*}
+\end{theorem}
+
+% TODO rewrite all in terms of unbiased sample variance
+Since convergence in probability implies convergence in distribution, and $Z
+\Dlim \N{0}{1}$, Slutsky's theorem implies that
+\begin{align*}
+  t_{n-1} = \ddfrac{Z}{\sqrt{\frac{V}{n-1}}}
+        &\Dlim \ddfrac{\N{0}{1}}{\sqrt{\frac{n}{n-1}}} \\
+        \implies t_{n-1} &\Dlim \N{0}{1}.  \qed
+\end{align*}
+
+\clearpage
+\end{document}
