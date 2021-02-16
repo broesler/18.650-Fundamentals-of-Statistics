@@ -13,9 +13,10 @@ s/\\m(left|right)/\\\1/g
 /\\begin\{equation\}/i \\n$$\n
 /\\end\{equation\}/a \\n$$\n
 /\\eqref/ s/\\eqref\{[^}]*\}/$&$/g
-# Remove some macros because pandoc doesn't like them
-# /\\newcommand\{\\indic\}/d
+# Remove some macros because mathjax doesn't like them, replace in preamble of
+# the markdown document for easier reading/editing.
 /newcommand/ {
     s/\\mathbbm/\\mathbb/g
     /\{\\numberthis\}/d
+    /\\indep\>/d
 }

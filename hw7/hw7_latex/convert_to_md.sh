@@ -17,20 +17,29 @@
 # TODO 
 #   * add expected reading time!
 
-post_name="ks2samp"
+# post_name="ks2samp"
+post_name="indep_bern"
 main_texfile="hw7_main.tex"
+
+categories="statistics"
+tags="statistics hypothesis-testing python"
+
 post_texfile="$post_name.tex"
 post_outfile="$post_name.md"
 
 figure_path="/assets/images/$post_name/"
 
+# White squares used for proof endings except for "wrapper" proofs, which use
+# black squares.
 WHITE_SQUARE=$'\u25FB'  # hex code from `echo ◻ | hexdump -C`
-# BLACK_SQUARE=$'\u25A0'  # hex code from `echo ■ | hexdump -C`
+BLACK_SQUARE=$'\u25A0'  # hex code from `echo ■ | hexdump -C`
 
+# TODO convert pattern to $pattern and ${pattern:0:1}
 # Slice K-S Test section BEFORE pandoc so we get the full preamble, and
 # then figure numbers, etc. will be translated correctly.
+# -e '/^\\section\{Kolmogorov/,/^\\section/ { /^\\section\{[^K]/! p}' \
 sed -E -n -e '1,/\\maketitle/ p' \
-          -e '/^\\section\{Kolmogorov/,/^\\section/ { /^\\section\{[^K]/! p}' \
+          -e '/^\\section\{Aside/,/^\\section/ { /^\\section\{[^A]/! p}' \
           -e '/\\end\{document\}/p' \
           "$main_texfile" > "$post_texfile"
 
@@ -48,7 +57,8 @@ sed -E -f before.sed "$post_texfile" \
     | sed -E -e "/^[[:blank:]]*$WHITE_SQUARE$/d" \
         -e "s/$WHITE_SQUARE/<span class=\"qed_symbol\">\0<\/span>/g" \
         -e '/\\tag/! s/\\qedhere/\\tag*{\0}/' \
-        -e "/qedhere/ s/\\\qedhere/$WHITE_SQUARE/" \
+        -e "/\\\qedhere/ s//$WHITE_SQUARE/" \
+        -e "/\\\qed/ s//$BLACK_SQUARE/" \
         -e "s,<embed\s+src=\"([^\"]*)\",<img src=\"{{ '${figure_path}\1' | absolute_url }}\",g" \
     | sed -E \
         '/\\begin\{align/,/\\end\{align/ { 
@@ -122,8 +132,8 @@ rm "$tmpfile"      # remove the file when the script exits
 
 cat "$post_outfile" >&3  # write the output file to a temp file
 
-# the_date='2021-01-27'
-the_date=$(date +'%F')
+the_date='2021-02-15'
+# the_date=$(date +'%F')
 
 # Write the preamble to the post_outfile
 cat > "$post_outfile" << EOF
@@ -131,8 +141,8 @@ cat > "$post_outfile" << EOF
 layout: post
 title:  "$the_title"
 date:   "$(date +'%F %T %z')"
-categories: statistics
-tags: statistics hypothesis-testing python
+categories: $categories
+tags: $tags
 reading_time: $reading_time
 ---
 
@@ -142,6 +152,8 @@ reading_time: $reading_time
 \newcommand{\coloneqq}{\mathrel{\vcenter{:}}=}
 \newcommand{\ceil}[1]{\left\lceil #1 \right\rceil}
 \newcommand{\floor}[1]{\left\lfloor #1 \right\rfloor}
+\newcommand{\indep}{\perp \hspace{-18mu} \perp}
+\newcommand{\nindep}{\not \hspace{-13mu} \indep}
 \end{align*}
 \$\$
 </div>

@@ -78,7 +78,7 @@ s/\\intertext\{(.+)\}$/\\end{align}$$ \1 $$\\begin{align}/
 # remove spaces before footnotes
 /\[\^[0-9]+\]/ s/\. (\[\^[0-9]+\])/.\1/g
 # Update figure references to make link encompass `Figure X`
-/(Figure|Proposition|Theorem|Lemma)[[:blank:]]<a/ {
+/(Figure|Proposition|Theorem|Lemma|Table)[[:blank:]]<a/ {
     s//<a/g;
     s@>([0-9]+)<@>Figure \1<@g
 }
